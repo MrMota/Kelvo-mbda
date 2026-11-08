@@ -60,8 +60,8 @@ Custom Python components (code editor),components,skip,yes,skip,security: arbitr
 Hosted cloud / enterprise SSO,platform,skip,yes,skip,original's business; not functionality
 100+ third-party bundles,components,skip,yes,skip,partner integrations; Ollama-only by request
 Langflow Store / community templates,platform,skip,yes,skip,the network and its users
-Offline-first: no startup network calls + startup budget + multi-arch images,fixes,must,no,no,X1 - H1 install/startup (9 issues 27 votes) + M8 arm64 (13 votes)
-Ollama model capability badges + tool-support warning + Ollama API key (cloud),fixes,must,no,no,X2 - H2 Ollama bugs (6 issues 16 votes)
+Offline-first: no startup network calls + startup budget + multi-arch images,fixes,must,no,yes,X1 - H1 install/startup (9 issues 27 votes) + M8 arm64 (13 votes); built: tests prove no network at startup + <3 s cold start (0.36 s measured); image bases are multi-arch and build natively on your machine (no public images: personal tool)
+Ollama model capability badges + tool-support warning + Ollama API key (cloud),fixes,must,no,yes,"X2 - H2 Ollama bugs (6 issues 16 votes); built: capability tags from /api/show (cached), Agent warning, write-only Ollama API key"
 Real HTTP status codes for model-server errors in run API,fixes,should,no,no,X3 - H4 #11534 (7 votes)
 Import skills from URL / GitHub folder / zip; export all skills,fixes,should,no,no,X4 - M5 #11547 skills (21 votes)
 Headless runner (mbdaflow exec) + export flow as Python script,fixes,should,no,no,X5 - M4 export code (3 issues 37 votes)

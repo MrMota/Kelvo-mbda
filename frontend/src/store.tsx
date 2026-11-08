@@ -2,7 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useState, type React
 import { api } from "./api";
 import type { ComponentSpec, Registry, Skill } from "./types";
 
-type Model = { name: string; parameter_size?: string; family?: string };
+type Model = { name: string; parameter_size?: string; family?: string; capabilities?: string[] | null };
 type Store = {
   registry: Registry | null;
   spec: (key: string) => ComponentSpec | undefined;
@@ -11,7 +11,7 @@ type Store = {
   refreshModels: () => Promise<void>;
   skills: Skill[];
   refreshSkills: () => Promise<void>;
-  settings: { ollama_base_url: string; default_model: string; default_embed_model: string };
+  settings: { ollama_base_url: string; default_model: string; default_embed_model: string; has_ollama_api_key?: boolean };
   refreshSettings: () => Promise<void>;
 };
 const Ctx = createContext<Store>(null as unknown as Store);

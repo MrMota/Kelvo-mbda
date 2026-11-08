@@ -10,6 +10,7 @@ function Models() {
   const { models, modelsError, refreshModels, settings, refreshSettings } = useStore();
   const [url, setUrl] = useState(settings.ollama_base_url);
   const [def, setDef] = useState(settings.default_model);
+  const [apiKey, setApiKey] = useState("");
   const [pullName, setPullName] = useState("");
   const [pull, setPull] = useState<{ status: string; pct: number } | null>(null);
   const toast = useToast();
@@ -54,6 +55,16 @@ function Models() {
           <button className="icon-btn sm" onClick={refreshModels} aria-label="Refresh"><RefreshCw size={13} /></button>
         </div>
         <label className="field">
+          <span className="label">API key (optional)</span>
+          <div className="row">
+            <input className="input" type="password" value={apiKey} onChange={(e) => setApiKey(e.target.value)} style={{ maxWidth: 420 }}
+              placeholder={settings.has_ollama_api_key ? "Saved. Type a new one to replace it" : "Only for ollama.com or an Ollama behind a login"} autoComplete="off" />
+            <button className="btn" disabled={!apiKey} onClick={async () => { await api("/api/settings", { method: "PUT", body: { ollama_api_key: apiKey } }); setApiKey(""); await refreshSettings(); await refreshModels(); toast("API key saved"); }}>Save</button>
+            {settings.has_ollama_api_key && <button className="btn ghost" onClick={async () => { await api("/api/settings", { method: "PUT", body: { ollama_api_key: "" } }); await refreshSettings(); await refreshModels(); toast("API key removed"); }}>Remove</button>}
+          </div>
+          <span className="help">Sent as a Bearer token to your Ollama URL. Stored on this server, never shown again.</span>
+        </label>
+        <label className="field">
           <span className="label">Default model</span>
           <div className="row">
             <select className="select" value={def} onChange={(e) => setDef(e.target.value)} style={{ maxWidth: 420 }}>
@@ -63,7 +74,7 @@ function Models() {
             </select>
             <button className="btn" onClick={save} disabled={def === settings.default_model}>Save</button>
           </div>
-          <span className="help">Used by every Ollama and Agent component whose model is left blank, including all templates. For agents, pick a tool-capable model.</span>
+          <span className="help">Used by every Ollama and Agent component whose model is left blank, including all templates. For agents, pick a model marked “tools”.</span>
         </label>
       </div>
       <div className="panel">
@@ -79,8 +90,9 @@ function Models() {
       <div className="panel">
         <h2>Installed models</h2>
         {models.length === 0 ? <span className="muted">No models found.</span> : (
-          <table className="table"><thead><tr><th>Model</th><th>Family</th><th>Size</th></tr></thead>
-            <tbody>{models.map((m: any) => <tr key={m.name}><td className="mono">{m.name}</td><td>{m.family ?? ""}</td><td>{m.parameter_size ?? ""}</td></tr>)}</tbody></table>
+          <table className="table"><thead><tr><th>Model</th><th>Size</th><th>Can do</th></tr></thead>
+            <tbody>{models.map((m: any) => <tr key={m.name}><td className="mono">{m.name}</td><td>{m.parameter_size ?? ""}</td>
+              <td>{m.capabilities ? m.capabilities.filter((c: string) => c !== "completion").map((c: string) => <span key={c} className={`badge ${c === "tools" ? "accent" : ""}`} style={{ marginRight: 4 }}>{c}</span>) : <span className="faint">unknown</span>}</td></tr>)}</tbody></table>
         )}
       </div>
     </div>

@@ -109,14 +109,15 @@ def components() -> dict[str, Any]:
 @app.get("/api/settings")
 def get_settings() -> dict[str, Any]:
     return {"ollama_base_url": db.ollama_base_url(), "default_model": db.get_setting("default_model", "") or "",
-            "default_embed_model": db.get_setting("default_embed_model", "nomic-embed-text")}
+            "default_embed_model": db.get_setting("default_embed_model", "nomic-embed-text"),
+            "has_ollama_api_key": bool(db.get_setting("ollama_api_key"))}
 
 
 @app.put("/api/settings")
 def put_settings(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
-    for k in ("ollama_base_url", "default_model", "default_embed_model"):
+    for k in ("ollama_base_url", "default_model", "default_embed_model", "ollama_api_key"):
         if k in body and body[k] is not None:
-            db.set_setting(k, str(body[k]).strip())
+            db.set_setting(k, str(body[k]).strip())  # ollama_api_key is write-only: never returned
     return get_settings()
 
 
@@ -127,10 +128,12 @@ async def ollama_models(base_url: str | None = None) -> dict[str, Any]:
         models = await ollama.list_models(base)
     except Exception as e:
         raise HTTPException(502, str(e) if isinstance(e, ollama.OllamaError) else f"Can't reach Ollama at {base}. Start it with `ollama serve`, or fix the URL in Settings → Models.")
+    caps = await asyncio.gather(*[ollama.capabilities(base, m["name"], m.get("digest") or m.get("modified_at") or "") for m in models])
     return {"url": base, "models": [
         {"name": m["name"], "size": m.get("size"), "family": (m.get("details") or {}).get("family"),
-         "parameter_size": (m.get("details") or {}).get("parameter_size"), "modified_at": m.get("modified_at")}
-        for m in models]}
+         "parameter_size": (m.get("details") or {}).get("parameter_size"), "modified_at": m.get("modified_at"),
+         "capabilities": c}
+        for m, c in zip(models, caps)]}
 
 
 @app.post("/api/ollama/pull")

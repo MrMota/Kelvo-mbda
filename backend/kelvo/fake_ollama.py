@@ -18,7 +18,19 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, StreamingResponse
 
 app = FastAPI()
-MODELS = ["llama3.1:8b", "qwen2.5:7b", "nomic-embed-text:latest"]
+MODELS = ["llama3.1:8b", "qwen2.5:7b", "gemma2:2b", "nomic-embed-text:latest"]
+CAPS = {"llama3.1:8b": ["completion", "tools"], "qwen2.5:7b": ["completion", "tools"],
+        "gemma2:2b": ["completion"], "nomic-embed-text:latest": ["embedding"]}
+SEEN_AUTH: list[str] = []
+
+
+@app.post("/api/show")
+async def show(req: Request):
+    body = await req.json()
+    SEEN_AUTH.append(req.headers.get("authorization", ""))
+    if body["model"] not in CAPS:
+        return JSONResponse({"error": "model not found"}, status_code=404)
+    return {"details": {}, "capabilities": CAPS[body["model"]]}
 
 
 @app.get("/api/tags")
@@ -43,6 +55,8 @@ async def embed(req: Request):
 @app.post("/api/chat")
 async def chat(req: Request):
     body = await req.json()
+    if "tools" in body and body.get("tools") and "tools" not in CAPS.get(body["model"], ["tools"]):
+        return JSONResponse({"error": f"registry.ollama.ai/library/{body['model']} does not support tools"}, status_code=400)
     if body["model"] not in MODELS and body["model"].split(":")[0] not in [m.split(":")[0] for m in MODELS]:
         return JSONResponse({"error": f"model '{body['model']}' not found"}, status_code=404)
     msgs = body["messages"]

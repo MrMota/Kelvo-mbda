@@ -78,3 +78,32 @@ def test_api_key_routes_unchanged(client):
     client.post("/api/auth/logout")
     assert client.post(f"/api/v1/run/{f['id']}", headers={"x-api-key": key}, json={"input_value": "hi"}).status_code == 200
     assert client.post("/mcp", headers={"x-api-key": key}, json={"jsonrpc": "2.0", "id": 1, "method": "ping"}).status_code == 200
+
+
+def test_proxy_origins(client, monkeypatch):
+    # behind a proxy that rewrites Host, the forwarded host still counts as same-site
+    r = client.post("/api/flows", json={"name": "p"}, headers={"Origin": "https://box.tail.ts.net", "X-Forwarded-Host": "box.tail.ts.net"})
+    assert r.status_code == 200
+    assert client.post("/api/flows", json={"name": "p"}, headers={"Origin": "https://box.tail.ts.net"}).status_code == 403
+    monkeypatch.setenv("KELVO_ALLOWED_ORIGINS", "https://box.tail.ts.net")
+    assert client.post("/api/flows", json={"name": "p"}, headers={"Origin": "https://box.tail.ts.net/"}).status_code == 200
+
+
+def test_backup_command(client, tmp_path, monkeypatch, capsys):
+    import sqlite3
+
+    from kelvo.cli import backup
+    from kelvo import db
+
+    client.post("/api/flows", json={"name": "keep me"})
+    backup(None, keep=2)
+    backup(None, keep=2)
+    import time; time.sleep(1.1)
+    backup(None, keep=2)
+    folder = tmp_path / "backups"
+    files = sorted(folder.glob("kelvo-*.db"))
+    assert len(files) == 2  # rotation kept the newest two
+    names = [r[0] for r in sqlite3.connect(files[-1]).execute("SELECT name FROM flows")]
+    assert "keep me" in names
+    out = backup(str(tmp_path / "one.db"), keep=0)
+    assert (tmp_path / "one.db").exists() and "integrity ok" in capsys.readouterr().out

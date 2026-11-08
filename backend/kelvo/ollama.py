@@ -14,6 +14,34 @@ class OllamaError(RuntimeError):
     pass
 
 
+def _client(timeout: float | None) -> httpx.AsyncClient:
+    """httpx client with the optional Ollama API key (Settings → Models) as a Bearer token."""
+    from . import db  # local import: db has no dependency on this module
+
+    key = db.get_setting("ollama_api_key") or os.environ.get("OLLAMA_API_KEY") or ""
+    return httpx.AsyncClient(timeout=timeout, headers={"Authorization": f"Bearer {key}"} if key else None)
+
+
+_caps_cache: dict[tuple[str, str, str], list[str] | None] = {}
+
+
+async def capabilities(base_url: str, model: str, version: str = "") -> list[str] | None:
+    """What a model can do, from /api/show (Ollama ≥ 0.6 reports e.g. completion, tools,
+    vision, embedding). None if this Ollama doesn't say. Cached per model version, so a
+    model list is one /api/show per model, once."""
+    key = (base_url, model, version)
+    if key in _caps_cache:
+        return _caps_cache[key]
+    try:
+        async with _client(10) as client:
+            r = await client.post(f"{base_url}/api/show", json={"model": model})
+        caps = r.json().get("capabilities") if r.status_code == 200 else None
+    except (httpx.HTTPError, ValueError):
+        return None  # don't cache transient failures
+    _caps_cache[key] = caps if isinstance(caps, list) else None
+    return _caps_cache[key]
+
+
 def _err(resp: httpx.Response, body: bytes) -> OllamaError:
     try:
         msg = json.loads(body).get("error", body.decode())
@@ -27,7 +55,7 @@ def _err(resp: httpx.Response, body: bytes) -> OllamaError:
 
 
 async def list_models(base_url: str) -> list[dict[str, Any]]:
-    async with httpx.AsyncClient(timeout=10) as client:
+    async with _client(10) as client:
         r = await client.get(f"{base_url}/api/tags")
         if r.status_code != 200:
             raise _err(r, r.content)
@@ -55,7 +83,7 @@ async def chat_stream(
     if keep_alive:
         payload["keep_alive"] = keep_alive
     try:
-        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        async with _client(TIMEOUT) as client:
             async with client.stream("POST", f"{base_url}/api/chat", json=payload) as r:
                 if r.status_code != 200:
                     raise _err(r, await r.aread())
@@ -82,7 +110,7 @@ async def chat(base_url: str, model: str, messages: list[dict[str, Any]], **kw: 
 
 async def embed(base_url: str, model: str, texts: list[str]) -> list[list[float]]:
     try:
-        async with httpx.AsyncClient(timeout=TIMEOUT) as client:
+        async with _client(TIMEOUT) as client:
             r = await client.post(f"{base_url}/api/embed", json={"model": model, "input": texts})
             if r.status_code != 200:
                 raise _err(r, r.content)
@@ -92,7 +120,7 @@ async def embed(base_url: str, model: str, texts: list[str]) -> list[list[float]
 
 
 async def pull(base_url: str, model: str) -> AsyncIterator[dict[str, Any]]:
-    async with httpx.AsyncClient(timeout=None) as client:
+    async with _client(None) as client:
         async with client.stream("POST", f"{base_url}/api/pull", json={"model": model, "stream": True}) as r:
             if r.status_code != 200:
                 raise _err(r, await r.aread())

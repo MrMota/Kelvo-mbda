@@ -95,7 +95,7 @@ function Inspector({ node, onClose, onDelete, onDuplicate }: { node: Node; onClo
   const renderField = (f: (typeof fields)[number]) => (
     <label className="field" key={f.name}>
       <span className="label">{f.display}{f.required && <span style={{ color: "var(--danger)" }}>*</span>}</span>
-      <FieldInput field={f} value={d.params?.[f.name]} onChange={(v) => updateParams(node.id, { [f.name]: v })} disabled={locked} />
+      <FieldInput field={f} value={d.params?.[f.name]} onChange={(v) => updateParams(node.id, { [f.name]: v })} disabled={locked} nodeType={d.type} />
       {f.info && <span className="help">{f.info}</span>}
     </label>
   );

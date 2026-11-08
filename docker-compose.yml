@@ -1,24 +1,35 @@
-# Kelvo + Ollama. GPU users: uncomment the deploy block.
+# Kelvo + Ollama on one machine, for one person.
+#   cp .env.example .env   # then edit it
+#   docker compose up -d --build
+#   docker compose exec ollama ollama pull qwen3:8b
 services:
   ollama:
     image: ollama/ollama:latest
+    restart: unless-stopped
     volumes: [ollama:/root/.ollama]
-    ports: ["11434:11434"]
+    # Not published: Ollama has no login, so only Kelvo (inside this Compose network) talks to it.
+    # To use it from this machine too, publish it on loopback only:
+    # ports: ["127.0.0.1:11434:11434"]
+    # NVIDIA GPU: uncomment (needs the NVIDIA Container Toolkit).
     # deploy:
     #   resources:
     #     reservations:
     #       devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+
   kelvo:
     build: .
+    restart: unless-stopped
     depends_on: [ollama]
     environment:
       OLLAMA_BASE_URL: http://ollama:11434
-      # Your account, created on first start. Put these in a .env file next to this one.
-      # Leave them unset to use the one-time setup token from `docker compose logs kelvo`.
       KELVO_USERNAME: ${KELVO_USERNAME:-}
       KELVO_PASSWORD: ${KELVO_PASSWORD:-}
+      KELVO_SECURE_COOKIE: ${KELVO_SECURE_COOKIE:-0}
+      KELVO_ALLOWED_ORIGINS: ${KELVO_ALLOWED_ORIGINS:-}
     volumes: [kelvo:/data]
-    ports: ["7860:7860"]
+    # 127.0.0.1 = this machine only (default). See .env.example for other devices.
+    ports: ["${KELVO_BIND:-127.0.0.1}:${KELVO_PORT:-7860}:7860"]
+
 volumes:
   ollama:
   kelvo:

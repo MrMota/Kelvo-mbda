@@ -11,3 +11,5 @@ backend/kelvo/static/
 test-results/
 playwright-report/
 *.tsbuildinfo
+.env
+backups/

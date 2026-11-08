@@ -93,7 +93,7 @@ export const ComponentNode = memo(function ComponentNode({ id, data, selected }:
                 {showEditor && f.type === "skills" ? (
                   <SkillsSummary value={params[f.name]} />
                 ) : showEditor && (
-                  <FieldInput field={f} value={params[f.name]} compact disabled={ed.locked}
+                  <FieldInput field={f} value={params[f.name]} compact disabled={ed.locked} nodeType={d.type}
                     onChange={(v) => ed.updateParams(id, { [f.name]: v })} />
                 )}
               </div>

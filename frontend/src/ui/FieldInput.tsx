@@ -5,29 +5,43 @@ import { useStore } from "../store";
 import type { Flow, FieldSpec } from "../types";
 import { Toggle } from "./kit";
 
-type Props = { field: FieldSpec; value: unknown; onChange: (v: unknown) => void; compact?: boolean; disabled?: boolean };
+type Props = { field: FieldSpec; value: unknown; onChange: (v: unknown) => void; compact?: boolean; disabled?: boolean; nodeType?: string };
 
 let flowsCache: Promise<Flow[]> | null = null;
 
-function ModelSelect({ value, onChange, embed, disabled }: { value: string; onChange: (v: string) => void; embed?: boolean; disabled?: boolean }) {
+const TAGS: Record<string, string> = { tools: "tools", vision: "vision", embedding: "embed", thinking: "thinks" };
+const tagLine = (caps?: string[] | null) => (caps ?? []).filter((c) => TAGS[c]).map((c) => TAGS[c]).join(", ");
+
+function ModelSelect({ value, onChange, embed, disabled, needsTools }: { value: string; onChange: (v: string) => void; embed?: boolean; disabled?: boolean; needsTools?: boolean }) {
   const { models, modelsError, refreshModels, settings } = useStore();
   const [busy, setBusy] = useState(false);
-  const isEmbed = (n: string) => /embed|minilm|bge|e5-|gte|arctic-embed/i.test(n);
+  const isEmbed = (n: string) => {
+    const caps = models.find((m) => m.name === n)?.capabilities;
+    return caps ? caps.includes("embedding") && !caps.includes("completion") : /embed|minilm|bge|e5-|gte|arctic-embed/i.test(n);
+  };
+  const effective = value || settings.default_model;
+  const chosen = models.find((m) => m.name === effective || m.name === `${effective}:latest`);
+  const noTools = needsTools && chosen?.capabilities && !chosen.capabilities.includes("tools");
   const list = models.filter((m) => (embed ? true : !isEmbed(m.name)));
   const sorted = embed ? [...list].sort((a, b) => Number(isEmbed(b.name)) - Number(isEmbed(a.name))) : list;
   const known = !value || models.some((m) => m.name === value || m.name === `${value}:latest`);
   return (
-    <div className="row" style={{ gap: 4 }}>
-      <select className="select nodrag" value={value} disabled={disabled} onChange={(e) => onChange(e.target.value)}
+    <div className="row" style={{ gap: 4, flexWrap: "wrap" }}>
+      <select className="select nodrag" value={value} style={{ flex: 1, minWidth: 0 }} disabled={disabled} onChange={(e) => onChange(e.target.value)}
         title={modelsError ?? undefined} aria-label="Model">
         {!embed && <option value="">{settings.default_model ? `Default (${settings.default_model})` : "Choose a model…"}</option>}
         {!known && <option value={value}>{value} (not pulled)</option>}
-        {sorted.map((m) => <option key={m.name} value={m.name}>{m.name}{m.parameter_size ? ` · ${m.parameter_size}` : ""}</option>)}
+        {sorted.map((m) => <option key={m.name} value={m.name}>{m.name}{m.parameter_size ? ` · ${m.parameter_size}` : ""}{tagLine(m.capabilities) ? ` · ${tagLine(m.capabilities)}` : ""}</option>)}
       </select>
       <button className="icon-btn sm nodrag" aria-label="Refresh models" title={modelsError ?? "Refresh models"} disabled={busy}
         onClick={async () => { setBusy(true); await refreshModels(); setBusy(false); }}>
         <RefreshCw size={13} className={busy ? "spin" : ""} />
       </button>
+      {noTools && (
+        <span className="error-text" role="alert" style={{ flexBasis: "100%", fontSize: 12 }}>
+          {chosen!.name} can't call tools, so this agent can't use any. Pick a model marked “tools”.
+        </span>
+      )}
     </div>
   );
 }
@@ -67,7 +81,7 @@ function SkillsMulti({ value, onChange, disabled }: { value: string[]; onChange:
   );
 }
 
-export function FieldInput({ field, value, onChange, compact, disabled }: Props) {
+export function FieldInput({ field, value, onChange, compact, disabled, nodeType }: Props) {
   const { skills } = useStore();
   const v = value ?? field.default ?? "";
   const cls = "nodrag nowheel";
@@ -88,7 +102,7 @@ export function FieldInput({ field, value, onChange, compact, disabled }: Props)
         </select>
       );
     case "model":
-      return <ModelSelect value={v as string} onChange={onChange} disabled={disabled} />;
+      return <ModelSelect value={v as string} onChange={onChange} disabled={disabled} needsTools={nodeType === "Agent"} />;
     case "embed_model":
       return <ModelSelect value={v as string} onChange={onChange} embed disabled={disabled} />;
     case "flow":

@@ -1,0 +1,9 @@
+# Nightly backup for the systemd install. Pair with kelvo-backup.timer.
+[Unit]
+Description=Back up the Kelvo database
+
+[Service]
+Type=oneshot
+User=YOUR_USER
+Environment=KELVO_DB=/home/YOUR_USER/.kelvo/kelvo.db
+ExecStart=/home/YOUR_USER/kelvo/.venv/bin/kelvo backup --keep 14

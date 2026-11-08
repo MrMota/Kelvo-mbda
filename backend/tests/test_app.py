@@ -238,3 +238,73 @@ def test_flow_crud(client):
     assert client.post("/api/flows", json={"data": {"nodes": [{"id": "x", "data": {"type": "Nope"}}], "edges": []}}).status_code == 422
     client.delete(f"/api/flows/{d['id']}")
     assert len(client.get("/api/flows").json()) == 1
+
+
+def test_model_capabilities_and_api_key(client):
+    from kelvo.fake_ollama import SEEN_AUTH
+    models = {m["name"]: m["capabilities"] for m in client.get("/api/ollama/models").json()["models"]}
+    assert models["llama3.1:8b"] == ["completion", "tools"] and models["gemma2:2b"] == ["completion"]
+    # API key: write-only, sent as a Bearer token
+    client.put("/api/settings", json={"ollama_api_key": "sk-test"})
+    s = client.get("/api/settings").json()
+    assert s["has_ollama_api_key"] is True and "sk-test" not in str(s)
+    from kelvo import ollama
+    ollama._caps_cache.clear()
+    client.get("/api/ollama/models")
+    assert SEEN_AUTH[-1] == "Bearer sk-test"
+
+
+def test_agent_on_model_without_tools_explains(client):
+    f = client.post("/api/flows", json={"template": "simple-agent"}).json()
+    data = f["data"]
+    for n in data["nodes"]:
+        if n["data"].get("type") == "Agent":
+            n["data"]["params"]["model"] = "gemma2:2b"
+    evs = build(client, f["id"], "hi", data=data)
+    assert evs[-1]["event"] == "error" and "can't call tools" in evs[-1]["data"]["error"]
+
+
+def test_startup_makes_no_network_calls(tmp_path, monkeypatch):
+    """X1: booting Kelvo must not touch the network (air-gapped servers start instantly)."""
+    import socket
+
+    calls = []
+    real = socket.socket.connect
+
+    def spy(self, addr):
+        calls.append(addr)
+        return real(self, addr)
+
+    monkeypatch.setattr(socket.socket, "connect", spy)
+    monkeypatch.setenv("KELVO_DB", str(tmp_path / "boot.db"))
+    from fastapi.testclient import TestClient
+
+    from kelvo.main import app
+
+    with TestClient(app):
+        pass
+    assert calls == []
+
+
+def test_startup_time_budget(tmp_path):
+    """X1: a cold start (fresh database) answers in under 3 s."""
+    import os, socket, subprocess, sys, time, urllib.request
+
+    s = socket.socket(); s.bind(("127.0.0.1", 0)); port = s.getsockname()[1]; s.close()
+    env = {**os.environ, "KELVO_DB": str(tmp_path / "cold.db")}
+    t0 = time.perf_counter()
+    p = subprocess.Popen([sys.executable, "-m", "kelvo.cli", "run", "--port", str(port)], env=env,
+                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        while True:
+            try:
+                urllib.request.urlopen(f"http://127.0.0.1:{port}/api/auth/status", timeout=0.5)
+                break
+            except OSError:
+                if time.perf_counter() - t0 > 10:
+                    raise AssertionError("did not start within 10 s")
+                time.sleep(0.05)
+        assert time.perf_counter() - t0 < 3.0
+    finally:
+        p.terminate()
+        p.wait(5)

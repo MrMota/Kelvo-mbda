@@ -68,6 +68,15 @@ await step("F01 memory: second message shows history", async () => {
   await page.locator(".msg-text", { hasText: "[history=2]" }).waitFor({ timeout: 15000 });
 });
 
+await step("X2 agent warns when its model can't call tools", async () => {
+  const sel = page.locator('.react-flow__node[data-id="agent"] select[aria-label="Model"]');
+  await sel.selectOption("gemma2:2b");
+  await page.getByText("gemma2:2b can't call tools").waitFor();
+  await sel.selectOption("");
+  if (await page.getByText("can't call tools").count()) throw new Error("warning stayed after picking a tools model");
+  if (!(await sel.locator('option[value="llama3.1:8b"]').textContent()).includes("tools")) throw new Error("no tools tag in picker");
+});
+
 await step("F02 build from scratch with drag and drop + connect", async () => {
   await page.goto(BASE);
   await page.getByRole("button", { name: "New Flow" }).first().click();
@@ -145,7 +154,7 @@ await step("F05 settings: create API key and see share snippets", async () => {
   await page.getByText("Copy it now").waitFor();
   await page.getByRole("button", { name: "Done" }).click();
   await page.goto(`${BASE}/settings/models`);
-  await page.getByText("Connected · 3 models").waitFor();
+  await page.getByText("Connected · 4 models").waitFor();
   await shot(page, "10-settings");
   await page.goto(BASE);
   await page.locator(".card", { hasText: "Simple Agent" }).first().click();

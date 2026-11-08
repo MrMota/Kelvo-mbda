@@ -1,0 +1,26 @@
+# Run Kelvo without Docker, as your own user, started at boot.
+#   1. git clone the repo to ~/kelvo, then: make install && make build
+#   2. Edit User=, WorkingDirectory= and the paths below, then:
+#        sudo cp deploy/kelvo.service /etc/systemd/system/
+#        sudo systemctl daemon-reload && sudo systemctl enable --now kelvo
+#   3. First start without an account prints a setup token: journalctl -u kelvo
+[Unit]
+Description=Kelvo agent builder
+After=network-online.target ollama.service
+Wants=network-online.target
+
+[Service]
+User=YOUR_USER
+WorkingDirectory=/home/YOUR_USER/kelvo
+Environment=KELVO_DB=/home/YOUR_USER/.kelvo/kelvo.db
+Environment=OLLAMA_BASE_URL=http://127.0.0.1:11434
+# 127.0.0.1 = this machine only. Use your Tailscale IP to reach it from your devices.
+ExecStart=/home/YOUR_USER/kelvo/.venv/bin/kelvo run --host 127.0.0.1 --port 7860
+Restart=on-failure
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ReadWritePaths=/home/YOUR_USER/.kelvo
+
+[Install]
+WantedBy=multi-user.target

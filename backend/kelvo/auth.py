@@ -226,6 +226,17 @@ def change_password(request: Request, response: Response, body: dict = Body(...)
 
 # ---------------------------------------------------------------- middleware
 
+def _same_site(origin: str, request: Request) -> bool:
+    """Origin must be this server: its Host, the Host a reverse proxy saw (X-Forwarded-Host),
+    or an origin listed in KELVO_ALLOWED_ORIGINS (comma-separated, e.g. https://box.tailnet.ts.net).
+    Browsers can't forge Origin, and can't add X-Forwarded-Host cross-site without a CORS
+    preflight, which Kelvo refuses for foreign origins."""
+    netloc = urlparse(origin).netloc
+    hosts = {request.headers.get("host"), request.headers.get("x-forwarded-host")}
+    allowed = {o.strip().rstrip("/") for o in os.environ.get("KELVO_ALLOWED_ORIGINS", "").split(",") if o.strip()}
+    return netloc in hosts or origin.rstrip("/") in allowed
+
+
 class AuthMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         path = request.url.path
@@ -235,7 +246,7 @@ class AuthMiddleware(BaseHTTPMiddleware):
             return await call_next(request)  # API key checked by the route
         if request.method not in ("GET", "HEAD", "OPTIONS"):
             origin = request.headers.get("origin")
-            if origin and urlparse(origin).netloc != request.headers.get("host"):
+            if origin and not _same_site(origin, request):
                 return JSONResponse({"detail": "Cross-site request refused."}, status_code=403)
         if path.startswith("/api/auth/") or path in PUBLIC_EXACT:
             return await call_next(request)

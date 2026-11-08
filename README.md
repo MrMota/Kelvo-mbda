@@ -21,6 +21,8 @@ ollama pull qwen3:8b            # or llama3.1:8b — agents need a tool-capable 
 ollama pull nomic-embed-text    # for the Document Q&A template
 ```
 
+Running it on your own server (private access, backups, updates): see **`replica/deploy.md`**.
+
 Then either **Docker** (bundles Ollama too):
 
 ```bash
