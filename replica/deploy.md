@@ -141,7 +141,9 @@ Kelvo stays bound to `127.0.0.1`; Tailscale's `serve` puts HTTPS in front of it 
    - **iPhone (Safari):** Share → **Add to Home Screen**.
    - **Android (Chrome):** ⋮ → **Install app** (or Add to Home screen).
 
-   It opens full-screen like an app, with the Kelvo icon.
+   It opens full-screen like an app, with the Kelvo icon. On Android, Chrome installs it as a real app (a WebAPK): it appears in the app drawer and the app switcher. Chrome reports Kelvo installable with no errors (checked 2026-11-08).
+
+   **If Chrome only offers "Add to Home screen" (a plain shortcut) instead of "Install app":** you're probably on the `http://100.x.y.z:7860` address. Installing needs HTTPS, so open the `https://….ts.net` address instead. Already installed and Kelvo's address changed? Uninstall the app and install it again from the new address. Updates to Kelvo itself need nothing: the app always loads the current version from your server.
 
 Use the same `https://….ts.net` address on your computer too: with `KELVO_SECURE_COOKIE=1` the sign-in cookie only travels over HTTPS.
 
