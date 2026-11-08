@@ -1,0 +1,2789 @@
+source,url,date,rating,votes,text
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/1864,2024-05-08,,66,"[Feature Request] Collaborative/Access Control enhancement
+
+As discussed in issues #1735 and #1725, enhancing the collaborative capabilities of LangFlow can significantly improve user experience, particularly in team-based environments. This feature request outlines proposed improvements in authentication/role management, cross-account flow sharing, asynchronous updates, and flow version management.
+
+## Proposed Enhancements:
+
+1. **Improved Authentication and Role Management:**
+- Objective: Implement a more robust authentication system to support va…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/2855,2024-07-20,,59,"Single Sign On (SSO) support with OIDC or OAuth2
+
+### Feature Request
+
+For some of our workloads we cannot use the hosted cloud solution from Langflow/DataStax and cannot get security approval for a self hosted solution without Single Sign On (SSO).
+
+### Motivation
+
+- Passwords leak and is a major security issue
+- Users forget them
+- With SSO, we would not need ""wait for admin approval"" since the OAuth flow would take care of that
+
+### Your Contribution
+
+Happy to contribute, just not as the lead."
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/1738,2024-04-17,,28,"[Feature Request] Langflow Graph: Integrate Direct Management Tools to Replace LangGraph with Equivalent Functionalities
+
+## Reasons for Suggestion
+By integrating direct management tools such as LLama Index and other utilities within Langflow, it is possible to achieve the same outcomes as using LangGraph, potentially rendering the latter redundant. This integration would streamline processes and consolidate functionalities within a single platform, enhancing efficiency and user experience.
+
+## Content of the Proposal
+Propose the development of an integrated system within Langflow that mimics the functionalitie…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11547,2026-02-03,,21,"Extend to support skills integratoin
+
+### Feature Request
+
+Hope Langflow can extend to support for external Skills integration, such as https://skills.sh/vercel-labs/skills/find-skills.
+
+### Motivation
+
+In order to make best use of existing flow, best practice, scripts and prompts, Langflow support integrating external skills is meaningful.
+
+### Your Contribution
+
+_No response_"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3794,2024-09-12,,19,"Knowledge Graph Integration for LangFlow
+
+### Feature Request
+
+#### Feature Description:
+The integration of **Neo4j** into LangFlow will bring support for powerful knowledge graph database retrieval capabilities, extending LangFlow's versatility in handling diverse data storage solutions. Neo4j, Nebula Graph, and FalcorDB are leading Knowledge Graph Databases, that can serve as both a vector database and a knowledge graph using Cypher queries. This feature will mirror existing integrations like Redis and Pinecone, empowering users to…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/6867,2025-02-27,,19,"Human-in-the-loop (HITL) Support
+
+### Feature Request
+
+I know that currenly is in the development roadmap, but I haven't found any issue about this topic. 
+
+So, I would like to ask for human-in-the-loop (HITL) support  in Langflow's. Currently, most of the agent framework have HITL support. This feature would allow human operators to intervene at critical decision points, review outputs before they're passed to subsequent agents, and provide feedback.
+
+In my opinion, ideally the feature should support the following aspects:
+**- …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/1520,2024-03-13,,15,"open webui integration
+
+https://github.com/open-webui/open-webui
+
+The open-webui project on the provided GitHub repository is currently developing a web UI that allows direct chatting with ollama. This project is configured to connect with ollama for direct communication. The suggestion is to integrate the langflow endpoint into this project as well. Although langflow is also experimenting with an embed project, it seems there is more demand for the direction this particular project is taking."
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8634,2025-06-19,,14,"Workflow Version History
+
+### Feature Request
+
+I’d like to propose a versioning feature for LangFlow workflows, similar to what [Dify](https://github.com/langgenius/dify) currently offers. The goal is to enable users to view, name, and restore previous versions of a workflow, including metadata such as timestamp, author, and optional description.
+
+This would bring better transparency and control to the agent and workflow-building process.
+
+![Image](https://github.com/user-attachments/assets/7b502cfb-c87e-4d82-aa24-5f87f0…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/1976,2024-05-26,,13,"Request for ARM64 Support in LangFlow Docker Images
+
+Thanks for creating such a nice project!
+
+I want to host langflow using docker image on ARM64 device (raspberry pi) but it seems that support only and64.
+Is there any plans to add support for ARM64 architecture in Docker images?"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8412,2025-06-07,,13,"any plan for MCP Server to support Streamable HTTP transport protocol?
+
+### Feature Request
+
+The sse transport is deprecated and has been replaced by streamable-http
+
+### Motivation
+
+The sse transport is deprecated and has been replaced by streamable-http
+
+### Your Contribution
+
+_No response_"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5530,2025-01-03,,13,"Downloading or exporting langflow into standalone python code
+
+### Feature Request
+
+Allow users to download and export workflows into standalone python code for greater flexibility and customizable use cases.
+
+
+### Motivation
+
+To the best of my knowledge langflow allows you to export workflows into python api format and python code.
+In both cases the exported workflow is extremely condensed without allowing the user to have a better understanding of the underlying processes and components.
+
+In certain situations the user might like to have more fl…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5849,2025-01-21,,12,"Add support for deepseek model
+
+### Feature Request
+
+Add compatibility for deepseek v3 to langflow 
+
+### Motivation
+
+Having access to more models
+
+### Your Contribution
+
+_No response_"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3081,2024-07-30,,11,"Implement LangfuseTracer
+
+### Feature Request
+
+We should clean up langfuse related code and add a LangfuseTracer implementation. 
+
+We need to check their data structure to make sure Langflow data is displayed correctly. 
+
+
+### Motivation
+
+Langfuse is a popular tracing and observability tool.
+
+### Your Contribution
+
+Steps:
+1. Implement LangfuseTracer based off of BaseTracer (similar to LangsmithTracer or LangwatchTracer)
+2. Make sure all data types are displayed as best as possible
+3. Make sure imports are…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/6142,2025-02-05,,11,"Disable Signing Up from the UI (`/signup`)
+
+### Feature Request
+
+Right now (as far as I can tell/find in the documentation), there's no way to disable signing up via the ""normal"" UI (not talking about creating users via `/admin`).
+
+It would make a lot of sense to have an environment variable like `LANGFLOW_DISABLE_SIGN_UP` that, when enabled disables the ""Sign Up"" button and route on the frontend.
+
+Ideally the API route for creating users would also then only allow creations from an Admin account to prevent abuse.
+
+### Motivation
+
+If an o…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/7927,2025-05-06,,11,"Streamable HTTP
+
+### Feature Request
+
+<b>Streamable HTTP replaces the [HTTP+SSE transport] </b> from protocol version 2024-11-05
+
+https://modelcontextprotocol.io/specification/2025-03-26/basic/transports
+
+
+
+### Motivation
+
+SSE feature doesn't work properly and is necessary for further langflow use.
+
+Streamable HTTP improves MCP servers and becomes standard.
+
+It is necessary to add tool properly working with new protocol version.
+
+### Your Contribution
+
+Testing"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8531,2025-06-13,,9,"Request: Flow Sharing between users
+
+### Feature Request
+
+I’d like to request a feature that enables shared flows across users in Langflow. The goal is to allow multiple users to view, edit, and collaborate on flows within the same self-hosted Langflow deployment.
+
+Key capabilities:
+- Workspace or organization support for grouping flows.
+- Ability to share flows across users (either globally or within a workspace).
+- Visibility of shared flows in the UI alongside personal flows.
+
+### Motivation
+
+Currently:
+- Flows are fully isolate…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3557,2024-08-26,,8,"Voyage embedding component
+
+### Feature Request
+
+I propose the addition of a custom component in Langflow to integrate VoyageAI embeddings. This would allow users to utilize VoyageAI’s advanced embedding models directly within Langflow for various NLP tasks, enhancing the tool’s versatility and applicability.
+
+### Motivation
+
+Currently, Langflow does not support direct integration with VoyageAI embeddings, which limits users who want to leverage this powerful tool for embedding generation. Incorporating this feature would …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/4863,2024-11-26,,8,"Guardrails Support
+
+### Feature Request
+
+A Langflow node with a setting to specify the guards config (for input and output cases).
+
+A real good option to that is  [guardrails](https://github.com/guardrails-ai/guardrails/)
+
+### Motivation
+
+ I realized after testing some workflows and testing out on real life use cases that We need to have guards for LLMs.
+Guards in your flow can detect, quantify and mitigate the presence of specific types of risk.
+
+### Your Contribution
+
+_No response_"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11067,2025-12-17,,8,"Agentic Capabilities
+
+Langflow **Agentic Capabilities** should support a growing set of modular, composable features that turn agents into intelligent, safe, and configurable operators that turn the Agent component into a structured system with planning, memory, validation, and orchestration built in. Examples include:
+
+- State Management
+- Human-in-the-loop (HITL)
+- Structured Outputs
+- Skills Framework
+- ToolGuard policies
+- Batch Runs
+- Execution Control"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8272,2025-05-29,,8,"Feature request: Export Standalone Executable Python Code from Flow
+
+### Feature Request
+
+In addition to the existing ability to export flows in .json format, I propose adding support to export the corresponding Python code that can run the flow as a standalone script—without requiring the langflow GUI. The exported code should be clean, readable, and executable as a traditional Python script.
+
+Also autogenerated “documentation” describing the flow similar to Mermaid / Gitingest would be a great addition.
+
+### Motivation
+
+LangFlow is excellent for quickly buildin…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/4664,2024-11-18,,7,"OpenAI-Like API support
+
+### Feature Request
+
+OpenAI-Like API support
+
+### Motivation
+
+OpenAI-Like API support
+
+### Your Contribution
+
+OpenAI-Like API support"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11534,2026-02-02,,7,"API always returns 500 Internal Server Error instead of propagating component errors
+
+### Feature Request
+
+Hi, I asked this on the [Discord](https://discord.com/channels/1116803230643527710/1466051734756659210) but was asked to do a feature request.
+
+When invoking a flow via its API endpoint, I’ve noticed that errors originating from LLM components (for example, 429 Too Many Requests rate-limit errors from an LLM provider) are not propagated to the API response. Instead, the Langflow API consistently returns a 500 Internal Server Error.
+
+### Motivation
+
+This makes it difficult in…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/2822,2024-07-19,,6,"Component for interacting with LangSmith Prompt Hub
+
+### Feature Request
+
+It would be cool to create a component (like a regular prompt), only that uses the ChatPromptTemplate class and interacts with the Prompt Storage Environment - LangSmith Prompt Hub
+You could input langchain_api_key, the name of the prompt.
+And also that there should be some kind of button to load input fields (it is possible to make another solution, which will be better).
+
+### Motivation
+
+My motivation is that our team has been using LangSmith in production for a long tim…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/4400,2024-11-05,,6,"Custom Component ID
+
+### Feature Request
+
+Introduce a feature allowing users to assign a Custom Component ID to individual components. This ID could then be used programmatically within tweaks, making it easier to identify and interact with specific components.
+
+### Motivation
+
+Currently, each component in Langflow has a system-generated ID, which can be challenging to manage when programmatically referencing components in tweaks or automations. Users working with multiple components in complex workflows may find it…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/7300,2025-03-27,,6,"Add support for OpenAI Compatible APIs
+
+### Feature Request
+
+One of those:
+- Support a custom model name for the OpenAI component
+- Add an extra Component, similar to the OpenAI component, for Self Hosted OpenAI compatible APIs. 
+
+### Motivation
+
+We are using TGI with multiple models like LLama 3.3 and wrapped all the models into one API Endpoint that acts same as OpenAI. In general, many LLM Inference Server provide the OpenAI Chat Interface and are compatible with the OpenAI python package and OpenAI Langchain package. Pretty much t…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5541,2025-01-04,,6,"[Feature Request] Scheduled Trigger/cron-like component to run a flow repeatedly
+
+### Feature Request
+
+⚠️ This is not related to the [loop feature](https://github.com/langflow-ai/langflow/pull/5429/files#diff-3c7f1df11215b4ee7df67f790d1360fa4157af09db02bc66f5c3698c232bf576R9) that is WIP.
+
+Think of this as a cron-like or a while loop-like component that runs indefinitely. For e.g. a daily overnight job at 2am or etc.,
+
+### Motivation
+
+There is currently no component / way to constantly keep initiating a flow that would execute a series of steps at a particular time interval…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/9082,2025-07-17,,5,"Dynamic MCP configuration for each flow invocation
+
+### Feature Request
+
+A way to pass authentication tokens and extra headers into an MCP configuration on a per-request basis, rather than defining statically as part of the flow configuration.
+
+### Motivation
+
+Hi Langflow Team,
+
+We are working on some applications using Langflow. A simplified version of our architecture is as follows:
+
+```
+User <--> Proxy Service <--> Langflow <--> (LLM & Custom MCP w/ Tools)
+```
+
+I am looking for a way to forward information along from the Langflow invocation to…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/1532,2024-03-15,,5,"Can langflow support multiple output?
+
+I'd like to assign multiple output that can connect to different nodes with condition. Are we planning to develop this functionality?"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/1716,2024-04-17,,5,"[Feature Request] Add Organizational Management for User-Specific Access Control
+
+### Reason for Suggestion
+To enable finer control over which flows users can access by integrating organizational structures within the system.
+
+### Content of the Proposal
+Introduce functionality to allow users to add their organization within the Langflow system. This would require adding a tenant ID when making API calls to determine the user's access rights based on their organization's permissions.
+
+### Technical Considerations
+1. Modify the API to support tenant ID parameters.
+2. E…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/6096,2025-02-03,,5,"Support Custom OpenAI-compatible Models (Custom Base URL, API Key & Model Name)
+
+### Feature Request
+
+To improve extensibility, we need to add support for custom base_url, api_key and model_name.
+
+### Motivation
+
+Currently, LangFlow supports OpenAI models but lacks flexibility for custom OpenAI-compatible endpoints (e.g., self-hosted LLMs, third-party services).
+
+### Your Contribution
+
+_No response_"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/2885,2024-07-23,,7,"Ollama component cannot get models from Ollama server
+
+### Bug Description
+
+<img width=""236"" alt=""Screenshot 2024-07-23 at 6 02 37 pm"" src=""https://github.com/user-attachments/assets/7525e64d-a224-4bb2-99d2-75884acce4c2"">
+
+Ollama component in Langflow does not pick up the models from Ollama server, leading to 404 error if the Llama-2 model is not installed in Ollama. 
+
+This error was observed with both Langflow docker container and running langflow directly from Python using the [getting started instructions](https://github.com/langflow-ai/langf…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/12147,2026-03-11,,4,"Langflow 1.8.0.: Agent and LLM components show Ollama models but do not load them, keeps querying Ollama with POST /api/show
+
+### Bug Description
+
+First of all thanks for the great Langflow software. Recently we tried out your 1.8.0 docker release and found some strange behaviour when working with self hosted Ollama as inference source. 
+
+### Preface
+* We have an Ollama instance (running in docker in v0.17.7) with roundabout 35 models (some stock models, some of them our own fine tuned models) loaded. The models all get shown in the Ollama management window.
+* Prior to release 1.8.0 we had Langflow 1.7.X running succes…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/4748,2024-11-21,,4,"Add LiteLLM Connector
+
+### Feature Request
+
+I would like to suggest adding a connector for LiteLLM to LangFlow.
+LiteLLM is a lightweight and fast open-source library for integrating various LLM providers with a simplified interface. Including this connector in LangFlow would offer several benefits:
+
+Broader compatibility: Support for multiple LLM providers through LiteLLM's unified interface.
+
+Improved usability: Simplifies the process of integrating and switching between LLMs.
+
+Community adoption: LiteLLM has …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/6505,2025-02-14,,4,"Add Compatibility for Open-Source Models like DeepSeek, Llama, and Others
+
+### Feature Request
+
+Provide a compatible API layer that allows requests to be routed to OpenAI models or user-hosted models (e.g., DeepSeek via Ollama, Llama via vLLM, etc.).
+Enable format compatibility so that requests to OpenAI (/v1/chat/completions) can be similarly structured when calling external models.
+Offer custom model endpoints, allowing developers to define third-party endpoints in the OpenAI SDK without complex rewrites.
+
+### Motivation
+
+Introduce a custom_models config in the OpenA…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/12771,2026-04-20,,2,"feat: add vLLM as a default Model Provider
+
+## Description
+
+Langflow already ships with `vLLM` and `vLLM Embeddings` components (`src/lfx/src/lfx/components/vllm/`), and the vLLM icon is already registered in the frontend icon system. However, vLLM is **not** included in the Model Providers list (Settings → Model Providers), which means users cannot configure a vLLM server centrally and must manually enter the API base URL in every vLLM component instance.
+
+## Current Behavior
+
+- Model Providers list includes: OpenAI, Anthropic, Google Ge…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7962,2025-05-09,,2,"v1.4.1 Ollama can't get Model Names
+
+### Bug Description
+
+v1.4.1 Ollama can't get Model Names
+
+![Image](https://github.com/user-attachments/assets/deba4eef-8c0e-4cca-9d91-beb75cc88856)
+
+### Reproduction
+
+Look pic 
+
+### Expected behavior
+
+Ollama model can‘t select 
+
+### Who can help?
+
+_No response_
+
+### Operating System
+
+MacOS 15.4.1
+
+### Langflow Version
+
+1.4.1
+
+### Python Version
+
+3.12
+
+### Screenshot
+
+_No response_
+
+### Flow File
+
+_No response_"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10968,2025-12-11,,2,"Streaming does not work when Ollama LLM is connected through Agent component
+
+### Bug Description
+
+When connecting the Ollama component directly to Chat Input/Output, streaming works correctly. However, when the Ollama component is connected via an Agent component, responses are buffered and only displayed after full completion.
+
+Also, the ""Stream"" toggle on the Ollama component is not being used. I've tried to manually add the argument ""streaming"": True to the underlying Ollama ChatOllama class without success.
+
+### Reproduction
+
+1. Create a flow: Chat Input → Ollama → C…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9488,2025-08-21,,2,"Ollama generation component fails to load models, while Embeddings component works fine
+
+### Bug Description
+
+On the Langflow Desktop application, the main ""Ollama"" component for text generation is unable to find or list any available models from a running Ollama service. The ""Model Name"" dropdown remains empty.
+
+This issue occurs despite the following conditions being met:
+
+The Ollama service is running correctly, and ollama list shows available generation models (e.g., mistral:latest).
+
+The service is accessible at http://localhost:11434, confirmed via a web browser.
+
+Crucially, t…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9203,2025-07-28,,2,"[Windows] Refresh button not displayed on components in Langflow v1.15.11
+
+### Bug Description
+
+
+On Langflow Desktop running on Windows 11, the ""Refresh"" button that should appear on certain components is not visible. There are no console logs or UI error messages indicating any failure.
+
+
+
+### Reproduction
+
+Steps to reproduce the issue:
+
+ 1. Install Langflow Desktop v1.15.11 on Windows 11.
+
+ 2. Launch the application.
+
+ 3. Open or create a flow with components that normally support a refresh operation.
+
+ 4. Observe that the refresh button is not rendered.
+
+No related …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3973,2024-10-01,,2,"Support for LMStudio
+
+### Feature Request
+
+https://lmstudio.ai/
+
+Could LM Studio support be added. LM Studio is much more versatile than ollama and allows you to download and run GGUF models directly from Hugging Face
+
+### Motivation
+
+Ollama simply doesn't work with my Nvidia GPU. It utilizes the CPU only so it's extremely slow.
+
+### Your Contribution
+
+Perhaps we could look at how [AnythingLLM](https://github.com/Mintplex-Labs/anything-llm) integrates with LM Studio"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1409,2024-02-07,,2,"Error: cannot import name 'CreateTrace' from 'langfuse.callback'
+
+Having an issue getting a response back from GPT when using a basic ConversationChain. 
+
+Terminal shows an error with langfuse being unable to import 'CreateTrace' from 'langfuse.callback'.
+
+Can anyone help me on this one?
+
+ - Browser [safari 17.2.1]
+ - Python 3.10
+ - Langflow 0.6.6
+ - Langfuse 2.9.0
+
+<img width=""1397"" alt=""Screenshot 2024-02-08 at 8 37 31 am"" src=""https://github.com/logspace-ai/langflow/assets/157888831/b0a6c8be-1d54-495b-960e-b15c93a5fc96"">
+<img width=""1052"" alt=""S…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/12399,2026-03-30,,1,"OLLAMA cloud painfully slow to retried and save enabled/disabled models
+
+### Bug Description
+
+There are no logs that refer to this in any way but when using ollama cloud the model selection is imposible to be used and slows down everything.
+
+### Reproduction
+
+- ollama.com create api key
+- settings > global variables > OLLAMA_API_KEY > past content > assign to Ollama Api Key
+- providers > ollama > https://ollama.com
+- problem: try to enable/disable any models > feel the immediate slow down
+
+Im not sure where the dance is stuck on if waiting on ollama cloud or handling…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11781,2026-02-15,,1,"Flow uploaded via API doesn't resolve global variables until opened in frontend
+
+### Bug Description
+
+When uploading a flow via API and immediately running it (also via API), global variables configured with ""Apply to Fields"" are not resolved. The flow fails with:
+
+OpenAI API key is required when using OpenAI provider
+
+However, opening the same flow in the frontend Playground and running it, without making any changes, works correctly. The variables resolve as expected
+
+### Reproduction
+
+1. Create a new user via API (POST /api/v1/users)
+2. Create a global variable via API:
+ …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/12839,2026-04-22,,1,"Add ""OpenAI Compatible"" as a Native Model Provider Option
+
+### Feature Request
+
+Currently, Langflow's unified model providers only support OpenAI, Google, IBM WatsonX, and Ollama as first-class native options. While the LiteLLM bundle exists for proxying to multiple LLMs, there is no direct way to configure generic OpenAI-compatible endpoints (such as OpenRouter, Together.ai, Groq, Perplexity, or self-hosted vLLM/TGI instances) as global model providers. Users must manually configure these in individual components or use workarounds.
+
+### Motivation
+
+Wi…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8172,2025-05-22,,1,"Ollama doesn't show models
+
+### Bug Description
+
+From version 1.4.2 **ollama models are not visible** thus not selectable.
+http://localhost:11434 is recognized by Langflow.
+Curl and firefox show http://localhost:11434/api/tags models like below:
+curl http://localhost:11434/api/tags
+{""models"":[{""name"":""qwen2.5:latest"",""model"":""qwen2.5:latest"",""modified_at"":""2025-04-25T16:05:01.403856683+02:00"",""size"":4683087332,""digest"":""845dbda0ea48ed749caafd9e6037047aa19acfcfd82e704d7ca97d631a0b697e"",""details"":{""parent_model"":"""",""format"":…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9881,2025-09-16,,1,"Flow does not transfer dictionary to MCP tool
+
+### Bug Description
+
+Model generate input for MCP tool like: `""{'msg': {'linear': {'x': 1}}, 'msg_type': 'geometry_msgs/msg/Twist', 'topic': '/turtle1/cmd_vel'}""`
+MCP tool get: `""{'msg': {}, 'msg_type': 'geometry_msgs/msg/Twist', 'topic': '/turtle1/cmd_vel'}""`
+
+### Reproduction
+
+1. Install Ollama
+2. ollama run qwen3:4b
+
+
+3. Install ROS2 Jazzy (https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html#)
+4. `sudo apt install ros-${ROS_DISTRO}-rosbridge-server`
+6. `source /opt/ros/jazzy/s…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11043,2025-12-16,,1,"problem in Ollama.py
+
+There are two concrete problems in the provider ollama.py that impacts the agent component and the ollama provider in general:
+
+**Problem 1**
+update_build_config() uses self.base_url (stale) instead of the value in build_config.
+
+In update_build_config() you do:
+
+`if await self.is_valid_ollama_url(self.base_url):
+    build_config[""model_name""][""options""] = await self.get_models(self.base_url, ...)
+`
+
+But during build-config refresh, self.base_url is often still the default (http://localhost:1143…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11121,2025-12-21,,1,"Ollama embedding component does not show the model listed
+
+### Bug Description
+
+Ollama embedding component does not show the model listed 
+
+### Reproduction
+
+Ollama embedding component does not show the model listed 
+
+curl http://localhost:11434/
+Ollama is running
+
+curl http://localhost:11434/api/tags
+{
+  ""models"": [
+    {
+      ""name"": ""gemma3:4b"",
+      ""model"": ""gemma3:4b"",
+      ""modified_at"": ""2025-12-21T15:43:44.3658294+05:30"",
+      ""size"": 3338801804,
+      ""digest"": ""a2af6cc3eb7fa8be8504abaf9b04e88f17a119ec3f04a3addf55f92841195f5a"",
+      ""deta…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10171,2025-10-08,,1,"Unable to Use Ollama Cloud in Langflow Despite Correct `OLLAMA_URL` and `API_KEY`
+
+### Bug Description
+
+Hi team,
+
+I'm trying to integrate Ollama Cloud with Langflow (self-hosted via Docker), but I'm unable to get it working using the built-in Ollama component. Even after setting the correct` OLLAMA_URL` and `OLLAMA_API_KEY`, Langflow doesn't retrieve or list any models.
+
+As a workaround, I created a custom component to connect to Ollama Cloud using the API directly — and that works — which suggests the core issue is with Langflow’s native Ollama integration (perhaps hardcoded …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10969,2025-12-11,,1,"can not chose model of ollama
+
+### Bug Description
+
+ollama runing in local
+
+### Reproduction
+
+ollama runing in local
+
+<img width=""530"" height=""574"" alt=""Image"" src=""https://github.com/user-attachments/assets/3c06da8b-43ca-4c16-b69a-15fa63a448f5"" />
+
+<img width=""854"" height=""749"" alt=""Image"" src=""https://github.com/user-attachments/assets/96f10731-5a15-4046-8ef5-52e56efafb49"" />
+
+### Expected behavior
+
+ollama runing in local
+
+### Who can help?
+
+_No response_
+
+### Operating System
+
+ubuntu 24
+
+### Langflow Version
+
+1.6.9 (latest…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7025,2025-03-12,,1,"Ollama Models with Tools
+
+### Bug Description
+
+<img width=""1117"" alt=""Image"" src=""https://github.com/user-attachments/assets/d68233ae-56f9-45d6-a3b1-ee3a7bd3f509"" />
+
+ExceptionWithMessageError: registry.ollama.ai/library/deepseek-r1:14b does not support tools (status code: 400).                         
+
+
+### Reproduction
+
+                             ExceptionWithMessageError: registry.ollama.ai/library/deepseek-r1:14b does not support tools (status code: 400).                         
+
+
+### Expected behavior
+
+         …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10912,2025-12-05,,1,"Langflow Desktop 1.6.0 will not start on Windows
+
+### Bug Description
+
+I installed Ollama and the required C++ dependencies, then installed Langflow 1.6.0. When I try to start the program, I receive an error message that says ""Langflow Installation Failed"".
+
+I have tried restarting my computer, reinstalling Langflow, reinstalling the C++ dependencies, using a different internet connection, and combinations of those steps.
+
+<img width=""3505"" height=""2400"" alt=""Image"" src=""https://github.com/user-attachments/assets/2b39be91-b0c1-4022-b673-dfb1812…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5564,2025-01-07,,1,"CrewAI Hierarchal Crew refuses to take custom ollama url
+
+### Bug Description
+
+I am creating a flow that uses remote deployed ollama along with CrewAI Agents, when running the flow it seems the Hierarchal Crew Component is calling localhost:11434 url for accessing ollama instead of http://ollama:11434 which is provided in the ollama component, hence the request is timing out and giving below error:
+
+```
+Error building Component Hierarchical Crew: litellm.ServiceUnavailableError: OllamaException: HTTPConnectionPool(host='localhost', port=11434): Max …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10963,2025-12-10,,1,"Error 22 after restart of Langflow (flow build failed - failed to fetch)
+
+### Bug Description
+
+My Langflow-Flow works perfectly after first launch of Langflow (after system startup).
+As soon as I end Langflow and open it up again (which is way faster than the initial startup of the program) I get an error message when trying to run my flow:
+
+Error while updating the Component
+- [Errno 22] Invalid argument
+- Flow build failed - Failed to fetch
+
+-> Screenshot (error message): https://postimg.cc/Lq07w89W
+-> Screenshot (my Langflow flow): https://postimg.cc/s1bKyKXv
+
+Sinc…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9417,2025-08-17,,1,"Error building Component Chroma DB: Expected metadata value to be a str, int, float or bool, got [] which is a list in upsert.
+
+Hi
+
+Just started discovering this app and I'm very impressed, thanks to all contributors.
+
+Current env:
+
+- OS: Linux
+- Python: v3.11
+- Langflow: 1.5.0post1
+
+Flow:
+
+File > Split Text > Chroma DB
+Ollama embedder /
+
+Symptoms:
+
+When I load a single file in ""File"" and run solution from ""Chroma DB"" with ""Ollama embedder"" attached, I get following error:
+
+Error building Component Chroma DB: Expected metadata value to be a str, int, float or bool, got [] which is a list in upsert.
+
+Remark:
+
+- When I loa…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6780,2025-02-24,,1,"Impossible to get the output from the Chat Output with stream enable.
+
+### Bug Description
+
+Hello,
+
+I got an issue regarding the output of the ""Chat Output"" followed by a ""Text Output"" component when I enable the streaming mode for my ""Ollama"" component.
+
+As you can see in the image below, I attempt to capture the message from ""Chat Output"" using the ""Text Output"" component. This works fine when the streaming mode on my Ollama component is disabled; however, once it's enabled, Text Output appears to have no output.
+
+NOTE : Everything in the pipeline seems to be fun…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/7272,2025-03-25,,1,"set model's ollama node with a node
+
+### Feature Request
+
+I have a llm chain using ollama node, I would like to be able to change model from a variable or an input node.
+
+
+
+### Motivation
+
+modifying only model in one node will be propagated to other nodes
+
+I am thinking on howto implement it. 
+At the moment the model selection is   a dropdown.
+
+### Your Contribution
+
+I may help"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5980,2025-01-28,,6,"Gemini model is reset on every load
+
+### Bug Description
+
+Hi,
+
+The Gemini model is reset to learnlm-1.5-pro-experimental every time i open the flow.
+
+### Reproduction
+
+- Add the google generative IA block
+- Select model
+- reload the page
+
+### Expected behavior
+
+The model should not be reset
+
+### Who can help?
+
+_No response_
+
+### Operating System
+
+langflowai/langflow Docker image
+
+### Langflow Version
+
+1.1.2
+
+### Python Version
+
+None
+
+### Screenshot
+
+![Image](https://github.com/user-attachments/assets/1420d8a3-27cb-4a3f-94d9-79023db…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6500,2025-02-14,,3,"Performance Issue with Tool Calling Agents in Langflow
+
+### Bug Description
+
+Hello,
+
+I have a flow where I initiate three Tool Calling Agents—Aggregator, Refiner, and Summarizer—triggered by a user question. The process works as follows:
+	1.	The user question is sent to the Aggregator Agent, which calls the connected tool and retrieves the output.
+	2.	The result is then passed to the Refiner Agent, which processes the data and forwards it to the Summarizer Agent.
+	3.	The Summarizer Agent processes the final output and returns the result.
+
+I am using …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11705,2026-02-10,,2,"[Feature]: Automatic Pre‑LLM Tool Search for the MCP Gateways
+
+### Feature Request
+
+### Enhancement
+
+Many MCP gateways (e.g., Composio, [agentic‑community/mcp-gateway-registry](https://github.com/agentic-community/mcp-gateway-registry/blob/main/docs/dynamic-tool-discovery.md#how-it-works), and many others) adopted a technique that uses a dedicated tool to search or rank available tools, typically using inexpensive semantic search or BM25 to filter and provide only the most relevant tools from a large list of servers. Today, the LLM must decide whether to ca…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8212,2025-05-26,,2,"Calling 2 tools with Google Generative AI Components returns 400
+
+### Bug Description
+
+Hi, 
+I found the following behaviour when chatting with the Google Generative AI component (GGAI), ie Gemini:
+With a simple flow, an agent and a tool, asking it to use the tool twice creates a 400 error code which traces to `langchain_google_genai.chat_models.ChatGoogleGenerativeAIError: Invalid argument provided to Gemini: 400 * GenerateContentRequest.contents[14].parts[0].function_response.name: Name cannot be empty.`, recreation is quite easy.
+
+### Reproduction
+
+Steps to …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10658,2025-11-19,,2,"Add Agent-to-Agent (A2A) Protocol Support for Multi-Agent   Collaboration
+
+### Feature Request
+
+I propose adding **Agent-to-Agent (A2A) Protocol** support to Langflow to enable multi-agent collaboration and interoperability with A2A-compliant agents from Google, Anthropic, and other providers.
+
+### What is A2A Protocol?
+
+The **Agent-to-Agent Protocol** is an industry standard for agent interoperability, announced by Google in November 2024. It uses JSON-RPC 2.0 over HTTP to enable agents to discover each other's capabilities and collaborate on complex tasks.
+
+**Key ben…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5419,2024-12-24,,2,"Agent provider choice not updating the model list
+
+### Bug Description
+
+Hey git hub community, what's up ?
+
+by using some of your template i found a bug on agent behaviour kinda troublesome when you use anthropic AI. 
+
+i fix it so using claude prompting, here the code as i don t know which file contain it. I might make a commit later if i find it.
+well since i updated the agent on my side it seems fixed so
+
+```python
+from langchain_core.tools import StructuredTool
+
+from langflow.base.agents.agent import LCToolsAgentComponent
+from lang…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11120,2025-12-21,,1,"Groq Component : error to fetch models LLM
+
+### Bug Description
+
+When I add component Groq and i refresh list model to field model,  i had errors strange and i havn't list to models llm on groq. 
+I have only 2 models llama 3.1 8B and 70b
+
+Errors when i fetched : 
+```
+Error while updating the Component
+
+    Error code: 400 - {'error': {'message': 'The model canopylabs/orpheus-arabic-saudi does not support chat completions', 'type': 'invalid_request_error'}}
+
+```
+```
+Error while updating the Component
+
+    Error code: 400 - {'error': {'mess…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6135,2025-02-05,,1,"Agent Component Error: 'Message' object has no attribute 'id'
+
+### Bug Description
+
+Hi
+
+I keep getting this issue Error: 'Message' object has no attribute 'id' a lot of models using Agent. 
+
+Here is the full error
+
+`'Message' object has no attribute 'id'
+
+Traceback (most recent call last):
+  File ""/usr/local/lib/python3.10/site-packages/langchain_google_genai/chat_models.py"", line 220, in _achat_with_retry
+    return await generation_method(**kwargs)
+  File ""/usr/local/lib/python3.10/site-packages/google/api_core/retry/retry_unary_async.py"", line 230, in re…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5947,2025-01-26,,1,"Tool Calling Agent - Component Build Failure
+
+### Bug Description
+
+Hi,
+
+I am getting the following error while building Tool Calling Agent- 
+```
+An error occured in the Tool Calling Agent Component, stopping your flow. See below for more details.
+Error details:
+ValueError
+Details: When passing a tool name or description, there must be only one tool, but 2 tools were found.
+```
+
+
+Please help
+
+Thanks,
+Kunal
+
+### Reproduction
+
+I am using latest version of local LangFlow with latest version of local Ollama Llama 3.2 model. Testing Calculator as…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4652,2024-11-16,,1,"No stream_url when using Tool Calling Agent
+
+### Bug Description
+
+When calling the run *api* with `stream=true` , on a flow that uses the `tool calling agent` component, there is no `stream_url` in the answer. The api returns as if `stream` was set to false.
+
+### Reproduction
+
+Just create a flow with the  `tool calling agent` component, and try to run it through the `api` with `stream=true`
+```bash
+curl -X POST \
+    ""http://127.0.0.1:7860/api/v1/run/ebf006d1-0bb0-483f-be5e-4869943170b0?stream=true"" \
+    -H 'Content-Type: application/…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1429,2024-02-13,,1,"VectorStoreAgent.from_toolkit_and_llm() missing 1 required positional argument: 'vectorstoreinfo' + other similar errors
+
+**Describe the bug**
+
+I'm trying to recreate a basic RAG flow using Pinecone and OpenAI and something seems to be broken. Trying to use `VectorStoreAgent` results in a build error(the one in the title), and so does using various other agent types. The agent types that do work result in a non-functional flow(chatting with it returns nothing).
+
+Version: 0.6.6
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Set up langflow 0.6.6
+2. Use this flow [broken-flow.json](https://github.com/…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/14263,2026-07-26,,0,"Full Realtime models support (text + audio) for OpenAI, Gemini, and Grok
+
+### Feature Request
+
+Feature Request
+Please add full support for Realtime models in Langflow, including:
+
+OpenAI — gpt-realtime, gpt-realtime-2, gpt-realtime-2.1, gpt-realtime-2.1-mini, etc.
+Google Gemini — realtime / Live API models
+xAI Grok — realtime-capable models (when available)
+
+What is needed
+
+Text-to-text over Realtime API (WebSocket)
+Currently, putting gpt-realtime-* into the Language Model component fails with:textThis is not a chat model and thus not supported in the v1/chat/completi…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8488,2025-06-11,,0,"Multiple tool calls in one LLM response are not properly dealt with in the LangChain ToolCallingAgent widget
+
+### Bug Description
+
+I have a simple tool-calling example based on the LangChain Tool Calling Agent and tools for Calculator an Yahoo Finance based on Ollama and llama3.3:latest. 
+
+Chat questions ""Find the exchange rate of EUR to USD."" and ""Tell me the sum of 100 plus -77."" work as expected (calling the respective tools and providing a response).
+
+The chat question ""Find the exchange rate of EUR to USD. Afterwards also tell me the sum of 100 plus -77."" yields `[""{""type"": ""function"", ""name"": ""fet…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/12792,2026-04-20,,0,"Add pre-execution validation for workflow/tool execution
+
+Langflow makes it easy to build and deploy agent workflows that can trigger real actions (tool calls, API requests, etc).
+
+However, there doesn’t appear to be a deterministic validation step at the moment of execution.
+
+In visual workflows especially, this creates a gap where:
+- node outputs can propagate into execution without final verification  
+- parameters may differ from what was intended upstream  
+- deployed flows (as APIs) may execute actions without validating the exact payload at runt…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/15349,2026-09-24,,0,"Amazon Bedrock Converse: OpenAI GPT-6 Sol/Luna/Astra calls fail with 400 because Temperature and Top P are sent by default
+
+### Bug Description
+
+Thanks for the error-driven retry in `model_remediation.py` (#14331, #14363). It already gets Claude 5 past its temperature 400, and it looks like the right place for this case too.
+
+OpenAI GPT-6 Sol, Luna and Astra are on Amazon Bedrock (`us.openai.gpt-6-sol`, `us.openai.gpt-6-luna`, `us.openai.gpt-6-astra`, and `global.*`). The Amazon Bedrock Converse component fails on every call to them with its defaults. Converse rejects the `temperature` field for these models at any v…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/15685,2026-10-09,,0,"Agent `{current_date}` resolves to seconds precision, which breaks prompt-cache reuse for chat history
+
+### Bug Description
+
+The default Agent system prompt ends with:
+
+```
+# Environment
+- Today's date: {current_date}
+```
+
+([default_system_prompt.py#L80](https://github.com/langflow-ai/langflow/blob/504c02fc47e76087b82b0e7cbe4186e9cdd916d4/src/lfx/src/lfx/base/agents/default_system_prompt.py#L80))
+
+`_inject_dynamic_prompt_values` fills it with a timestamp down to the second on every run:
+
+```python
+""{current_date}"": datetime.now(tz=timezone.utc).strftime(""%Y-%m-%d %H:%M:%S UTC""),
+```
+
+([agent.py#L5…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/15360,2026-09-24,,0,"Amazon Bedrock Converse: Claude Opus 5.5 calls fail with 400 because Top K and Top P are sent by default
+
+### Bug Description
+
+Thanks for the error-driven retry in `model_remediation.py` (#14331) and the Top K work in #14758 and #14784. It already gets newer Claude models past their `temperature` 400, so this was quick to trace.
+
+Claude Opus 5.5 on Amazon Bedrock also rejects `top_k` and `top_p`, one field per 400, in the same words it uses for `temperature`. The Amazon Bedrock Converse component sends Top K 250 and Top P 0.9 by default, so once the retry clears `temperature` the call stops at `` `t…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/15358,2026-09-24,,0,"Multiple components of the same type, wired as separate Agent tools, all get the identical tool name
+
+### Bug Description
+
+`_derive_tool_name()` (`src/lfx/src/lfx/base/tools/component_tool.py`) picks the name an LLM sees for a tool based only on the component's **class** and its **output method name** — never on anything specific to that particular node's own configuration:
+
+```python
+def _derive_tool_name(component: Component, output_method: str, outputs: list[Output]) -> str:
+    if output_method in _GENERIC_OUTPUT_METHOD_NAMES and len(outputs) == 1:
+        return _class_name_to_tool_name(typ…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9184,2025-07-25,,0,"Agent with Amazon Bedrock LLAMA cannot execute the tool
+
+### Bug Description
+
+Agent with Amazon Bedrock Bug
+i use llama3 (every version) in Amazon Bedrock provider 
+it cannot execute the tool that i provide to agent component.
+event vanilla tool like web search (duckduckgo, tavily)
+testing with question:
+1. Check current time.
+2. Check currency exchange.
+
+### Reproduction
+
+Test Calling with many LLM provider
+
+1.amazon bedrock: Cannot
+2.open ai: Can
+3.groq: Can (even with llama)
+
+##I have only llama in bedrock 
+
+### Expected behavior
+
+I suspect to amaz…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/14725,2026-08-24,,0,"[Feature Request] Add an optional HOL Guard tool-policy bundle
+
+### Feature Request
+
+Add **HOL Guard** as an optional Langflow bundle/component for pre-execution tool security.
+
+HOL Guard: https://github.com/hashgraph-online/hol-guard
+
+Langflow already has the right integration shape in the current Policies component: it accepts `List[Tool]`, wraps the tools, and returns `guarded_tools` so policy checks happen before the original tool executes. The existing ToolGuard bundle is useful for generated business-policy code; this proposal is complementary and woul…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/14668,2026-08-19,,0,"AG-UI protocol: tool calls are duplicated with new IDs and zero duration at the end of the stream when narration text precedes a tool call
+
+AG-UI protocol: tool calls are duplicated with new IDs and zero duration at the end of the stream when narration text precedes a tool call
+
+### Summary
+
+When streaming a flow via `POST /api/v2/workflows` with `stream_protocol: ""agui""`, tool-call events (`TOOL_CALL_START`, `TOOL_CALL_ARGS`, `TOOL_CALL_END`, `TOOL_CALL_RESULT`) are duplicated at the end of the stream. The duplicate quartet has a **different `tool_call_id`** than the original but **identical** tool name, input, and output. All four…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/13965,2026-07-04,,0,"Langfuse traces cause both the “Agent” and “Tool Calling Agent (LangChain)” to fail — a regression related to issue #13429
+
+### Bug Description
+
+Hello,
+
+Traces are ok in langfuse. But now, we have a big regression on blocks like ""Agent"" or ""Tool Calling Agent (Langchain)"" using tool like ChromaDB.
+Error is Error building Component Tool Calling Agent:
+
+LangfuseResourceManager.new() missing 3 required keyword-only arguments: 'public_key', 'secret_key', and 'base_url'.
+
+Error is silent in ""Agent"" but no result retrieved whereas flow failed with ""Tool Calling Agent"".
+Here attached langfuse traces.
+
+[trace-2ff9d87972c3c89…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/14380,2026-08-03,,0,"Read File component in tool mode has sync code in async block
+
+### Bug Description
+
+```python
+        async def read_files_tool() -> str:
+            """"""Read the content of uploaded files.""""""
+            try:
+                if getattr(self, ""advanced_mode"", False):
+                    # In advanced mode, use the markdown output path so that the
+                    # tool shares the same Docling processing as the advanced
+                    # outputs rather than triggering a second subprocess via
+                    # load_files_message.
+                  …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/263,2023-05-09,,8,"Self hosted LLMs Support
+
+Hello, 
+
+Thanks for this awesome work.
+
+Is there any support for custom self hosted LLMs? Like I host multiple models in AWS EC2 instances using https://github.com/huggingface/text-generation-inference. If so, could you please point me to example.
+
+Happy to help or contribute regarding this if not already exists."
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5175,2024-12-10,,5,"Request for Implementation of DSPy Integration in Langflow
+
+### Feature Request
+
+I kindly ask for contributors or maintainers of Langflow to consider implementing this integration. It would be beneficial to the community and could position Langflow as a more powerful tool for developers working with language models.
+
+Thank you for your attention to this request! 
+
+### Motivation
+
+Integrating [DSPy](https://dspy.ai) would provide several advantages, including:
+
+- **Automatic Prompt Optimization:** DSPy can automate the optimization of prompts, i…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10359,2025-10-22,,4,"How to get each nodes' performance metrics directly from langflow library files
+
+First of all, thanks for everyone's great effort for such a great project! 
+We need flow name, node name, and each node's duration
+for example:
+{
+""flow name"": {
+""node_name1"": miliseconds,
+""node_name2"": miliseconds,
+...
+}
+}
+ 
+We tried to make adjustments in 
+- graph/graph/base.py
+- backend/base/langflow/processing/process.py 
+- base/agents/agent.py
+- base/agents/events.py
+- services/flow/flow_runner.py
+
+but unfortunately we couldn't achieve this result, any help will be appreciated!
+
+Langflow Ver…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10529,2025-11-07,,4,"[color-component] : There should be option to set a color to a component which will improve UX for non-technical users
+
+### Feature Request
+
+As a developer building an AI agentic tool for content writers, I believe that adding color customization to components would greatly improve usability and clarity for non-technical users.
+
+For example, if the Prompt Text component could be highlighted in red, it would allow content writers to quickly identify which parts are editable. This simple visual cue would make it much easier for them to locate and update prompts at a glance.
+
+Overall, this feature would significantl…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/7085,2025-03-14,,4,"Add support for OpenAI's Responses API
+
+### Feature Request
+
+The purpose of this feature is to integrate OpenAI's Responses API to significantly improve the speed and efficiency of tool calls. This enhancement will enable faster and more reliable execution of tasks that depend on interactions with external tools or language models. By leveraging the Responses API, the system can handle complex workflows more effectively, reducing latency and improving overall performance.
+
+Additionally, the Responses API supports the use of advanced r…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/4964,2024-11-30,,4,"Improve the local (Self Managed) installation process.
+
+### Feature Request
+
+Improve the local (Self Managed) installation process. Currently it takes more than 5 hours to realize that the installation failed. Extremely bad user experience. Even after retrying the installation and even though the cached files were available, the installation process was iterating over the cached files really really slow. 
+
+This is especially happening at this stage:
+
+***********
+Collecting groq<1,>=0.4.1 (from langchain-groq<1.0.0,>=0.1.9->langflow)
+  Using c…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8149,2025-05-21,,3,"How to Increase or Remove the Length Limit for Prompt Component Templates?
+
+For the prompt component, I noticed that if its template content is too long, it gets truncated automatically. How can I modify this length limit or disable it entirely?"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11149,2025-12-26,,2,"Support for Gemini 3.0 models
+
+An error occured in the Agent Component, stopping your flow. See below for more details.
+Error details:
+ChatGoogleGenerativeAIError
+Details: Invalid argument provided to Gemini: 400 Function call is missing a thought_signature in functionCall parts. This is required for tools to work correctly, and missing thought_signature may lead to degraded model performance. Additional data, function call default_api:kai_list_available_doctypes , position 2. Please refer to https://ai.google.dev/gemini-api/…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/12175,2026-03-13,,2,"OWASP Agentic AI Security Assessment -- Langflow
+
+### OWASP Agentic AI Top 10 -- Security Assessment
+
+Hi team,
+
+We conducted an OWASP Agentic AI Top 10 (2025) assessment of 39 popular AI agent frameworks as part of ongoing agentic security research. This assessment was performed via **static analysis of public source code only** -- no systems were accessed or tested remotely.
+
+---
+
+#### Assessment Results -- Langflow
+
+| Check | OWASP ID | Severity | Detail |
+|-------|----------|----------|--------|
+| Unsafe Execution | AA-03 | HIGH | Inherits L…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10085,2025-10-02,,2,"Not able to install - setup failed
+
+### Bug Description
+
+I installed 1.6.0 when it was on preview release, and I had a problem. After I was told to wait the official version, I downloaded and installed. I have the same problem. After I install, I run, and it says initializing, and then Setup Failed - Something went wrong during setup. Any suggestions how to fix?
+
+### Reproduction
+
+Install
+run
+setp failure
+
+### Expected behavior
+
+not able to run, it says setup failure. passes antivirus check
+
+### Who can help?
+
+_No response_
+
+### O…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4394,2024-11-05,,2,"performance of run_flow_from_json function
+
+### Bug Description
+
+For the basic general LLM/ChatGPT query, execution time took 17 seconds for the process, but for pure Python, it took only 4-7 seconds, which after debug into langflow code, see that around 10 seconds for job initialization. Is it possible to cache it or find a solution to run it as fast as hosting the Langflow service? here is sample code:
+```python
+from langflow.load import run_flow_from_json
+import time
+ 
+start_time = time.time()
+ 
+result = run_flow_from_json(flow=…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3274,2024-08-10,,2,"[Export] From json to python code.
+
+### Feature Request
+
+I would like to request a feature that enables users to export JSON files to Python code. This functionality would be very helpful for users who want to generate Python scripts directly from their JSON configurations.
+
+### Motivation
+
+The motivation for this feature request stems from the need to streamline the development workflow when working with JSON configurations in LangFlow. Currently, users who want to transition from JSON configurations to Python code must manually …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4866,2024-11-26,,2,"Installation Freezes for Langflow 1.1.1
+
+### Bug Description
+
+Attempting to install the latest version of Langflow (1.1.1) takes an unusually long time and eventually freezes during the installation process. The installation does not proceed even after waiting for an extended period, forcing me to cancel the process.
+
+
+
+### Reproduction
+
+Steps to Reproduce
+
+Create a new directory:
+mkdir langflow1.1.1 && cd langflow1.1.1
+
+Create a new Python virtual environment:
+python -m venv ./venv1.1.1
+
+Activate the virtual environment:
+so…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/2473,2024-07-02,,2,"pip install never seems to finish running
+
+**Describe the bug**
+pip install never finish and always gets stuck. This message keeps popping up also: 
+INFO: This is taking longer than usual. You might need to provide the dependency resolver with stricter constraints to reduce runtime. If you want to abort this run, you can press Ctrl + C to do so. To improve how pip performs, tell us what happened here: https://pip.pypa.io/surveys/backtracking
+
+
+**Browser and Version**
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
+
+**To Re…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1477,2024-02-28,,2,"how to deploy a chain build from langflow by using LangServe？
+
+As title, when I build a chain in LangFlow, how can I deploy this Chain by using LangServe?"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8605,2025-06-18,,1,"Request: add a persistent latest-release tag/branch that always points to the current stable LangFlow release
+
+### Feature Request
+
+I’m planning to build our own LangFlow Docker image that bundles the custom components we maintain in our Git repository.
+To do that, we need to build LangFlow from source while still tracking the latest official release.
+However, I couldn’t find a branch or tag that always points to the most recent release (for example, something like latest-release); all I see are version-specific tags such as 1.4.3-release.
+If such a tag already exists and I just missed it, could you tell…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9039,2025-07-14,,1,"Langflow startup taking a long time on server with no internet access
+
+### Bug Description
+
+I am running a Langflow + langfuse combined setup on server using docker compose. for persistence it uses postgre for both. Its taking a long time for start up. Especially Langflow is very slow. how do we speed it up. It gets stuck at several places one of which is below. takes almost 45 minutes to startup. On my laptop it gets started in 1 minute only. i suspect this is to do with timeout configurations and Langflow might be trying to reach some external websites and the ti…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8193,2025-05-23,,1,"Update pydantic version
+
+### Feature Request
+
+I hope pydantic version can be updated to 2.11.x
+https://github.com/langflow-ai/langflow/blob/fc2eee8fa5a510ae37ea06d698eedf68078fc69f/src/backend/base/pyproject.toml#L34
+Currently, pydantic is at version 2.10.x
+
+### Motivation
+
+With version 2.11.x, it is able to create dynamic class like [this](https://docs.pydantic.dev/latest/concepts/models/#dynamic-model-creation)
+```python
+from pydantic import BaseModel, create_model
+
+DynamicFoobarModel = create_model('DynamicFoobarMode…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10259,2025-10-14,,1,"MAX_ITEMS_LENGTH truncates DataFrames in backend serialization, but docs say it’s only a “visual appearance” setting
+
+### Bug Description
+
+The documentation says LANGFLOW_MAX_ITEMS_LENGTH (and related limits) only affect visual appearance. In practice, the cap is applied in the backend serializer and truncates list-like structures and pandas DataFrames before they reach the UI or API response. This makes large tables appear incomplete even when fetched via API.
+
+Docs about environment variables: “Configure environment variables for Langflow OSS.” (Wording implies visual/UI use.) 
+[docs.langflow.org](https://doc…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9243,2025-07-30,,1,"Remove Text Truncation in Prompt Template Component
+
+### Bug Description
+
+The ""template"" prompt component has limited text input. Adding a limitations variable controllable from the controller section would be beneficial.
+
+### Reproduction
+
+Dear Development Team,  
+
+I'm encountering persistent text truncation issues in our Langflow prompt template implementation, despite multiple attempts to resolve it through component configuration. The current behavior limits the system's effectiveness for academic use cases requiring full text preservation.  
+…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1530,2024-03-15,,5,"pip always encounters failures when installing LangFlow
+
+###  **pip always encounters failures when installing LangFlow**
+
+I followed the code on the docs and typed pip install langflow into my windows command line tool, but I always got the following error. Have tried to reinstall several times and still haven't succeeded. The error screen is as follows:  
+
+**Browser and Version**
+ - Microsoft Edge, version 122.0.2365.80 (GA) (64-bit)
+ - Python 3.12.2
+ - Windows10
+
+![image](https://github.com/logspace-ai/langflow/assets/162543658/fe5b0059-d1…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10614,2025-11-16,,4,"Support for Multi-Agent Orchestration Where a Main Agent Reads Shared Storage and Integrates Background Agent Outputs Into the Dialogue
+
+### Feature Request
+
+I would like to request native support in Langflow for multi-agent orchestration, where:
+
+Agent A (main conversational agent) continuously interacts with the user.
+
+Other agents (B, C, …) run background tasks such as web search, API calls, database lookups, etc.
+
+Agent A can reliably read the storage/output of these helper agents and integrate the retrieved information back into the ongoing conversation.
+
+Currently, Langflow allows multiple agents and tools, but there is no …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6042,2025-01-31,,3,"Lang flow Fails to Load Admin/User Information as well as flows when Running on multiple replicas in AWS ECS.
+
+# Langflow Deployment on AWS ECS: Multi-Replica Issue
+
+## 1. Overview of the Setup
+This document outlines the Langflow deployment on AWS ECS, the configurations used, and the issues encountered when scaling the number of replicas. The following sections describe the setup and problem in detail.
+
+---
+
+## 2. Langflow Deployment Architecture
+The Langflow service is deployed on AWS ECS with the following architecture and configurations:
+
+### **Core Components**
+1. **PostgreSQL Database**
+   - Hosted…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/2997,2024-07-26,,3,"Dynamic tweaks
+
+### Feature Request
+
+When using the API, is there any way to pass dynamic data to the tweaks? I have a flow with memory, I would like the user to be able to choose between two session memories.
+
+For example, user says: ""Hi, my is John"" and passes a session_id of ""chat1"". Then another user says, ""Hi, my name is Jane"" and passes a session_id of ""chat2"". So there would be two memory sessions. 
+
+Please see code below: 
+
+```
+class LangflowClient {
+  constructor(baseURL, apiKey) {
+    this.ba…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/141,2023-04-09,,3,"Documentation: Add simple ""getting started"" examples
+
+It would be great if the documentation included a few minimal working examples to get started with.
+
+For example, it wasn't intuitive to me how to recreate something similar to the ChatGPT web interface.
+
+<img width=""1552"" alt=""Screenshot 2023-04-09 at 12 40 33"" src=""https://user-images.githubusercontent.com/875194/230768048-78dedbec-abd6-4d25-a3c2-319ea490e0d8.png"">"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11857,2026-02-22,,2,"Onboard like OpenClaw
+
+### Feature Request
+
+I'd like to easy install and onboard LangFlow like OpenClaw.
+- Setting up channels, so I can interact with LangFlow via channels such as Slack, Discord, WhatsApp
+- Gateway: to connect to VPN for security 
+- configure memory
+- setup popular MCP servers
+- LLM provider Auth
+- Cron for scheduling tasks
+- Add popular Skills
+- run as demon/ service 
+
+https://docs.openclaw.ai/start/wizard#advanced-full-control
+
+
+### Motivation
+
+OpenClaw showed big success, mostly for ease of use an…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9452,2025-08-20,,2,"Langflow's CPU usage reaches 100%, causing the system to become sluggish
+
+### Bug Description
+
+After Langflow is deployed in the production environment and used by several different projects, it has been observed that 1 to 2 hours after startup, Langflow's CPU usage reaches 100%, causing the system to become sluggish. I'm not sure whether this is caused by a ​​Langflow issue​​ or a ​​workflow/flow design problem​​.
+
+Langflow version = ""1.4.2""
+cpu top：
+<img width=""1410"" height=""654"" alt=""Image"" src=""https://github.com/user-attachments/assets/ae57283f-4ced-4e6a-91fa-747…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6870,2025-02-27,,2,"Flows fail to run after upgrade to 1.2.0 -- service - No queue found for job_id
+
+### Bug Description
+
+After upgrading to langflow 1.2.0, none of my flows work anymore.
+
+It gets stuck in the ""building"" phase and reports the following errors in the logs:
+
+Feb 27 11:19:33 ubuntu python[4981]: [02/27/25 11:19:33] ERROR 2025-02-27 11:19:33 - ERROR - service.py:179
+Feb 27 11:19:33 ubuntu python[4981]: service - No queue found for job_id
+Feb 27 11:19:33 ubuntu python[4981]: 22af6948-63a6-4164-a234-3cc47ae5ef35
+Feb 27 11:21:28 ubuntu python[4978]: [02/27/25 11:21:28] ERROR 2025-02-2…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6910,2025-03-03,,2,"Could not open a template: Cannot read properties of undefined (reading data)
+
+### Bug Description
+
+When clicking on any templates, getting an error message:
+```
+Could not create flow
+Cannot read properties of undefined (reading 'data')
+```
+While I can create an empty flow and add nodes.
+
+![Image](https://github.com/user-attachments/assets/218d1f94-5a77-49a2-9c63-04d298e77d2e)
+
+### Reproduction
+
+deployed on the k8s cluster using the official helm-chart. tested with both externalDB enabled and disables (SQLite).
+```yaml
+imagePullSecrets: []
+
+nameOverride: ""langflow-service""…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4266,2024-10-24,,2,"Error in Zep Chat Memory ""ImportError: Could not import zep-python package. Please install it with pip install zep-python.""
+
+### Bug Description
+
+I encountered an issue while trying to use the Zep Chat Memory component. I'm receiving the error message: ""ImportError: Could not import zep-python package. Please install it with pip install zep-python."" However, this error stems from an exception in the code, and the underlying issue is a `ModuleNotFoundError: No module named 'zep_python.zep_client'` at the line `import zep_python.zep_client`.
+
+I've attempted to resolve the problem but haven't been successful. There is …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4148,2024-10-14,,2,"Incorrect default Curl snippet when tweaks are enabled in API tab.
+
+### Bug Description
+
+Issue: Incorrect default Curl snippet when tweaks are enabled in API tab.
+
+Description:
+When clicking on the API tab with tweaks enabled, the default Curl snippet generated is incorrect. Specifically, the input_value is located within the tweaks of the chatinput, whereas it should be directly at the root level as input_value. This causes an error because when input_value is available in both places, it conflicts and leads to the incorrect application of the input value …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8555,2025-06-16,,1,"mem0 node missing .from_config
+
+### Bug Description
+
+When building the mem0 node with either manual or dynamic input for the mem0 configuration, the node throws the following error:
+
+ValueError: Error running graph:                   
+langflow-1            |                              Error building Component Mem0 Chat                 
+langflow-1            |                              Memory:                                            
+langflow-1            |                                                                …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10014,2025-09-27,,1,"Feature Request: Support for Custom MongoDB Tool in Langflow
+
+### Feature Request
+
+Add support for creating a custom tool that connects to MongoDB, performs CRUD operations, and integrates with Langflow's tool node system.
+
+### Motivation
+
+MongoDB is a widely used NoSQL database in modern AI, web, and data applications. Integrating a MongoDB tool into Langflow would allow users to:
+
+- Store and retrieve dynamic data from agents and chains.
+- Query collections to power context-aware LLM responses.
+- Update user-specific data or logs for memory and analytics…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5287,2024-12-16,,1,"RAM is increasing while doing batches via API and workers
+
+### Bug Description
+
+Hello,
+
+I am doing calls via API,
+Server was using 7.3GB of RAM
+now it is using 8.33GB of RAM
+
+Seems like there still is a leak in 1.1 version
+Seems like issue was also in the past.
+
+
+### Reproduction
+
+Just running API calls.
+Installation was made via pip installation.
+SQLite db.
+Running 6 workers.
+
+### Expected behavior
+
+RAM should not increase drastically while running API calls.
+
+### Who can help?
+
+_No response_
+
+### Operating System
+
+Ubuntu 22.04
+
+### Langflow…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8215,2025-05-26,,1,"TypeError in Agent Component with Anthropic Models after 1.4.2 Update
+
+### Bug Description
+
+Bug Description
+Agent component crashes with TypeError: unsupported operand type(s) for +: 'NoneType' and 'int' when using Anthropic Claude models. This is a regression bug introduced in the May 25, 2025 automatic update.
+Primary Issue:
+
+Agent component consistently crashes at conversation step 3 with NoneType + int error
+Error occurs specifically with Anthropic models (OpenAI works fine)
+Fresh/empty chat sessions trigger the bug
+
+Secondary Issue:
+
+Agent component automatica…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/12875,2026-04-24,,1,"Third-party architecture audit notes from agchk
+
+Hi maintainers — sharing a small third-party static architecture audit in case it is useful. Please feel free to close if this is not a useful tracking item for Langflow.
+
+I ran [`agchk`](https://github.com/huangrichao2020/agchk) against the current `langflow` repository with the personal-development profile:
+
+```bash
+agchk /path/to/langflow --profile personal
+```
+
+This is not a vulnerability disclosure and not a request to adopt another tool. It is a static architecture/methodology scan intende…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9068,2025-07-16,,1,"Langflow / langfuse configs for fast startup on servers with no internet access
+
+@dosu
+
+please check the configuration below and suggest how to quicken startup.
+
+langflow startup is not 1-2 minutes on a server with no internet access. its taking around 20 minutes. please assist. on machine with internet access it takes 1-2 minutes only
+
+# Docker Registry Configuration
+DOCKER_REGISTRY=YOUR_DOCKER_REGISTRY
+
+# Application Versions - Update these for easy upgrades
+LANGFUSE_VERSION=3
+LANGFLOW_VERSION=1.5.0
+
+# Langflow Authentication Settings
+LANGFLOW_AUTO_LOGIN=false            #…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11143,2025-12-24,,1,"Langflow backend service crashes if DO_NOT_TRACK is set true
+
+### Bug Description
+
+I tried to disable the usage tracking on kubernetes with version 1.7.1 but backend service get into `CrashLoopBackOff` if I set the `DO_NOT_TRACK` variable to `""true""` .
+Here is my values snippet:
+```
+ingress:
+  enabled: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  hosts:
+    - host: langflow-test.dev.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+  - secretName: langflow-test.dev.example.com-tls
+    hosts:
+    - langflo…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10058,2025-10-01,,1,"Langflow 1.6.0 - Error importing module langflow.components.composio.googletasks_composio: No module named 'base'
+
+### Bug Description
+
+On starting langflow 1.6.0, I get an error thrown telling me that 
+
+> Error importing module langflow.components.composio.googletasks_composio: No module named 'base'
+
+in context
+
+> ✓ Starting Core Services
+> ✓ Connecting Database...
+> ✓ Loading Components...
+> ✓ Adding Starter Projects...
+> ▢ Launching Langflow...2025-10-01T09:15:49.718927Z [error    ] Error importing module langflow.components.composio.googletasks_composio: No module named 'base'
+> ✓ Launching Langflow...
+…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10504,2025-11-05,,1,"Metabolismo lipidos
+
+Chat de asesorias"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8374,2025-06-04,,1,"Add SSO to Langflow
+
+### Bug Description
+
+How to enable sso from microsoft from langflow for multi user rather than using langflow own authentication 
+
+### Reproduction
+
+Sso for langflow
+
+### Expected behavior
+
+Sso for langflow 
+
+### Who can help?
+
+_No response_
+
+### Operating System
+
+Linux
+
+### Langflow Version
+
+Latest
+
+### Python Version
+
+3.12
+
+### Screenshot
+
+_No response_
+
+### Flow File
+
+_No response_"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11548,2026-02-03,,1,"File Component throws ""no component context"" error for specific .md files
+
+### Bug Description
+
+I am encountering a persistent and inconsistent error with the **File Component** when uploading Markdown (`.md`) files.
+
+The issue is specifically regarding the error:
+> `ValueError: called add_log but no component context found`
+
+**The Behavior:**
+- I have multiple `.md` files in the **same local directory**.
+- Some files upload and process correctly without any issues.
+- Other files (from the same directory, same extension) fail immediately with the error above.
+- Retryin…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9410,2025-08-15,,1,"Langflow unable to run without anyid on Openshift.
+
+### Bug Description
+
+We are trying to update the langflow image so that it can run on openshift without the anyid access as this is not accetpable by many company security policies. 
+
+We have mounted volumes for
+```yaml
+          volumeMounts:
+            - name: flows
+              mountPath: /app/flows
+              readOnly: false
+            - name: tmp
+              mountPath: /tmp
+              readOnly: false
+            - name: data
+              mountPath: /app/data
+              readOn…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8506,2025-06-12,,1,"Input not working
+
+I dont see the input tab altogether. I believe there is a bug."
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9306,2025-08-05,,9,"Windows Desktop App Reinstalls Itself on Each Launch""
+
+### Bug Description
+
+After installing the Langflow Desktop app on Windows, the application runs normally the first time. However, on subsequent launches, instead of opening directly or checking for updates, the installer is triggered again.
+
+From the logs, it appears that the app is being reinstalled every time the user tries to launch it.
+
+This seems to be related to a missing or altered requirements.txt file, which may be causing the installer to treat every launch as a fresh installation.
+
+[D…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7039,2025-03-12,,6,"ModuleNotFoundError: Module langflow.base.astra_assistants.util not found. Please install it and try again
+
+### Bug Description
+
+Impossible to run langflow.
+
+I got the error ModuleNotFoundError: Module langflow.base.astra_assistants.util not found. Please install it and try again
+
+Tried with two different PCs with : 
+- python 3.10.11 and 3.10 and 3.11.9
+- langflow 1.2.0
+
+The util file is here but the system cannot find it.
+
+I tried reinstalling it with different commands and removed the cache but still no success.
+
+Could you please help me.
+
+Cheers
+
+### Reproduction
+
+1. In a virtualenv on python 3.10.…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5717,2025-01-16,,4,"Support for system TLS certificate trust store and custom certificates
+
+### Feature Request
+
+Langflow should trust and respect certificates in the system trust store, or provided to Langflow directly so it can communicate with hosts using self-signed certificates.
+
+Since Langflow uses `httpx` the [implementation could be relatively simple](https://www.python-httpx.org/advanced/ssl/#configuring-client-instances), however [looking through the code](https://github.com/search?q=repo%3Alangflow-ai%2Flangflow%20httpx&type=code) there doesn't appear to be a single `httpx…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10215,2025-10-10,,4,"Missing langflow-frontend Docker Image for Version 1.6.4
+
+### Bug Description
+
+The Langflow 1.6.4 release appears to be missing the corresponding `langflowai/langflow-frontend` Docker image on Docker Hub.
+
+**Current Situation:**
+- **Langflow version**: 1.6.4 was recently released
+- **langflow-frontend Docker image**: Latest available version is still `1.5.1`
+- **Expected**: `langflowai/langflow-frontend:1.6.4` image should be published to match the Langflow release
+
+**Impact:**
+The `langflow-ide` Helm chart from https://github.com/langflow-ai/langflow-…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9035,2025-07-14,,4,"MCP component build error
+
+### Bug Description
+
+Hi! We have been unable to use MCP Tool block since we upgraded to 1.5.0 in SSE mode.
+
+It saves the URL, and settings displays all the tools available. But inside any flow block shows no tools and returns error about Superuser account. It seems like some migration went off, but migration tool see no issue.
+
+```
+                             <langflow.utils.validate.MCPToolsCompo             
+                             nent object at 0x7ff18e458590>                     
+    …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1432,2024-02-15,,4,"Error in DB migration with PostgreSQL for Langflow v0.6
+
+### Describe the bug
+When using PostgreSQL as the database for Langflow version 0.6, an error occurs during the DB migration process. Despite the log suggesting to run `langflow migration --fix`, executing this command does not resolve the error.
+
+### Browser and Version
+ - Google Chrome: Version 121.0.6167.160 (Official Build) (arm64)
+ - Langflow: v0.6.6
+
+### To Reproduce
+Steps to reproduce the behavior:
+1. Construct the environment using the attached `compose.yaml` and `Dockerfile`.
+…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9126,2025-07-22,,3,"update  langflow  1.4.3 to 1.5.0.post1  flow error “ Module langflow.base.models.openai_constants not found”
+
+error：
+400: {'error': 'Error building Component: Error creating class: Module langflow.base.models.openai_constants not found. Please install it and try again', 'traceback': 'Traceback (most recent call last):\n File ""/app/.venv/lib/python3.12/site-packages/langflow/utils/validate.py"", line 285, in prepare_global_scope\n exec_globals[alias.name] = importlib.import_module(full_module_path)\n ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n File ""/usr/local/lib/python3.12/importlib/init.py"", line 90, i…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8633,2025-06-19,,3,"Error when using Google Generative AI model with StructuredOutput component
+
+### Bug Description
+
+This is the error that I'm getting
+
+```
+An error occured in the Structured Output Component, stopping your flow. See below for more details.
+Error details:
+ParseError
+Details: Failed to parse properties field: Message type ""google.ai.generativelanguage.v1beta.Schema"" has no field named ""title"" at ""Schema.properties[objects].items"". Available Fields(except extensions): ""['type', 'format', 'description', 'nullable', 'enum', 'items', 'maxItems', 'minItems', 'properties', 'requi…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4572,2024-11-13,,3,"Langflow not starting with postgres - giving Sqlite error
+
+### Bug Description
+
+When I try starting Langflow on my Mac (latest version) when Langflow is configured to use Postgres, I get the following exception:
+
+
+```
+[11/13/24 12:40:49] ERROR    2024-11-13 12:40:49 - ERROR    - main - Error creating DB and tablesTraceback (most recent call last):                                                          main.py:114
+
+                               File ""/app/.venv/lib/python3.12/site-packages/langflow/services/database/utils.py"", line 21, in initia…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5375,2024-12-19,,3,"Static component names
+
+### Feature Request
+
+When a flow is exported and re-imported into LangFlow, the component IDs change. When that flow is used in an app with tweaks, however, unless the original environment is still available that created the flow, changes to the flow result in new IDs, which break the component IDs used in the flow tweaks. The component name can be referenced in some cases, but if more than one component of a given type exists, this doesn't work. It would be ideal if components could be given st…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8503,2025-06-12,,2,"Serve langflow at custom path
+
+### Bug Description
+
+I understand langflow runs at root path like localhost:7680 
+But if we want to serve at different path for different containers like localhost:7680/user1
+Likewise where and all we need to make this change in frontend and backend to make it run seamless . Is there any configuration file . Please provide the all the file changes and location where to change and what . Currently running with docker file and compose and building from source
+
+### Reproduction
+
+Run langflow at dif…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9011,2025-07-11,,2,"Use of multiple outputs simultaneously from nodes no longer possible in version 1.5.0
+
+### Bug Description
+
+In version 1.5.0 a drop down menu was introduced for cleaning up nodes with multiple outputs (i.e. like AzureChatOpenAIComponent where you can choose between language model or text response). 
+
+Sadly this breaks (custom) components that rely on having multiple outputs. In my example I have a component that takes a SPARQL query and executes it against a graph database. It cleans and verifies the incoming SPARQL query and outputs it as Message along with the result of the quer…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8967,2025-07-09,,2,"LangFlow Custom Component Not Showing in UI
+
+### Bug Description
+
+I have created a custom component following the guidelines in LangFlow documentation. I have placed it in the correct folder structure and mapped it to my docker volume mount correctly. I know this because I can check the docker container files and see the files there. 
+
+However I cannot see these or use them in the UI. 
+
+Here's the code, and it's not exactly what I want but the skeleton is fine and should be seen by the UI. 
+**_DO NOT COMMENT ON THE EFFECTIVENESS OF THE COD…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6016,2025-01-30,,2,"LangFlow v1.1.3 Error
+
+C:\Users\$myuser$\anaconda3\envs\LLM\Lib\site-packages\sqlmodel\orm\session.py:66: SAWarning: DELETE statement on table 'flow' expected to delete 18 row(s); 0 were matched.  Please set confirm_deleted_rows=False within the mapper configuration to prevent this warning. (This warning originated from the Session 'autoflush' process, which was invoked automatically in response to a user-initiated operation. Consider using ``no_autoflush`` context manager if this warning happended while initializing …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/2618,2024-07-10,,2,"There is a problem with the Create data component
+
+**Describe the bug**
+There is a problem with the Create data component   
+
+Add a Create data component and fill in the key and value, click Run, no output data
+
+**Browser and Version**
+ - Browser [chrome,]
+ - Version [v1.0.7]
+
+**To Reproduce**
+![微信图片_20240710154806](https://github.com/langflow-ai/langflow/assets/71969995/2a184f21-a6d9-4016-bddc-37b03483cae6)
+
+
+**Screenshots**
+If applicable, add screenshots to help explain your problem.
+
+**Additional context**
+Add any other conte…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1707,2024-04-15,,2,"A note for newcomers
+
+It doesn't work without an API key they won't give out. Don't waste your time with gatekeepers."
+GitHub issues,https://github.com/langflow-ai/langflow/issues/639,2023-07-12,,2,"LLamaIndex + Langflow conflict on SQLAlchemy
+
+I'm new to Python, so please don't judge me harshly, I'm from the Java world.
+
+Langchain depends on SQLAlchemy 2.0.15, but LLamaIndex depends on 1.4.41
+
+Langflow install log ERROR, if Langflow package is installed after LLamaIndex package:
+```
+ERROR: pip's dependency resolver does not currently take into account all the packages that are installed. This behavior is the source of the following dependency conflicts.
+llama-index 0.7.5 requires sqlalchemy>=2.0.15, but you have sqlalchemy 1.4.…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/14086,2026-07-15,,1,"Upgrade Langfuse tracing integration to Python SDK v4
+
+Hi Langflow team 👋 — I'm Hassieb from the Langfuse team.
+
+Langfuse Cloud's [Fast Preview](<https://langfuse.com/docs/v4>) is observations-first. For real-time data in the new UI, Python integrations should use SDK v4.7.0+.
+
+I reviewed `services/tracing/langfuse.py`; this looks like a focused v3→v4 migration:
+
+* Bump the optional dependency from `langfuse~=3.8` to a v4-compatible range such as `langfuse>=4.7,<5`.
+* Rename root and child `start_span` calls to `start_observation`.
+* Replace the roo…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11216,2026-01-06,,1,"Upgrade Langfuse dependency version to 3.x.x from 2.53.9
+
+### Feature Request
+
+Hi folks 👋
+
+First of all, thank you for all the amazing work — we’ve been really enjoying using **Langflow**.
+
+I noticed that the current `langfuse` dependency appears to be pinned to **v2.53.9**.
+Is there a specific reason for keeping it on 2.x at the moment (e.g. API compatibility, breaking changes in 3.x, or pending migrations)?
+
+I was also wondering:
+
+* Is upgrading to **Langfuse 3.x** on the roadmap?
+* If so (or even if not yet), would you be open to a **community PR** …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/9337,2025-08-09,,1,"Structured Output Component to support Pydantic Model Schema
+
+### Feature Request
+
+The ""Structured Output Component "" is currently like a ""toy-level"" feature; the table schema can't indicate the data structural level and the belonging message. Without the Pydantic support, we can't validate data and make data corrections along the pipeline. We must involve a ""Parser"" afterward, which disrupts the original data flow. 
+
+### Motivation
+
+Project migration.
+
+We found that the Langflow lacks prompt management and Custom Python code management (mainly data defini…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/13157,2026-05-16,,1,"Langflow 1.9.3 SQLite and postgresql Database Issue After Upgrade from 1.9.2
+
+### Bug Description
+
+We encountered intermittent issues when using Langflow version 1.9.3 with an SQLite or postgresql database after upgrading from version 1.9.2.
+
+After the upgrade, SQLite-related errors started appearing in the logs, as shown in the screenshots and logs below. In some cases, users are unable to log in due to database-related errors. However, the issue is inconsistent — sometimes users are able to log in successfully again after some time has passed without any changes being m…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4090,2024-10-10,,21,"Question is it possible to implement multi-agent flows using langgraph in Langflow?
+
+### Feature Request
+
+I would like to implement multi-agent flows based on `langgraph`, as explained in the following tutorials:
+
+- [Multi-Agent Collaboration](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/multi-agent-collaboration/)
+- [Agent Supervisor](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/agent_supervisor/)
+- [Hierarchical Agent Teams](https://langchain-ai.github.io/langgraph/tutorials/multi_agent/hierarchical_agent_teams/)
+
+However, I noticed th…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4295,2024-10-27,,5,"ImportError: cannot import name 'CodeInterpreter' from 'e2b_code_interpreter'
+
+### Bug Description
+
+**Hi everyone,**
+
+First of all, I would like to congratulate the whole team for their hard work in making Langflow available.
+
+I’m encountering an issue after installing Langflow in a conda environment. When I run `python -m langflow run`, I receive the following error: 
+
+``ImportError: cannot import name 'CodeInterpreter' from 'e2b_code_interpreter'``.
+
+I’ve attached a screenshot below to illustrate the problem.
+
+I did some investigation on my side to understand…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/866,2023-09-05,,4,"Conflict dependencies
+
+**Describe the bug**
+A clear and concise description of what the bug is.
+
+**Browser and Version**
+ - Browser [opera GX]
+ - Version [101.0.4843.81]
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to 'Anaconda prompt, create a new environment with python=3.9.'
+2. Activate Environment
+3. ""pip install langflow"" following the instructions
+
+![image](https://github.com/logspace-ai/langflow/assets/88533031/c4098dcb-602a-4333-988a-800624c6b00e)
+
+I tried to install the packages man…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/21,2023-03-15,,4,"Fix dockerfile
+
+Facing error when building image.
+
+![image](https://user-images.githubusercontent.com/34348523/225198929-31389830-3c5d-4c4e-a641-2237718a96ac.png)
+
+
+Logspace repo on Docker Hub is not accessible."
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/2212,2024-06-18,,3,"[Request] Please add openrouter as LLM Model
+
+**Describe the bug**
+https://openrouter.ai/ has more than 150+ different models at cheap prices. Please add it as a llm model so we can easily use it with langflow. 
+
+**Additional context**
+Also it would be great, if you add a project in https://pinokio.computer/, then we can easily install Langflow in desktop computer."
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1391,2024-02-04,,3,"Langflow Store API Token
+
+Hi I hope you are doing well.
+I have installed Langflow locally in my system. I can't see any components in that when I run the Langflow. I want to create Flow for which I need  components. It asks me to Put API Token Key for Langflow. when I register for API Token Key it put me in wait list. How long I have to wait. i need to complete the task by today. Suggest me how can I create flow using components.
+!"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1071,2023-10-18,,3,"UPDATE RAILWAY TEMPLATE
+
+Please update the one-click install for railway with the newest version"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/502,2023-06-17,,3,"spawn.py Error -
+
+Could not run Langflow at all.
+
+ - Windows 11
+ - Python 3.10.11 (64 bit)
+ - LangChain 0.0.202
+
+**Error Msg**
+C:\Users\xxxx>langflow
+Traceback (most recent call last):
+  File ""<string>"", line 1, in <module>
+  File ""C:\Program Files\Python310\lib\site-packages\multiprocess\spawn.py"", line 116, in spawn_main
+    exitcode = _main(fd, parent_sentinel)
+  File ""C:\Program Files\Python310\lib\site-packages\multiprocess\spawn.py"", line 126, in _main
+    self = reduction.pickle.load(from_pare…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/119,2023-04-06,,3,"Requirement missing in release 0.0.53? rich.logging
+
+File ""py390/lib/python3.9/site-packages/langflow/utils/logger.py"", line 4, in <module>
+    from rich.logging import RichHandler
+ModuleNotFoundError: No module named 'rich'
+
+After` pip install rich` all was good
+
+Awesome release by the way!"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/80,2023-03-29,,3,"Error: A single string input was passed in, but this chain expects multiple inputs (set()).
+
+Hey there! 
+
+Just installed this and playing around with it. 
+Unfortunately I'm getting this error as soon as I try a basic example
+
+```
+Error: A single string input was passed in, but this chain expects multiple inputs (set()). When a chain expects multiple inputs, please call it by passing in a dictionary, eg `chain({'foo': 1, 'bar': 2})`
+```
+
+Is there something I'm not configuring correctly and I'm missing?
+
+<img width=""1721"" alt=""image"" src=""https://user-images.githubusercontent.c…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/12345,2026-03-26,,2,"CVE-2026-33017 is not fixed in langflow 1.8.2
+
+The release notes for Langflow 1.8.2 specify that CVE-2026-33017 is fixed in the release - https://github.com/langflow-ai/langflow/releases/tag/1.8.2
+
+However - it seems that the patch is not applied in langflow 1.8.2, the vulnerability is still exploitable - https://pypi.org/project/langflow/1.8.2/
+
+https://inspector.pypi.io/project/langflow-base/0.8.2/packages/29/7b/9c97bda0047d22351ecf2bfc7db7a58b8501ee6c50190961e094f045a472/langflow_base-0.8.2-py3-none-any.whl/langflow/api/v1/chat.py#line.63…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11115,2025-12-19,,2,"Langflow Desktop 1.6.0 is failing to start up
+
+### Bug Description
+
+Bug Description
+
+I'm using Langflow Desktop as a main tool for  Agents course I'm teaching, few people since yesterday had issues with the  set up
+
+ 
+
+
+### Reproduction
+
+Here's part of the log:
+
+```
+[2025-12-18][19:45:23][INFO] 🔥 [ENSURE_LANGFLOW] Installing Langflow 1.6.0...
+[2025-12-18][19:45:23][INFO] 🪟 [INSTALL_LANGFLOW_WIN] Installing Langflow on Windows...
+[2025-12-18][19:45:23][INFO] [PATH] Built expanded PATH with 10 entries
+[2025-12-18][19:45:23][INFO] 🔗 [INSTALL_LA…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/631,2023-07-10,,16,"Feature Request: Export the LangFlow to a LangChain code implementation
+
+Hey Langflow - 
+
+My team and I are working on building a tool and we wanted to use LangFlow to figure out how we would configure our LangChain agent. It would be helpful if instead of only having the option to export/generate python code which calls and implements the flow.json designed in LangFlow, would it be possible to add in a feature to generate an equivalent LangChain code which would implement all the components present in the LangFlow document.
+
+Is there already a way to do this - o…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/429,2023-06-02,,9,"Support for LocalAI
+
+[LocalAI](https://github.com/go-skynet/LocalAI) is a OpenAI drop-in API replacement with support for multiple model families to run LLMs on consumer-grade hardware, locally. As it is compatible with OpenAI, it just requires to set the base path as parameter in the OpenAI client, there is also an example with langchain-js and langchain-python in the LocalAI repository here: https://github.com/go-skynet/LocalAI/blob/577d36b5964ba0873b945f2ea00404ed52556408/examples/langchain/langchainjs-localai-ex…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1731,2024-04-17,,8,"[Feature Request] Case Components Management: Integrating Conditional Logic into Langflow with Custom Component Status Fields
+
+## Reasons for Suggestion
+Managing conditional logic like ""If"" and ""Case"" statements directly within Langflow rather than through Langchain would enhance customization and control over the flow processes. Using custom component status fields for this purpose could provide a more integrated and efficient approach to handling diverse outputs and responses, particularly for error handling in API interactions.
+
+## Content of the Proposal
+Implement a method to manage conditional statements (e.g.,…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9671,2025-09-03,,6,"Custom components not loading
+
+### Bug Description
+
+Custom components are not loading when run local langflow probably because of the weird condition to load components. The following fix  works :  
+
+Replace in interface/components.py line 173 :
+```
+elif (
+            settings_service.settings.components_path
+            and BASE_COMPONENTS_PATH not in settings_service.settings.components_path
+        ):
+```
+by
+`elif len(settings_service.settings.components_path) > 1:
+`
+
+### Reproduction
+
+try to load components
+
+### Expected …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/6070,2025-02-02,,5,"Implement IMAP Trigger and Mail Reading Feature
+
+### Feature Request
+
+As a user of LangFlow, I want to integrate an IMAP trigger and mail reading functionality that can automatically process incoming emails based on specified criteria. This feature will enable AI agents to trigger workflows in response to new emails, automating various tasks such as email classification, searching for user information, and preparing response emails.
+
+### Motivation
+
+As a user of LangFlow, I want to integrate an IMAP trigger and mail reading functionality that …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7980,2025-05-10,,5,"I am dissapointed with inability of simply get the nested key from api request especially if it is list.
+
+for 2-3 hours i just could not retrieve the key's value from nested json response and loop over it. it becomes Data or DataFrame and always gets wrapped around result column and if the value of it is nested, there is no way you get that nested value especially if it is a list. i am deleting this thing."
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5,2023-02-24,,4,"Add custom node to load from langchainhub
+
+Need some type of node to use langchainhub components in the flow"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/6214,2025-02-08,,3,"Feature Request: Realtime custom components addition and update
+
+### Feature Request
+
+This is a three feature request
+
+1. Request to make components update in real time when the there are changes in the custom component folder
+2. Request to create components directly on specific group via Components Panel of LangFlow
+3. Request to create groups directly via Components Panel
+4. Create sub groups in Component Panel
+
+Components created are automatically save in the custom component directory.
+
+### Motivation
+
+Ease of use for various extended AI/ML workflows not …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3563,2024-08-26,,3,"How can set subpath on my langflow ?
+
+How can set subpath on my langflow ?
+
+- I running below
+  > python -m langflow run
+
+- I can access to langflow 
+  > http://localhost:7860
+
+- I wanna access to langflow 
+  > http://localhost:7860/myflow"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/7473,2025-04-07,,3,"Voice mode should not heavily rely on OpenAI
+
+### Feature Request
+
+At present, the Voice mode can only be implemented using OpenAI. Can a project similar to [Pipecat](https://github.com/pipecat-ai/pipecat) be used to implement the built-in voice mode
+
+### Motivation
+
+Support local deployment of relevant LLM in place of use, rather than using OpenAI
+
+### Your Contribution
+
+_No response_"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10700,2025-11-24,,3,"Langflow on Kubernetes not working properly
+
+### Bug Description
+
+We deployed langflow 1.6.8 using the official helm chart and there are differences between a local deployment and the kubernetes one : 
+
+- The profile pictures does not copy properly
+- The components are placed in a folder of the same name, creating many folders in the interface
+- The behavior of components is not the same as before, for instance the agent component does not have a custom model option
+
+The deployment in version 1.4.2 is working properly.
+
+### Reproduction
+
+S…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10393,2025-10-24,,3,"Make sticky notes more useful for documentation inside flows
+
+### Feature Request
+
+To make sticky notes more useful for documentation inside flows:
+
+1. Remove the size constraints so they can be as large as needed
+2. Add more colors so more parts of a flow can be easily visually distinguished
+
+### Motivation
+
+### Executive summary:
+As a developer, I would like to be able to document my langflow inside the flow as much as possible. This will enable developers or users to more easily understand complex setups by simply opening the flow, without needing to re…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7376,2025-04-01,,3,"fail to access MCP SSE Server created by supergateway
+
+### Bug Description
+
+When I used mcp inspector to access the MCP server ran by supergateway, it's OK. But when I use langflow, the error message shows Invalid SSE URL for the supergateway. 
+
+1. In langflow, I see
+langflow_mcp-langflow-1  | [04/01/25 05:58:14] ERROR    2025-04-01 05:58:14 - ERROR    -       <string>:374
+langflow_mcp-langflow-1  |                              <string> - Invalid SSE URL
+langflow_mcp-langflow-1  |                              configuration:
+langflow_mcp-langflow-1  …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/144,2023-04-10,,7,"Add support for llama.cpp
+
+add support for llama.ccp for local Ai inferencing"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5578,2025-01-07,,5,"Feature to enable loop/map function to a subflow and assemble the ouput
+
+### Feature Request
+
+It is a very common scenario where a subflow is implemented on a list of inputs and the output is combined before sending to LLM for further analysis. For eg: RAG over multiples queries. Right now, only one end to end flow is supported.
+
+### Motivation
+
+One query can be broken down into multiple sub queries which goes through RAG to retrieve documents for each sub query and combined before sending to LLM. Right now, it is not possible to run fetch docs for multiples queries …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/9283,2025-08-01,,4,"Can the Chinese translation version of Langflow be merged into the community?
+
+### Feature Request
+
+Can the Chinese translation version of Langflow be merged into the community? I noticed there are i18n-related contents in the community code, but the workload is relatively large. Therefore, for now, we have directly translated the 'docs-zh' directory and provided an online Chinese documentation address: [Langflow中文文档](https://langflow.lishiyu.cn). You can review the translation results.
+
+### Motivation
+
+None
+
+### Your Contribution
+
+I'll submit a PR later."
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/9157,2025-07-23,,4,"S3 langflow integration
+
+### Feature Request
+
+Please include data sources such as s3 from AWS such that files from s3 are displayed in langflow file component or docling. 
+
+### Motivation
+
+Would be helpful for cloud like AWS and Azure data sources 
+
+### Your Contribution
+
+_No response_"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3499,2024-08-22,,4,"Multi-Channel Support and Website Integration
+
+### Feature Request
+
+Hello,
+
+I am currently using LangFlow to develop a chatbot for our website, and I have a few questions regarding the platform's capabilities and future updates:
+
+1. **Multi-Channel Support:** Are there any plans to introduce multi-channel support in future updates? It would be extremely beneficial to deploy the same chatbot across different platforms (e.g., WhatsApp, Facebook Messenger, etc.) without needing to create separate flows for each channel. If this is not on th…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/712,2023-08-03,,4,"Feature Request - Add Python Code Export Functionality
+
+**Description:**
+Add a Python code export feature to Langflow. This will allow users to export the flows they design using the UI as executable Python code. Enhancing flexibility and scalability, enabling use in large-scale applications.
+
+**Benefits:**
+Versatility: Users can fine-tune flows and run them in different environments.
+Scalability: Suitable for large-scale data processing applications.
+Integration: Seamlessly integrate with existing Python-based workflows and libraries.
+
+**Imp…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/1337,2024-01-15,,4,"OpenAI Models are deprecated
+
+**Describe the bug**
+A clear and concise description of what the bug is.
+
+**Browser and Version**
+ - Browser [e.g. chrome, safari]
+ - Version [e.g. 22]
+
+Chrome 120.0.6099.216
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+OpenAI Model are deprecated
+https://github.com/logspace-ai/langflow/blob/dev/src/backend/langflow/utils/constants.py#L4
+https://platform.openai.com/docs/deprecations
+
+```
+ValueErro…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10449,2025-10-30,,3,"A flow owned by someone can be ran using another user's API KEY
+
+### Bug Description
+
+I deployed langflow on a kubernetes cluster via helm-chart, the multi-user authentication variables provided in the documentation are filled like this : 
+
+```
+            - name: LANGFLOW_STORE
+              value: 'false'
+            - name: LANGFLOW_AUTO_LOGIN
+              value: 'false'
+            - name: LANGFLOW_SECRET_KEY
+              value: 'something'
+            - name: LANGFLOW_SUPERUSER
+              value; 'something'
+            - name: LANGFLOW_SUPERUSER_PAS…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/9281,2025-08-01,,3,"Shareable Playground supports uploading pictures, videos and files.
+
+### Feature Request
+
+Shareable Playground supports uploading pictures, videos and files.
+
+### Motivation
+
+Shareable Playground supports uploading pictures, videos and files.
+
+### Your Contribution
+
+_No response_"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/9494,2025-08-22,,4,"Langflow MCP client User Elicitation Support
+
+### Feature Request
+
+MCP/fastmcp has official support of user elicitation, however langflow mcp client does not support this. 
+This is really a required feature now in terms of security. 
+
+Elicitation requires the client to implement an elicitation handler. 
+And Langflow client doesn’t support elicitation, thus calls to ctx.elicit() raises an error indicating that elicitation is not supported.
+
+<img width=""1184"" height=""469"" alt=""Image"" src=""https://github.com/user-attachments/assets/2972a9f8-c3…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10975,2025-12-11,,3,"MCP Tool Request is sent from Agent Component without (some) parameters
+
+First of all thanks for the amazing Langflow platform!
+
+### Bug Description
+
+When a MCP request ist sent from an Agent Component in Langflow it does not contain `searchParams` that it shows in the playground. The following shows the query from the playground:
+
+<img width=""693"" height=""271"" alt=""Image"" src=""https://github.com/user-attachments/assets/02a2fc26-e1d4-47cb-a9c5-0dd25dce74d4"" />
+
+Digging deeper the query looks perfectly fine and should be working and langflow also logs this: `Invoking:…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/3467,2024-08-21,,3,"Publish Chat as a Single-page Web App
+
+### Feature Request
+
+It would be nice if we can get a publish Chat as Single-page Web App Feature. 
+
+### Motivation
+
+Example: https://docs.dify.ai/guides/application-publishing/launch-your-webapp-quickly
+
+### Your Contribution
+
+_No response_"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/2563,2024-07-05,,3,"API Stream leak
+
+**Describe the bug**
+When using the API to stream a chat output, the stream url endpoint is accessible open. Resulting in possible leaking of the message if two devices call the same endpoint.
+
+**To Reproduce**
+Steps to reproduce the behavior:
+1. Use the basic flow to make a call using the _playground_
+2. Go to any browser or device and access:  http://<YOUR_ADDR>/api/v1/build/<YOUR_FLOW_ID>/<CHAT_OUTPUT_ID>/stream.
+ex: (https://langflow.brasil.com/api/v1/build/90deb8be-4e8c-422a-b35f-450…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6929,2025-03-05,,2,"Playground Chat Arrangement went haywire
+
+### Bug Description
+
+Dear Dev Team, 
+
+I notice since the last few release, the playground chat become haywire. The latest question from the user goes all the way back on top of the conversation. User needs to close the playground and reopen the playground to get the conversation correctly placed at the bottom most of the whole conversation. 
+This issue is not found in version 1.1.1 and it existed since 1.1.2 and later. 
+Please assist. 
+
+### Reproduction
+
+This is my first question. 
+![Image](http…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/4145,2024-10-14,,2,"Add Chat Input Playground support for multiple images and different types of files
+
+### Feature Request
+
+Right now the Chat Input apparently support different types of files, as suggested by:
+
+```py
+FileInput(
+    name=""files"",
+    display_name=""Files"",
+    file_types=TEXT_FILE_TYPES + IMG_FILE_TYPES,
+    info=""Files to be sent with the message."",
+    advanced=True,
+    is_list=True,
+)
+```
+
+But the playground appears to only work with images types and only supports an upload by time, but apparently there is no limitation for this in the component backend (at leas…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5378,2024-12-20,,2,"URL component lost imported urls in tool mode when refresh UI
+
+### Bug Description
+
+I have this issue when i build multi agent flow like import json below
+- URL Component Before refresh UI:
+![image](https://github.com/user-attachments/assets/f361501d-3d11-4e4a-b560-203faf8a4935)
+![image](https://github.com/user-attachments/assets/4ee6c93f-914b-4efa-b0eb-5a13f5c404fa)
+
+After refresh UI:
+![image](https://github.com/user-attachments/assets/2224a76e-1dd7-42d4-8531-a5e86719653c)
+![image](https://github.com/user-attachments/assets/3753754f-3a16-4bfc-a82e-1…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10299,2025-10-16,,1,"Add native support for LangChain-style message history in the Chat Input component
+
+### Feature Request
+
+Enable the Chat Input component to accept LangChain-style message objects, preserving roles and message order automatically.
+Example format:
+
+{
+  ""messages"": [
+    { ""role"": ""user"", ""content"": ""Hi!"" },
+    { ""role"": ""assistant"", ""content"": ""Hello! How are you?"" },
+    { ""role"": ""user"", ""content"": ""I'm fine, thanks!"" }
+  ]
+}
+
+
+Langflow should be able to parse and manage this structure internally, so users can build multi-turn chat flows without custom parsers or manual splitt…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/7608,2025-04-13,,1,"Feature Request: Bulk Delete or Version-Based Grouping for Playground Chats
+
+### Feature Request
+
+This feature request relates specifically to the chat interface within the Langflow Playground – the area where users interact with their flows via text input and see the responses.
+
+When developing and testing a flow in Langflow, I frequently use the Playground to iterate and refine it. This process often involves running numerous tests, sometimes resulting in 20 or more chat sessions being created for a single version of the flow (as indicated by the multiple sessions in t…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/10419,2025-10-27,,1,"Logs are not visible in tool mode
+
+When using `self.log` in a component, if I build it in the canvas, logs are visible in the component output preview. 
+
+However, if I use the component as a tool, and then try to build it or use it with the agent in the playground, log outputs are empty. Is there a way to see the logs in the tool mode? Should I use a different method to see them?
+
+To reproduce, simply link an agent with any tool, and use self.log in the build output method. A/B test the tool with tool mode on, linked to agent and…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11118,2025-12-20,,1,"Langflow output component not showing  the image generated by jigsaw bundle
+
+### Bug Description
+
+Langflow output component not showing  the image generated by jigsaw bundle . The output is showing text instead of the image 
+
+
+### Reproduction
+
+Create the langflow  using jigsaw model connected as tool to agent dialog and output 
+Output is not showing the image and not showing in chat window 
+
+### Expected behavior
+
+image is shown in chat window
+
+### Who can help?
+
+_No response_
+
+### Operating System
+
+windows 11
+
+### Langflow Version
+
+latest
+
+### Python Version
+
+None
+
+###…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11153,2025-12-27,,1,"Empty input when using RunFlow component
+
+### Bug Description
+
+## Problem
+I am using a Parent Flow with an Agent that calls a Subflow via the ""Run Flow"" component.
+
+The issue is that the Subflow receives empty input. The input is successfully sent in the Parent Flow (visible in logs), but for some reason, it fails to reach the Subflow.
+
+Interestingly, this workflow was originally functioning correctly. The problem appeared after I updated the system prompt in the Subflow and changed the LLMs. Reverting the prompt and model changes did n…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7520,2025-04-09,,1,"Uploading pdf files in playground
+
+The chat input provides an option to upload files with the 'files' field name:
+
+![Image](https://github.com/user-attachments/assets/724c9171-f8ab-4700-97e9-3f323b1962d6)
+
+However when running the flow in the playground there is only an image upload icon which supports only image formats. Is this how it is supposed to be or am I missing something?
+
+Is it possible to have a rag flow which allows file upload during chat and stores them to the vector db and perform rag for the following questions?"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/10360,2025-10-22,,1,"Chat Input no longer supports multiple input fields or connections in Langflow 1.6.5
+
+### Bug Description
+
+### **Summary**
+
+After upgrading from **Langflow 1.5.0** to **1.6.5**, our customized `ChatInput` component stopped supporting **multiple independent input fields** within a single flow.
+
+In version 1.5.0, we extended the base `ChatInput` to handle **multiple message fields** (for example, `input_value`, `session_context`, `ocpp_logs`, or simply `input_value_2`).
+Each field could be connected to a different downstream node, allowing complex AI workflows where multiple contex…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/2750,2024-07-17,,1,"Unable to Upload PDFs in LangFlow Playground
+
+**Description:**
+I am currently working on a project that involves uploading and processing PDF files using LangFlow Playground. However, I have encountered an issue where the system does not allow me to upload PDF files. This functionality is crucial for my project's requirements.
+
+**Steps to Reproduce:**
+
+Go to LangFlow Playground.
+Attempt to upload a PDF file using the provided upload feature.
+Observe the behavior and the error message (if any).
+
+**Expected Behavior:**
+The PDF file …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6862,2025-02-27,,1,"OpenAI API issues : No Queue Found for  job_id
+
+### Bug Description
+
+Feb 27 09:11:46 inference1 python3[2903]: [02/27/25 09:11:46] ERROR    2025-02-27 09:11:46 - ERROR    -     service.py:179
+Feb 27 09:11:46 inference1 python3[2903]:                              service - No queue found for job_id
+Feb 27 09:11:46 inference1 python3[2903]:                              b2016695-092b-49d5-8fdd-c41f765421cc
+
+### Reproduction
+
+Create a OpenAI Model component with a Chat Input, and Chat output. With Streaming on, the playground output will be slow …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6308,2025-02-12,,1,"Error with Agent that does not have tools
+
+<img width=""1789"" alt=""Image"" src=""https://github.com/user-attachments/assets/3cdfabfd-bd75-4c42-9d35-9b346b6786bf"" />
+
+Error with no traceback. This is happening when the last component of the flow is an agent without tools, after reloading there is a response in the playground (happens each time a user sends an input)"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5413,2024-12-23,,1,"Error with Agent Component with JSON as input
+
+### Bug Description
+
+I am having trouble with a simple flow in the playground and the issues appears to be related to the **AGENT component** and trying to get a JSON object into the user prompt.
+
+If I create a simple flow with a PROMPT and Chat Input going into the **OPENAI  component** and out to a Chat Output, I can paste in a JSON object into the user chat and get an expected output from the model.
+
+However, if I replace the OpenAI component with an AGENT component (using the gpt-4o as…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6880,2025-02-28,,1,"Traces not being captured anymore
+
+### Bug Description
+
+Hello there,
+
+The recent changes on the build process caused `end_all_traces` to no longer being called, as a result the final call to send the traces for langwatch, langfuse etc are not being called:
+
+https://github.com/langflow-ai/langflow/pull/5940#issuecomment-2685617499
+
+### Reproduction
+
+1. Set up LANGWATCH_API_KEY
+2. Traces are not arriving to langwatch
+3. Add print statements on `end_all_traces`
+4. Verify it's not being called
+
+### Expected behavior
+
+`end_all_traces`…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/5409,2024-12-23,,1,"Can't delete a flow after running it when a playground execution failed
+
+### Bug Description
+
+I can't remove a flow that 1) ran successfully once and 2) thrown an exception later.
+It looks like the application state is broken for that flow and the API returns the flowing error:
+```
+(psycopg.errors.NotNullViolation) null value in column ""flow_id"" of relation ""vertex_build"" violates not-null constraint
+DETAIL:  Failing row contains (2024-12-23 14:00:32.353404, ChatInput-WZqts, {""results"": {""message"": {""text_key"": ""text"", ""data"": {""timestamp..., {""message"": ""Hello"",…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6124,2025-02-05,,1,"Repeatedly run vertexes when use ConditionalRouterComponent
+
+### Bug Description
+
+<img width=""925"" alt=""Image"" src=""https://github.com/user-attachments/assets/03639159-face-4916-b748-1be73f1377f7"" />
+
+`/api/v1/build/59fb2d26-14cb-410f-a599-75a5b3bf2413/flow?&start_component_id=ChatInput-vAd7W&log_builds=true` api response:
+
+```
+{""event"": ""vertices_sorted"", ""data"": {""ids"": [""ChatInput-vAd7W""], ""to_run"": [""ConditionalRouter-zRRVB"", ""ChatInput-vAd7W"", ""ChatOutput-hFryt"", ""ChatOutput-5dYR6""]}}
+
+{""event"": ""add_message"", ""data"": {""timestamp"": ""2025-02-05T08:55:…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/3264,2024-08-09,,1,"Playground does not fully clear chat history
+
+### Bug Description
+
+This is a tough one to explain, so maybe someone else is seeing this too.  I have a chat input at the start of my flow, and then a message to chat output at the end.  When i open up the playground, it will add all of the chat messages in there as expected.  However, if i hit the eraser button to clear out the chat, it will at first get rid of all the previous chat... but then if i close the playground and re-open it ALL of the previous chat history will appear and it will au…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/3926,2024-09-26,,1,"I've been experiencing issues with LANGFLOW_WORKERS and cache configurations in Langflow
+
+### Bug Description
+
+**My current configuration**:
+langflow:
+  image: langflowai/langflow:latest
+  container_name: langflow
+  environment:
+    - LANGFLOW_WORKERS=4    
+    - LANGFLOW_CONFIG_DIR=/app/langflow
+    - DO_NOT_TRACK=true
+    - BROKER_URL=amqp://langflow:langflow@rabbitmq:5672
+    - LANGFLOW_CACHE_TYPE=memory
+    - LANGFLOW_DATABASE_URL=postgresql://langflow:langflow@db_database:5432/langflow_db
+    - LANGFLOW_HOST=0.0.0.0
+    - LANGFLOW_PORT=7860
+    - LANGFLOW_LOG_FILE=l…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/3146,2024-08-01,,1,"Bug: Playground Messages Are Out of Order and Reappear After Deletion
+
+### Bug Description
+
+There are two ongoing issues with the playground messages:
+
+1. **Message Order**:
+   - New messages sometimes appear at the top or in the middle, instead of at the bottom in chronological order.
+   
+2. **Message Reappearance After Deletion**:
+   - Deleted messages reappear after a few seconds, affecting both session messages and playground messages.
+
+
+Video of the bug https://jam.dev/c/240e8f54-37f5-446c-8f42-9bb5e1868052
+
+### Reproduction
+
+1. Send multiple messages…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7440,2025-04-04,,9,"bug: 🐦‍🔥🔥🔥🔥🔥🔥🔥 Langflow 1.3.2 crashes with Langfuse tracing and Streaming Chat 🔥🔥🔥🔥🔥🔥🐦‍🔥
+
+### Bug Description
+
+""When I enable Langfuse tracing options and use Streaming Chat, the Langflow app crashes. I'm using version 1.3.2, and this happens even with the provided basic prompt.""
+
+
+
+### Reproduction
+
+Steps to Reproduce:
+
+1. Clone the Langflow Git repository (main branch).
+2. Navigate to the docker_example directory.
+3. Execute the setup, including your Langfuse API keys.
+4. Run a Streaming Chat in the Basic Prompt using LLMs like Google or OpenAI.
+
+### Expected behavior
+
+app is stopp…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/752,2023-08-10,,5,"Feature Request: Authentication needed for public domain
+
+In order to use in Public domain, we need to ability to password protect our Langflow instances in  public domain. Without this feature I cant use langflow on a vps or vm instances ."
+GitHub issues,https://github.com/langflow-ai/langflow/issues/12923,2026-04-29,,4,"🐛 Bug Report: Frontend Black Screen with Missing Chinese Locale File Error
+
+### Bug Description
+
+## **Description**
+When accessing Langflow with a browser that has Chinese (zh) as the preferred language, the frontend displays a black screen and fails to load. The browser console shows an error indicating that the Chinese locale file (`zh.json`) cannot be found.
+
+## **Error Message**
+```
+index-CuWAH0LD.js:980 Uncaught (in promise) Error: Unknown variable dynamic import: ./locales/zh.json
+    at index-CuWAH0LD.js:980:3787
+    at new Promise (<anonymous>)
+    at rwr (index…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/794,2023-08-21,,4,"Path based routing support for langflow
+
+**Describe the bug**
+Using SCRIPT_NAME to change the base url prefix of the langflow service does not work. 
+
+**To Reproduce**
+Change SCRIPT_NAME env variable and launch UI.
+
+**Additional context**
+I'd like to host langflow on our Kubernetes cluster which implements a service mesh (istio). We'd like to keep all inbound traffic behind https://example.com and use path based routing for different applications. We currently run kubeflow on the cluster so each namespace is a different project.…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/708,2023-08-02,,4,"Feature Request: credentials support for Production
+
+In order to be useful in Production, we need to ability to password protect our Langflow instances in Production / public domain."
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/104,2023-04-04,,4,"Add support for database API
+
+Adding support for database API such as Pinecone, Weaviate or other vector databases"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/12117,2026-03-10,,3,"Support sending traces to a generic OpenTelemetry OTLP endpoint
+
+### Feature Request
+
+Langflow presently supports sending traces using the OpenTelemetry SDK to vendor specific endpoints including:
+
+* Langwatch
+* [Traceloop](https://github.com/langflow-ai/langflow/issues/7955)
+* Arize/Phoenix (combined exporter for both)
+
+... all of which use OLTP and the OpenTelemetry SDK internally, but have their own configuration env-vars, own authentication schemes, etc.
+
+These are not identical; in addition to their different built-in endpoints and auth headers, some, li…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/11918,2026-02-26,,2,"Support dynamic reloading of flows from LANGFLOW_LOAD_FLOWS_PATH
+
+### Feature Request
+
+**Current behavior**  
+When running Langflow in **runtime mode** (backend-only, e.g., `langflow run --backend-only` or via the official Helm chart / Docker image in production), flows placed in the directory specified by `LANGFLOW_LOAD_FLOWS_PATH` (often mounted via PVC in Kubernetes/EKS) are only scanned and loaded **once at startup**.  
+Adding, updating, or removing flow JSON files in that directory has **no effect** until the pod/container is restarted. There is no built-…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/14983,2026-09-08,,2,"Global variables from LANGFLOW_VARIABLES_TO_GET_FROM_ENVIRONMENT never reach existing SSO users, and value changes never propagate to anyone
+
+### Bug Description
+
+Two bugs in how `LANGFLOW_VARIABLES_TO_GET_FROM_ENVIRONMENT` is turned into per-user rows in the `variable` table.
+
+  **Bug 1 — SSO users only get these variables on the day their account is created.**
+
+  `initialize_user_variables()` only runs when a user is created or logs in. With `LANGFLOW_EXTERNAL_AUTH_ENABLED=true` there is no `/login` call at all — every request goes through `AuthService._materialize_external_user()` (`src/backend/base/langflow/services/auth/service.p…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/8165,2025-05-22,,2,"Unable to use global variable as MCP command
+
+### Bug Description
+
+I have an internal MCP server that I'm running using `uvx` and inline authentication with a GitHub token per https://docs.astral.sh/uv/configuration/authentication/
+
+If I paste my command into the MCP Connection block directly (`uvx --from git+https://github_pat_XXX@github.com/org/repo server-command`), it installs and works fine.
+
+If I then extract that same text out into a global variable `MY_MCP_COMMAND` (either generic or credential) and bind that variable to the same co…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/8568,2025-06-17,,5,"Async Event Scheduler with Notify → Listen → LLM Trigger Support
+
+### Feature Request
+
+In current Langflow implementations, the `Notify` and `Listen` components allow simple state-based triggering between flows. However, they are designed for synchronous execution and do not support delayed asynchronous notifications or automatic downstream LLM reactivation. This limitation becomes problematic when designing time-sensitive, event-driven workflows.
+
+For example:
+- I want to use a `Notify` component as a tool callable by an LLM (e.g., `set_alarm(time=10)`).
+- In…"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/5619,2025-01-10,,3,"""It looks like we're missing some important information: session_id..."" when I run run_flow_from_json by api - python code
+
+### Title
+
+session_id issue when run ""run_flow_from_json
+
+### Type
+
+Improvement
+
+### Description
+
+""It looks like we're missing some important information: session_id (unique conversation identifier). Please ensure that your message includes all the required fields."" when I run run_flow_from_json, here is my code which I set session_id: 
+
+result = run_flow_from_json(flow=""flow_name.json"",
+                            input_value=""hello"",
+                            session_id=""123"", # provide …"
+GitHub feature requests,https://github.com/langflow-ai/langflow/issues/1492,2024-03-04,,3,"Rendering non-chat flows
+
+Hi Team, are there any plans to render the output of non-chat flows? Currently it seems the end node has to be some form of LLMChain in which the chat functionality can connect to. I currently have to export the json workflow into my local environment and execute there. Having this functionality on the frontend is possible would be great!"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6997,2025-03-10,,2,"MCP (stdio) raise error ""Too many arguments to single-input tool""
+
+### Bug Description
+
+Hi, I am trying to run a simple config to test the MCP function.
+
+But the flow keeps failing with the following error:
+```
+Prompt: Tell me what you think about Elon Musk.
+
+Error building Component Agent: Too many arguments to single-input tool sequentialthinking. Consider using StructuredTool instead. Args: [True, 'Begin by identifying key facts about Elon Musk - his background, education, early career, and how he became involved in technology and entrepreneurship.', 1, 5].
+…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/7822,2025-04-28,,2,"LangFlow IDE can not running on AWS EKS
+
+### Bug Description
+
+Hello there. I'm try to deploy LangFlow IDE on AWS EKS by langflow-ide helm chart, the command is like this: `helm install langflow-ide langflow/langflow-ide -n langflow --create-namespace --set langflow.backend.sqlite.volume.existingStorageClassName=gp2`, and langflow backend pod cannot pass the health check, it keeps failed and restart. I got those log
+```
+$ k logs -n langflow langflow-service-0 -p
+LF_CHART_EXTERNALDB_DRIVER is not set, using SQLLite database
+/app/.venv/li…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/4164,2024-10-15,,7,"ImportError: cannot import name 'CodeInterpreter' from 'e2b_code_interpreter'
+
+I think there's an e2b_code_interpreter problem as well in .19. Have you stumbled upon it?
+
+```
+     │                                                                                                                                                           │
+                             │ /Users/.../Library/Caches/uv/archive-v0/_cr7vMV6pjW43AbOp9t_q/lib/python3.10/site-packages/langflow/base/astra_assistants/util.py:56 in <module> │
+                             │                            …"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/3221,2024-08-07,,6,"dosubot is so annoying
+
+### Bug Description
+
+The current gpt ai : **dosubot**,
+which does github issues auto response, is very annoying
+It only wastes time and produce garbage code in this repo issues,
+giving false reaction of having issues closed and solved.
+It's advised that you not use this **dosubot** to resolve issues,
+to my prediction dosubot will want to solve this complaint by giving a stupid code
+In addition, you are polluting the internet's data that will get re-trained into future gpts.
+
+
+### Repr…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/9579,2025-08-28,,4,"MCP SSE Server settings, can't save or update the Headers
+
+### Bug Description
+
+When trying to modified or create the  header from the MCP Server's settings, I can't see the modified data.
+
+<img width=""540"" height=""505"" alt=""Image"" src=""https://github.com/user-attachments/assets/b79f283d-2ad8-4b18-9105-b48031b630ee"" />
+
+I know there was a closed issued related to this but I'm still seeing this issue .
+
+Version LangFlow: 1.5.0.post2 
+System: MAC
+
+### Reproduction
+
+Steps to reproduce:
+
+1. Go to Settings
+2. Click on MCP Server
+3. Click on Edit one server
+4…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/11234,2026-01-07,,4,"Run Flow Component  can only be used as start of a flow
+
+### Bug Description
+
+When creating a ""Run Flow"" component and when the sub flow has a chat input I can only set the chat input directly into the Run Flow Control, but I cannot wire it up to for example a prompt template in order to pass in the prompt to the sub-flow. I tried to change the chat input to text input in the sub flow, but when dong this the subflow fails:
+Error details:
+TypeError
+Details: Error running method ""_resolve_flow_output__TextOutput_u3yPa__text"": Invalid input value: { ""tim…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/3468,2024-08-21,,3,"Streaming URL is not unique in multi-user environment
+
+### Bug Description
+
+When `stream=true` is passed, the resulting `stream_url` is always the same, no matter what `session_id` is passed. Possibly related to #2563 , that stream is completely open so any session can consume tokens from the stream.
+
+### Reproduction
+
+1. Invoke any flow via API with `stream=true`
+2. Inspect the response `init_response[""outputs""][0][""outputs""][0][""artifacts""][""stream_url""]` : no matter what browser / session ID is passed, this value is always the same.
+
+###…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/3211,2024-08-06,,3,"The Flow as Tool component will crash, please fix it as a priority
+
+### Bug Description
+
+![f7124c79566cf165362fdf924972f38](https://github.com/user-attachments/assets/4aebd8a4-cbb0-467d-a163-53f4a54e3e79)
+
+
+### Reproduction
+
+Add the component Flow as Tool, then go and select another flow and see what you see in the picture
+
+### Expected behavior
+
+I need this component, this component is important to me, please help to fix it as a priority
+
+### Who can help?
+
+_No response_
+
+### Operating System
+
+windows 
+
+### Langflow Version
+
+1.0.14
+
+### Python Version
+
+None
+
+#…"
+GitHub issues,https://github.com/langflow-ai/langflow/issues/6216,2025-02-08,,3,"Bug when using multiple 'If-Else' components.
+
+### Bug Description
+
+If only one 'If-Else' component is used in the project, it works as expected. However, if a second or subsequent component is added, the flow does not stop on false branches. That is, the value None is passed as the output of the component, but the flow itself does not stop with it
+
+![Image](https://github.com/user-attachments/assets/3501adce-9de5-4068-a450-be96472f4297)
+
+![Image](https://github.com/user-attachments/assets/fa988892-9845-4741-86c2-5dffac925e29)
+
+### Reproduct…"

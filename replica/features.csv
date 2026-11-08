@@ -14,7 +14,7 @@ Sticky notes on canvas,editor,should,yes,yes,
 Autosave flow,editor,must,yes,yes,
 Undo/redo + keyboard shortcuts,editor,should,yes,yes,"Del / Ctrl+Z / Ctrl+S; Ctrl+Z / Ctrl+Shift+Z, Delete"
 Run single component and see output,editor,should,yes,partial,build status per node; partial: whole-flow Run shows per-node output previews; no single-node run
-Version history,editor,could,yes,no,
+Version history,editor,should,yes,no,X7 - promoted: #8634 (14 votes)
 Chat Input / Chat Output components,components,must,yes,yes,
 Text Input / Text Output,components,should,yes,yes,
 Prompt Template with {variable} ports,components,must,yes,yes,dynamic ports from template
@@ -34,7 +34,7 @@ Parser / text template,components,should,yes,yes,
 If-Else router,components,should,yes,yes,
 Split text,components,should,yes,yes,
 Vector store / knowledge base (local),components,should,yes,yes,in-DB vectors + cosine search
-Human approval for tool calls,agents,could,yes,no,
+Human approval for tool calls,agents,should,yes,no,X8 - promoted: #6867 (19 votes)
 Skills: reusable instruction packs agents load on demand,skills,must,no,yes,ADDITION - user request; SKILL.md format
 Skills library page (create/edit/import/export),skills,must,no,yes,ADDITION - S13/S14
 Skill component wired into Agent,skills,must,no,yes,ADDITION
@@ -60,3 +60,9 @@ Custom Python components (code editor),components,skip,yes,skip,security: arbitr
 Hosted cloud / enterprise SSO,platform,skip,yes,skip,original's business; not functionality
 100+ third-party bundles,components,skip,yes,skip,partner integrations; Ollama-only by request
 Langflow Store / community templates,platform,skip,yes,skip,the network and its users
+Offline-first: no startup network calls + startup budget + multi-arch images,fixes,must,no,no,X1 - H1 install/startup (9 issues 27 votes) + M8 arm64 (13 votes)
+Ollama model capability badges + tool-support warning + Ollama API key (cloud),fixes,must,no,no,X2 - H2 Ollama bugs (6 issues 16 votes)
+Real HTTP status codes for model-server errors in run API,fixes,should,no,no,X3 - H4 #11534 (7 votes)
+Import skills from URL / GitHub folder / zip; export all skills,fixes,should,no,no,X4 - M5 #11547 skills (21 votes)
+Headless runner (mbdaflow exec) + export flow as Python script,fixes,should,no,no,X5 - M4 export code (3 issues 37 votes)
+Schema migrations + flow format_version upgrader,fixes,should,no,no,X6 - H3 upgrades break flows (4 issues 8 votes; thin)

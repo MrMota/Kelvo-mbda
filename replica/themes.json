@@ -1,0 +1,185 @@
+{
+  "Install & dependency pain": [
+    "pip install",
+    "uv pip",
+    "installation",
+    "install ",
+    "dependency",
+    "dependencies",
+    "requirements",
+    "wheel",
+    "windows",
+    "build fail"
+  ],
+  "Upgrades break things": [
+    "upgrade",
+    "upgrading",
+    "after updat",
+    "migration",
+    "migrate",
+    "breaking change",
+    "no longer work",
+    "stopped working",
+    "broke"
+  ],
+  "Slow / heavy": [
+    "slow",
+    "latency",
+    "performance",
+    "takes long",
+    "takes a long",
+    "freez",
+    "hang",
+    "startup time",
+    "lag"
+  ],
+  "Memory & resource use": [
+    "memory",
+    " ram",
+    "oom",
+    "out of memory",
+    "cpu",
+    "leak"
+  ],
+  "Ollama & local models": [
+    "ollama",
+    "local model",
+    "lm studio",
+    "lmstudio",
+    "llama.cpp",
+    "offline",
+    "localhost:11434"
+  ],
+  "Agents & tool calling": [
+    "tool call",
+    "tool_call",
+    "tool calling",
+    "tool mode",
+    "agent component",
+    "agents",
+    "agent "
+  ],
+  "Custom components & code": [
+    "custom component",
+    "custom_component",
+    "code editor",
+    "python code"
+  ],
+  "Playground & chat": [
+    "playground",
+    "chat input",
+    "chat output",
+    "streaming",
+    "stream"
+  ],
+  "Deploy & production": [
+    "deploy",
+    "production",
+    "kubernetes",
+    "k8s",
+    "helm",
+    "docker",
+    "scaling",
+    "workers",
+    "celery",
+    "redis"
+  ],
+  "Docs & examples": [
+    "documentation",
+    "docs",
+    "tutorial",
+    "unclear",
+    "no example"
+  ],
+  "Versioning & collaboration": [
+    "version control",
+    "versioning",
+    "version history",
+    "git integration",
+    "git repo",
+    "sync with git",
+    "collaborat",
+    "teams",
+    "workspace",
+    "share flow",
+    "sharing flows",
+    "multiple users"
+  ],
+  "Lost work & saving": [
+    "lost",
+    "disappear",
+    "not saved",
+    "unsaved",
+    "deleted my",
+    "saving",
+    "autosave",
+    "auto-save",
+    "auto save"
+  ],
+  "API & integration": [
+    "api endpoint",
+    "rest api",
+    "/api/v1",
+    "run endpoint",
+    "webhook",
+    "sdk",
+    "tweaks",
+    "api call"
+  ],
+  "Auth & users": [
+    "login",
+    "log in",
+    "authentication",
+    "password",
+    "superuser",
+    "permission",
+    "multi-user",
+    "rbac",
+    "sso",
+    "oauth"
+  ],
+  "Model provider support": [
+    "deepseek",
+    "openai compatible",
+    "openai-compatible",
+    "provider",
+    "gemini",
+    "anthropic",
+    "groq",
+    "mistral",
+    "litellm"
+  ],
+  "MCP": [
+    "mcp"
+  ],
+  "RAG & vector stores": [
+    "vector",
+    "embedding",
+    "rag",
+    "chroma",
+    "astra",
+    "pinecone",
+    "qdrant",
+    "retriev"
+  ],
+  "Chat memory & sessions": [
+    "chat history",
+    "message history",
+    "session_id",
+    "session id",
+    "memory component",
+    "conversation memory"
+  ],
+  "UI / canvas usability": [
+    "canvas",
+    "drag",
+    "zoom",
+    "user interface",
+    "undo",
+    "shortcut",
+    "minimap",
+    "the ui",
+    "ui is",
+    "ui bug"
+  ]
+}
