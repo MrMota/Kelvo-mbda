@@ -28,25 +28,65 @@ Kelvo is a personal tool: one account (yours), no domain, no public internet. So
 
 **Also fixed:** Compose published Ollama's port 11434 to every network (Ollama has no login) and Kelvo's port to every network. Both are now private by default.
 
+**GPU:** `docker-compose.gpu.yml` gives Ollama the NVIDIA GPU (switched on by one line in `.env`); `deploy/check-gpu.sh` checks driver → toolkit → Compose → a model actually running on the GPU. Validated here: Compose output with and without the GPU file, script syntax, and its first failure path. Not run here: everything that needs a real GPU.
+
 **Sandbox-only notes:** the Docker build here needed this sandbox's proxy settings and a mirror for one base image (Docker Hub rate-limited the shared IP). Those changes live only in a scratch copy of the Dockerfile; the repo's `Dockerfile` is unchanged and needs nothing special on your machine. **Not tested here:** a real Ollama with real models (a stand-in was used), a GPU, and Tailscale.
 
-## 2. Install on your machine (Docker, recommended)
+## 2. Install on your machine: Linux + NVIDIA GPU (Docker)
 
-You need Docker with Compose, and a machine with enough RAM for your models (8 GB+ for 7–8B models; a GPU or Apple silicon makes agents much quicker).
+Written for Ubuntu/Debian. Other distributions: same steps, use NVIDIA's instructions for your package manager in step B. **Not tested on real GPU hardware.** The build sandbox has no GPU. The config is validated, and `deploy/check-gpu.sh` tells you on your machine whether the GPU is really used.
+
+**A. NVIDIA driver.** If `nvidia-smi` already prints your GPU, skip this.
+
+```bash
+sudo ubuntu-drivers install     # Ubuntu: installs the recommended driver
+sudo reboot
+nvidia-smi                      # should list your GPU and its memory
+```
+
+**B. Docker + the NVIDIA Container Toolkit** (lets containers use the GPU). Install Docker Engine from docs.docker.com if you don't have it, then:
+
+```bash
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey \
+  | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+curl -fsSL https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list \
+  | sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' \
+  | sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+sudo apt-get update && sudo apt-get install -y nvidia-container-toolkit
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+docker run --rm --gpus all ubuntu:24.04 nvidia-smi -L   # should print your GPU
+```
+
+If NVIDIA changes these commands, their current version is in the NVIDIA Container Toolkit install guide (docs.nvidia.com).
+
+**C. Kelvo + Ollama on the GPU.**
 
 ```bash
 git clone https://github.com/MrMota/MBDAflow.git kelvo && cd kelvo
-cp .env.example .env          # set KELVO_USERNAME and KELVO_PASSWORD (first start only)
+cp .env.example .env     # set KELVO_USERNAME and KELVO_PASSWORD; the GPU line is already on
 docker compose up -d --build
-docker compose exec ollama ollama pull qwen3:8b          # a model that can call tools
-docker compose exec ollama ollama pull nomic-embed-text  # for Document Q&A
+docker compose exec ollama ollama pull qwen3:8b           # pick the size for your VRAM below
+docker compose exec ollama ollama pull nomic-embed-text   # for Document Q&A
+bash deploy/check-gpu.sh qwen3:8b                         # must end with "runs fully on the GPU"
 ```
 
-Open **http://127.0.0.1:7860**, sign in, then **Settings → Models**: pick `qwen3:8b` as the default model. After the first sign-in, delete the two account lines from `.env`. They're only read once.
+`.env.example` contains `COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml`, so plain `docker compose …` commands always include the GPU. Ollama keeps the model in VRAM for 30 minutes after the last message (`OLLAMA_KEEP_ALIVE`), so agent replies don't wait for a reload.
 
-No `.env` account? `docker compose logs kelvo` shows a one-time setup token; the app asks for it.
+Open **http://127.0.0.1:7860**, sign in, then **Settings → Models**: pick your model as the default. Models marked **tools** work with agents. After the first sign-in, delete the two account lines from `.env`. No account in `.env`? `docker compose logs kelvo` shows a one-time setup token.
 
-**NVIDIA GPU:** uncomment the `deploy:` block under `ollama` in `docker-compose.yml` (needs the NVIDIA Container Toolkit). **Mac:** Docker can't use the Apple GPU, so run Ollama natively (`brew install ollama`, then `ollama serve`). In `docker-compose.yml`, remove the `ollama` service and its `depends_on`, and set `OLLAMA_BASE_URL: http://host.docker.internal:11434`. Or skip Docker and use the install below.
+**Which model fits your GPU.** Rough sizes for the default 4-bit downloads. Check the exact size on the model's page at ollama.com before pulling. Longer chats and a bigger context window use more VRAM on top.
+
+| VRAM | agent model (calls tools) | approx. download |
+| --- | --- | --- |
+| 6–8 GB | `qwen3:4b`, `llama3.2:3b` | 2–3 GB |
+| 8–12 GB | `qwen3:8b`, `llama3.1:8b` | ~5 GB |
+| 12–16 GB | `qwen3:14b`, `mistral-nemo` (12B) | 7–9 GB |
+| 24 GB | `qwen3:30b` (mixture of experts) or `qwen3:32b` | ~18–20 GB |
+
+`check-gpu.sh` warns if a model is split between CPU and GPU, which means it doesn't fit. Go one size down. The embedding model is small and shares the GPU without trouble.
+
+**Windows with an NVIDIA GPU:** use Docker Desktop with the WSL 2 backend and a current NVIDIA Windows driver; the same `docker compose` commands and GPU file work. `check-gpu.sh` needs a bash shell (run it inside WSL).
 
 ### Without Docker (systemd, Linux)
 

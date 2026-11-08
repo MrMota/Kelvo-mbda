@@ -26,7 +26,8 @@ Running it on your own server (private access, backups, updates): see **`replica
 Then either **Docker** (bundles Ollama too):
 
 ```bash
-docker compose up --build       # → http://localhost:7860
+cp .env.example .env            # account + NVIDIA GPU switch (delete the COMPOSE_FILE line without one)
+docker compose up -d --build    # → http://127.0.0.1:7860
 docker compose exec ollama ollama pull qwen3:8b
 ```
 

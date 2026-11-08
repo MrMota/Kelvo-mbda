@@ -1,0 +1,15 @@
+# NVIDIA GPU for Ollama. Turn it on with this line in .env:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml
+# Needs the NVIDIA driver and the NVIDIA Container Toolkit on the host (see replica/deploy.md).
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    environment:
+      # Keep the model in GPU memory between messages so agents answer without reloading.
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-30m}

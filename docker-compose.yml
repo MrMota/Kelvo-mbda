@@ -2,6 +2,8 @@
 #   cp .env.example .env   # then edit it
 #   docker compose up -d --build
 #   docker compose exec ollama ollama pull qwen3:8b
+name: kelvo
+
 services:
   ollama:
     image: ollama/ollama:latest
@@ -10,11 +12,7 @@ services:
     # Not published: Ollama has no login, so only Kelvo (inside this Compose network) talks to it.
     # To use it from this machine too, publish it on loopback only:
     # ports: ["127.0.0.1:11434:11434"]
-    # NVIDIA GPU: uncomment (needs the NVIDIA Container Toolkit).
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+    # NVIDIA GPU: see docker-compose.gpu.yml (one line in .env turns it on).
 
   kelvo:
     build: .
