@@ -4,12 +4,28 @@ Kelvo is a personal tool: one account (yours), no domain, no public internet. So
 
 **Status: not deployed yet.** Everything below was built and tested in the build sandbox. It goes live when you run the steps on your machine.
 
+## Your setup at a glance
+
+**Machine:** Linux + NVIDIA GPU with **32 GB VRAM**. **Access:** this machine and **your phone**, privately over Tailscale, with HTTPS and no domain.
+
+| | choice | why |
+| --- | --- | --- |
+| everyday agent model | **`qwen3:30b`** (~19 GB) | mixture-of-experts: only a few billion parameters work per token, so tool-calling loops are fast, and it fits fully in 32 GB with room for a long context |
+| harder tasks | **`qwen3:32b`** (~20 GB) | dense and slower, but stronger; pick it on specific Agents |
+| embeddings (Document Q&A) | **`nomic-embed-text`** (<1 GB) | small; shares the GPU |
+| context window | Agent → Advanced → **Context window `16384`** | fits in the headroom; raise to 32768 if `check-gpu.sh` still says "100% GPU" |
+| phone | **Tailscale + `tailscale serve`** | private to your devices, real HTTPS at `https://<machine>.<tailnet>.ts.net`, installable on your home screen |
+
+Only one of the two big models fits in VRAM at a time; Ollama swaps them automatically (a few seconds' load). These are the strongest tool-calling models I know of for 32 GB; newer ones may be on ollama.com, and any model the picker tags **tools** works with agents.
+
+Steps, in order: **section 2** (driver, toolkit, Kelvo, models, `bash deploy/check-gpu.sh qwen3:30b`), then **section 3 → "Your phone"**. Total: about 30 minutes plus model downloads.
+
 ## 1. Preflight (run 2026-11-08)
 
 | check | result |
 | --- | --- |
 | Backend tests (`make test`) | **33 passed**: engine, every template, agents/tools/skills, run API, MCP, sign-in (lockout, cross-site refusal, single account, setup token, password change), backup rotation, no network at startup, cold start < 3 s, model capabilities, Ollama API key |
-| Browser click-through (`e2e/smoke.mjs`) | **13/13 passed**, against both the local server and the **built Docker image** |
+| Browser click-through (`e2e/smoke.mjs`) | **15/15 passed** (incl. iPhone emulation: editor ⋯ menu, chat with tool call, no sideways scrolling). The 13 desktop checks also passed against the **built Docker image** |
 | Production build (`npm run build`) | passes |
 | Feature parity (`replica/tools/parity.py`) | **32/32 must-haves**, 88% weighted. X1 and X2 were missing at the start of this run and were built (see below) |
 | Brand sweep (`replica/tools/sweep.py`) | **clean**: 0 findings |
@@ -66,9 +82,10 @@ If NVIDIA changes these commands, their current version is in the NVIDIA Contain
 git clone https://github.com/MrMota/MBDAflow.git kelvo && cd kelvo
 cp .env.example .env     # set KELVO_USERNAME and KELVO_PASSWORD; the GPU line is already on
 docker compose up -d --build
-docker compose exec ollama ollama pull qwen3:8b           # pick the size for your VRAM below
+docker compose exec ollama ollama pull qwen3:30b          # your 32 GB GPU: see 'Your setup'
+docker compose exec ollama ollama pull qwen3:32b          # optional: stronger, slower
 docker compose exec ollama ollama pull nomic-embed-text   # for Document Q&A
-bash deploy/check-gpu.sh qwen3:8b                         # must end with "runs fully on the GPU"
+bash deploy/check-gpu.sh qwen3:30b                        # must end with "runs fully on the GPU"
 ```
 
 `.env.example` contains `COMPOSE_FILE=docker-compose.yml:docker-compose.gpu.yml`, so plain `docker compose …` commands always include the GPU. Ollama keeps the model in VRAM for 30 minutes after the last message (`OLLAMA_KEEP_ALIVE`), so agent replies don't wait for a reload.
@@ -100,16 +117,47 @@ Then edit and install `deploy/kelvo.service` (and `deploy/kelvo-backup.{service,
 
 ## 3. Reaching it from your other devices (no domain)
 
-Pick one. Never `0.0.0.0` on a machine with a public IP.
+### Your phone (Tailscale + HTTPS)
+
+Kelvo stays bound to `127.0.0.1`; Tailscale's `serve` puts HTTPS in front of it for **your devices only**. Nothing is opened on your router or the internet. **Not tested here** (needs your Tailscale account): the commands are Tailscale's standard ones, and the Kelvo side (secure cookie, allowed origin) is covered by the tests.
+
+1. **On the GPU machine:**
+   ```bash
+   curl -fsSL https://tailscale.com/install.sh | sh
+   sudo tailscale up                    # sign in in the browser it opens
+   ```
+2. **In the Tailscale admin console → DNS:** turn on **MagicDNS** and **HTTPS Certificates** (needed once per tailnet).
+3. **Serve Kelvo over HTTPS:**
+   ```bash
+   sudo tailscale serve --bg 7860       # https://<machine>.<tailnet>.ts.net → 127.0.0.1:7860
+   tailscale serve status               # shows the exact address
+   ```
+4. **Tell Kelvo its address**, in `.env`, then `docker compose up -d`:
+   ```bash
+   KELVO_SECURE_COOKIE=1
+   KELVO_ALLOWED_ORIGINS=https://<machine>.<tailnet>.ts.net
+   ```
+5. **On your phone:** install the Tailscale app, sign in with the same account, open `https://<machine>.<tailnet>.ts.net`, sign in to Kelvo.
+   - **iPhone (Safari):** Share → **Add to Home Screen**.
+   - **Android (Chrome):** ⋮ → **Install app** (or Add to Home screen).
+
+   It opens full-screen like an app, with the Kelvo icon.
+
+Use the same `https://….ts.net` address on your computer too: with `KELVO_SECURE_COOKIE=1` the sign-in cookie only travels over HTTPS.
+
+**Never run `tailscale funnel`.** Funnel publishes the service to the whole internet; `serve` keeps it inside your tailnet.
+
+**On the phone, what works well:** the Playground (chat, live tool-call cards, sessions), the flow list, Skills, Settings, run logs, starting flows from templates. On narrow screens the editor's top bar folds Run, Share, Logs, notes, undo/redo and sign-out into a **⋯** menu. Building big flows on the canvas is still easier on a computer.
+
+### Other options
 
 | option | how | address |
 | --- | --- | --- |
 | **This machine only** (default) | nothing to do | `http://127.0.0.1:7860` |
-| **Tailscale** (recommended for phone/laptop anywhere) | install Tailscale on the machine and your devices; set `KELVO_BIND=` your machine's Tailscale IP (`tailscale ip -4`) in `.env`; `docker compose up -d` | `http://100.x.y.z:7860` from your devices only |
-| **Tailscale + HTTPS** | keep `KELVO_BIND=127.0.0.1`; run `tailscale serve --bg 7860`; in `.env` set `KELVO_SECURE_COOKIE=1` and `KELVO_ALLOWED_ORIGINS=https://<machine>.<tailnet>.ts.net` | `https://<machine>.<tailnet>.ts.net` |
-| **Home network** | `KELVO_BIND=0.0.0.0` (or the machine's LAN IP); only on a home network you trust | `http://<lan-ip>:7860` |
+| **Tailscale without HTTPS** | `KELVO_BIND=` the machine's Tailscale IP (`tailscale ip -4`) | `http://100.x.y.z:7860` |
+| **Home network** | `KELVO_BIND=0.0.0.0`; only on a home network you trust, never on a machine with a public IP | `http://<lan-ip>:7860` |
 
-If saving anything fails with "Cross-site request refused" behind a proxy, add the exact address you browse to (scheme + host) to `KELVO_ALLOWED_ORIGINS`.
+If saving anything fails with "Cross-site request refused", add the exact address you browse to (scheme + host) to `KELVO_ALLOWED_ORIGINS`.
 
 ## 4. Backups
 
@@ -155,10 +203,11 @@ For one person, this is enough:
 
 ## 7. First week
 
-- [ ] Do the core flow on the real thing: Simple Agent → Playground → "what is 12% of 340?", and check the calculator tool call appears. Then the same from your phone.
+- [ ] Do the core flow on the real thing: Simple Agent → Playground → "what is 12% of 340?", and check the calculator tool call appears. Then the same from your phone, from the home-screen icon.
+- [ ] Run `bash deploy/check-gpu.sh qwen3:30b` after raising an Agent's context window; it should still say "100% GPU".
 - [ ] Try a few models; note which ones call tools reliably on your hardware (the picker's "tools" tag tells you which *can*).
 - [ ] Confirm the first nightly backup exists (`docker compose exec kelvo ls /data/backups`) and copy one off the machine.
 - [ ] Sign in from a second device, change your password in Settings → Account, and check the first device was signed out.
 - [ ] Remove `KELVO_USERNAME` / `KELVO_PASSWORD` from `.env`.
 
-Live URL: *none yet. Fill in the address you chose in step 3.*
+Live URL: *none yet: it will be `https://<machine>.<tailnet>.ts.net` once section 3 is done.*

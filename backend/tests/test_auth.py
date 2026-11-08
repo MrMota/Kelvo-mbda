@@ -107,3 +107,13 @@ def test_backup_command(client, tmp_path, monkeypatch, capsys):
     assert "keep me" in names
     out = backup(str(tmp_path / "one.db"), keep=0)
     assert (tmp_path / "one.db").exists() and "integrity ok" in capsys.readouterr().out
+
+
+def test_secure_cookie_for_https_setups(client, monkeypatch):
+    client.post("/api/auth/logout")
+    r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"})
+    assert "secure" not in r.headers["set-cookie"].lower()
+    monkeypatch.setenv("KELVO_SECURE_COOKIE", "1")
+    client.post("/api/auth/logout")
+    r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"})
+    assert "secure" in r.headers["set-cookie"].lower()

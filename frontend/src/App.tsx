@@ -34,8 +34,8 @@ export function OllamaStatus() {
   const ok = h?.ollama?.reachable;
   return (
     <NavLink to="/settings" className="row faint" style={{ fontSize: 12.5 }} title={ok ? `Ollama at ${h.ollama.url}` : h?.ollama?.error ?? "Checking Ollama…"}>
-      <span className={`status-dot ${h ? (ok ? "ok" : "err") : ""}`} />
-      {h ? (ok ? `Ollama · ${h.ollama.models} models` : "Ollama not running") : "…"}
+      <span className={`status-dot ${h ? (ok ? "ok" : "err") : ""}`} aria-hidden="true" />
+      <span className="status-text">{h ? (ok ? `Ollama · ${h.ollama.models} models` : "Ollama not running") : "…"}</span>
     </NavLink>
   );
 }

@@ -3,7 +3,7 @@
 # Run from the repo folder:  bash deploy/check-gpu.sh [model]
 # Each step prints OK or FAIL with what to do next. Nothing is changed on your system.
 set -u
-MODEL="${1:-qwen3:8b}"
+MODEL="${1:-qwen3:30b}"
 pass() { printf '  OK    %s\n' "$1"; }
 fail() { printf '  FAIL  %s\n        → %s\n' "$1" "$2"; exit 1; }
 

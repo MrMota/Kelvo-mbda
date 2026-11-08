@@ -185,6 +185,9 @@ h3 { font-size: 14px; }
 .menu button { display: flex; width: 100%; align-items: center; gap: 8px; padding: 7px 9px; border: 0; background: none; border-radius: 5px; cursor: pointer; text-align: left; }
 .menu button:hover { background: var(--surface-2); }
 .menu button.danger { color: var(--danger); }
+.menu button:disabled { opacity: .45; cursor: not-allowed; }
+.narrow-only { display: none; }
+.status-text { white-space: nowrap; }
 
 /* ---------- modal */
 .overlay { position: fixed; inset: 0; background: rgba(8, 12, 18, 0.5); display: grid; place-items: center; z-index: 100; padding: 16px; animation: fade .12s; }
@@ -208,7 +211,7 @@ h3 { font-size: 14px; }
 /* ---------- editor */
 .editor { flex: 1; display: flex; min-height: 0; position: relative; }
 .editor-top { height: 52px; display: flex; align-items: center; gap: 10px; padding: 0 12px; border-bottom: 1px solid var(--border); background: var(--surface); flex: none; }
-.flow-name { border: 1px solid transparent; background: none; font-weight: 650; font-size: 15px; padding: 4px 8px; border-radius: 6px; min-width: 120px; max-width: 340px; }
+.flow-name { text-overflow: ellipsis; border: 1px solid transparent; background: none; font-weight: 650; font-size: 15px; padding: 4px 8px; border-radius: 6px; min-width: 120px; max-width: 340px; }
 .flow-name:hover { border-color: var(--border); }
 .save-state { font-size: 12px; color: var(--text-3); display: flex; align-items: center; gap: 5px; }
 .palette { width: 260px; flex: none; border-right: 1px solid var(--border); background: var(--surface); display: flex; flex-direction: column; min-height: 0; }
@@ -280,7 +283,7 @@ h3 { font-size: 14px; }
 .step summary { display: flex; align-items: center; gap: 7px; padding: 6px 9px; cursor: pointer; list-style: none; font-weight: 600; }
 .step summary::-webkit-details-marker { display: none; }
 .step pre { margin: 0; padding: 0 9px 8px; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; color: var(--text-2); }
-.pg-input { border-top: 1px solid var(--border); padding: 12px; }
+.pg-input { border-top: 1px solid var(--border); padding: 12px 12px max(12px, env(safe-area-inset-bottom)); }
 .pg-box { display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--border); border-radius: 12px; padding: 6px 6px 6px 12px; background: var(--surface); }
 .pg-box:focus-within { border-color: var(--accent); }
 .pg-box textarea { flex: 1; border: 0; outline: none; resize: none; background: none; max-height: 160px; padding: 6px 0; }
@@ -313,6 +316,15 @@ h3 { font-size: 14px; }
   .pg-sessions { display: none; }
   .skill-editor { grid-template-columns: 1fr; }
   .nav a span { display: none; }
+}
+@media (max-width: 760px) {
+  .wide-only { display: none !important; }
+  .narrow-only { display: inline-flex; }
+  .save-state { display: none; }
+  .editor-top { gap: 6px; padding: 0 8px; }
+  .flow-name { min-width: 0; flex: 1; max-width: none; }
+  .status-text { display: none; }
+  .topbar { gap: 8px; padding: 0 10px; }
 }
 @media (max-width: 600px) {
   .palette { display: none; }

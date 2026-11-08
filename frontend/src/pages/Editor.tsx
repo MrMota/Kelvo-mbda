@@ -3,7 +3,7 @@ import {
   type Connection, type Edge, type Node,
 } from "@xyflow/react";
 import {
-  ArrowLeft, Check, ChevronDown, ChevronRight, Copy, Loader2, Lock, Play, Redo2, ScrollText, Search, Share2, StickyNote, Trash2, Undo2, X, Zap,
+  ArrowLeft, Check, ChevronDown, ChevronRight, Copy, Loader2, Lock, LogOut, MoreHorizontal, Play, Redo2, ScrollText, Search, Share2, StickyNote, Trash2, Undo2, X, Zap,
 } from "lucide-react";
 import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -14,11 +14,23 @@ import type { ComponentSpec, Flow, FlowGraph, NodeData, NodeRun } from "../types
 import { FieldInput } from "../ui/FieldInput";
 import { ComponentNode, EditorCtx, NoteNode, nodeFields, outputType } from "../ui/FlowNode";
 import { CATEGORY_COLORS, Icon, typeColor } from "../ui/Icon";
-import { Modal, timeAgo, useToast } from "../ui/kit";
+import { Menu, Modal, timeAgo, useToast } from "../ui/kit";
+import { useAuth } from "../auth";
 import { Playground } from "../ui/Playground";
 import { ShareModal } from "../ui/ShareModal";
 
 const nodeTypes = { component: ComponentNode, note: NoteNode };
+
+function useNarrow(query = "(max-width: 760px)") {
+  const [narrow, setNarrow] = useState(() => matchMedia(query).matches);
+  useEffect(() => {
+    const m = matchMedia(query);
+    const on = () => setNarrow(m.matches);
+    m.addEventListener("change", on);
+    return () => m.removeEventListener("change", on);
+  }, [query]);
+  return narrow;
+}
 const rid = (p: string) => `${p}-${Math.random().toString(36).slice(2, 8)}`;
 
 function toGraph(nodes: Node[], edges: Edge[], viewport?: FlowGraph["viewport"]): FlowGraph {
@@ -208,6 +220,9 @@ function EditorInner({ initial }: { initial: Flow }) {
   const [share, setShare] = useState<null | "api" | "mcp" | "export">(null);
   const [showLogs, setShowLogs] = useState(false);
   const [running, setRunning] = useState(false);
+  const [more, setMore] = useState(false);
+  const { signOut } = useAuth();
+  const narrow = useNarrow();
   const [name, setName] = useState(initial.name);
   const locked = !!flow.locked;
   const loaded = useRef(false);
@@ -374,17 +389,37 @@ function EditorInner({ initial }: { initial: Flow }) {
           <span className="save-state" aria-live="polite">
             {locked ? <><Lock size={12} /> Locked</> : saveState === "saving" ? <><Loader2 size={12} className="spin" /> Saving</> : saveState === "dirty" ? "Unsaved" : saveState === "error" ? <span className="error-text">Not saved</span> : <><Check size={12} /> Saved</>}
           </span>
-          <button className="icon-btn" onClick={undo} aria-label="Undo" title="Undo (Ctrl+Z)" disabled={locked}><Undo2 size={16} /></button>
-          <button className="icon-btn" onClick={redo} aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled={locked}><Redo2 size={16} /></button>
+          <span className="wide-only row" style={{ gap: 2 }}>
+            <button className="icon-btn" onClick={undo} aria-label="Undo" title="Undo (Ctrl+Z)" disabled={locked}><Undo2 size={16} /></button>
+            <button className="icon-btn" onClick={redo} aria-label="Redo" title="Redo (Ctrl+Shift+Z)" disabled={locked}><Redo2 size={16} /></button>
+          </span>
           <span className="spacer" />
-          <OllamaStatus />
-          <button className="btn ghost" onClick={addNote} disabled={locked} title="Add note"><StickyNote size={15} /> Note</button>
-          <button className="btn ghost" onClick={() => setShowLogs(true)}><ScrollText size={15} /> Logs</button>
-          <button className="btn" onClick={runOnce} disabled={running} title="Run the whole flow once">{running ? <Loader2 size={15} className="spin" /> : <Zap size={15} />} Run</button>
-          <button className="btn" onClick={() => setShare("api")}><Share2 size={15} /> Share</button>
-          <button className={`btn ${showPg ? "" : "primary"}`} onClick={() => setShowPg(!showPg)}><Play size={15} /> Playground</button>
-          <ThemeToggle />
-          <SignOut />
+          <span className="wide-only row" style={{ gap: 10 }}>
+            <OllamaStatus />
+            <button className="btn ghost" onClick={addNote} disabled={locked} title="Add note"><StickyNote size={15} /> Note</button>
+            <button className="btn ghost" onClick={() => setShowLogs(true)}><ScrollText size={15} /> Logs</button>
+            <button className="btn" onClick={runOnce} disabled={running} title="Run the whole flow once">{running ? <Loader2 size={15} className="spin" /> : <Zap size={15} />} Run</button>
+            <button className="btn" onClick={() => setShare("api")}><Share2 size={15} /> Share</button>
+          </span>
+          <button className={`btn ${showPg ? "" : "primary"}`} onClick={() => setShowPg(!showPg)}><Play size={15} /> <span className="pg-label">Playground</span></button>
+          <span className="wide-only row" style={{ gap: 2 }}>
+            <ThemeToggle />
+            <SignOut />
+          </span>
+          <span className="narrow-only" style={{ position: "relative" }}>
+            <button className="icon-btn" aria-label="More" aria-expanded={more} onClick={() => setMore(!more)}><MoreHorizontal size={18} /></button>
+            {more && (
+              <Menu onClose={() => setMore(false)} style={{ right: 0, top: 36, minWidth: 200 }}>
+                <button onClick={() => { setMore(false); runOnce(); }} disabled={running}><Zap size={14} /> Run once</button>
+                <button onClick={() => { setMore(false); setShare("api"); }}><Share2 size={14} /> Share</button>
+                <button onClick={() => { setMore(false); setShowLogs(true); }}><ScrollText size={14} /> Logs</button>
+                <button onClick={() => { setMore(false); addNote(); }} disabled={locked}><StickyNote size={14} /> Add note</button>
+                <button onClick={() => { setMore(false); undo(); }} disabled={locked}><Undo2 size={14} /> Undo</button>
+                <button onClick={() => { setMore(false); redo(); }} disabled={locked}><Redo2 size={14} /> Redo</button>
+                <button onClick={() => { setMore(false); signOut(); }}><LogOut size={14} /> Sign out</button>
+              </Menu>
+            )}
+          </span>
         </header>
         <div className="editor">
           <Palette onAdd={(k) => addNode(k)} locked={locked} />
@@ -408,7 +443,7 @@ function EditorInner({ initial }: { initial: Flow }) {
             >
               <Background variant={BackgroundVariant.Dots} gap={18} size={1.4} color="var(--canvas-dot)" />
               <Controls showInteractive={false} />
-              {!showPg && <MiniMap pannable zoomable nodeColor={(n) => (n.type === "note" ? "#ecd97a" : CATEGORY_COLORS[spec((n.data as NodeData).type)?.category ?? ""] ?? "#94a3b8")} />}
+              {!showPg && !narrow && <MiniMap pannable zoomable nodeColor={(n) => (n.type === "note" ? "#ecd97a" : CATEGORY_COLORS[spec((n.data as NodeData).type)?.category ?? ""] ?? "#94a3b8")} />}
             </ReactFlow>
             {nodes.length === 0 && (
               <div className="canvas-empty">

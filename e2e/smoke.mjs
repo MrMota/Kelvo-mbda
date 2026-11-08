@@ -5,7 +5,7 @@
 // Usage: node e2e/smoke.mjs [baseUrl] [screenshotDir]
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
-const { chromium } = require("playwright");
+const { chromium, devices } = require("playwright");
 
 const BASE = process.argv[2] ?? "http://127.0.0.1:7860";
 const SHOTS = process.argv[3];
@@ -183,6 +183,35 @@ await step("Phone width home has no horizontal scroll", async () => {
   if (over) throw new Error("horizontal scroll at 390px");
   if (SHOTS) await m.screenshot({ path: `${SHOTS}/13-mobile.png` });
   await ctx.close();
+});
+
+await step("Phone: editor ⋯ menu and chat with a tool call", async () => {
+  const ctx = await browser.newContext({ ...devices["iPhone 13"], storageState: await page.context().storageState() });
+  const m = await ctx.newPage();
+  await m.goto(BASE);
+  await m.getByRole("button", { name: "New Flow" }).first().tap();
+  await m.getByRole("button", { name: /Simple Agent/ }).tap();
+  await m.waitForURL(/\/flow\//);
+  await m.locator(".react-flow__node").first().waitFor();
+  if (await m.locator(".react-flow__minimap").count()) throw new Error("minimap shown on phone");
+  await m.getByRole("button", { name: "More", exact: true }).tap();
+  await m.locator(".menu").getByRole("button", { name: "Logs" }).tap();
+  await m.getByRole("heading", { name: "Run logs" }).waitFor();
+  await m.getByRole("button", { name: "Close" }).tap();
+  await m.getByRole("button", { name: "Playground", exact: true }).tap();
+  await m.getByLabel("Message", { exact: true }).fill("calc: 6*7");
+  await m.getByRole("button", { name: "Send" }).tap();
+  await m.locator(".msg-text", { hasText: "Result:" }).waitFor({ timeout: 15000 });
+  if (await m.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) throw new Error("sideways scroll on phone");
+  if (SHOTS) await m.screenshot({ path: `${SHOTS}/14-phone-chat.png` });
+  await ctx.close();
+});
+
+await step("Installable: manifest and home-screen icon", async () => {
+  const r = await page.request.get(`${BASE}/manifest.webmanifest`);
+  const man = await r.json();
+  if (man.display !== "standalone" || !man.icons?.length) throw new Error("bad manifest");
+  if (!(await page.request.get(`${BASE}/apple-touch-icon.png`)).ok()) throw new Error("no apple-touch-icon");
 });
 
 await step("Sign out returns to the sign-in screen", async () => {
