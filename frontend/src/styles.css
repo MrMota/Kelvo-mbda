@@ -4,17 +4,17 @@
   --surface-2: #f1f3f6;
   --surface-3: #e7eaef;
   --border: #dfe3e9;
-  --border-strong: #c9cfd8;
+  --border-strong: #8a94a3;
   --text: #121821;
   --text-2: #4a5565;
-  --text-3: #7b8594;
-  --accent: #0e9f8e;
-  --accent-strong: #0b8576;
-  --accent-soft: #e2f5f2;
+  --text-3: #636d7c;
+  --accent: #0b7c70;
+  --accent-strong: #086358;
+  --accent-soft: #e1f3f0;
   --accent-text: #ffffff;
-  --danger: #d23c3c;
+  --danger: #c0302f;
   --danger-soft: #fdecec;
-  --warn: #c98a12;
+  --warn: #a8730a;
   --ok: #1d9a5b;
   --canvas: #eef0f3;
   --canvas-dot: #c8ced7;
@@ -26,29 +26,36 @@
   --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
 
   /* port colours by data type */
-  --t-Message: #3b82f6;
-  --t-Text: #8b5cf6;
-  --t-Data: #ef7d22;
-  --t-LanguageModel: #e0457b;
-  --t-Embeddings: #14b8a6;
-  --t-Tool: #22a559;
-  --t-Skill: #d4a014;
+  --t-Message: #2f6fe4;
+  --t-Text: #0b7f9c;
+  --t-Data: #c45a0c;
+  --t-LanguageModel: #5b6678;
+  --t-Embeddings: #0b8478;
+  --t-Tool: #1b8545;
+  --t-Skill: #9a7206;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
+    --t-Message: #5b95f5;
+    --t-Text: #22b5d6;
+    --t-Data: #ec8a3c;
+    --t-LanguageModel: #94a0b4;
+    --t-Embeddings: #2bc2b1;
+    --t-Tool: #3cbf6e;
+    --t-Skill: #d6aa2c;
     --bg: #0d1117;
     --surface: #151b23;
     --surface-2: #1b222c;
     --surface-3: #242c38;
     --border: #2a3340;
-    --border-strong: #3a4554;
+    --border-strong: #667386;
     --text: #e8ecf1;
     --text-2: #aab3bf;
-    --text-3: #7a8595;
-    --accent: #23b8a5;
-    --accent-strong: #3fd0bd;
+    --text-3: #8590a0;
+    --accent: #2bb8a6;
+    --accent-strong: #4fd2c0;
     --accent-soft: #11302c;
     --accent-text: #04211d;
     --danger: #f06363;
@@ -61,17 +68,24 @@
   }
 }
 :root[data-theme="dark"] {
+    --t-Message: #5b95f5;
+    --t-Text: #22b5d6;
+    --t-Data: #ec8a3c;
+    --t-LanguageModel: #94a0b4;
+    --t-Embeddings: #2bc2b1;
+    --t-Tool: #3cbf6e;
+    --t-Skill: #d6aa2c;
   --bg: #0d1117;
   --surface: #151b23;
   --surface-2: #1b222c;
   --surface-3: #242c38;
   --border: #2a3340;
-  --border-strong: #3a4554;
+  --border-strong: #667386;
   --text: #e8ecf1;
   --text-2: #aab3bf;
-  --text-3: #7a8595;
-  --accent: #23b8a5;
-  --accent-strong: #3fd0bd;
+  --text-3: #8590a0;
+  --accent: #2bb8a6;
+  --accent-strong: #4fd2c0;
   --accent-soft: #11302c;
   --accent-text: #04211d;
   --danger: #f06363;
@@ -119,8 +133,8 @@ h3 { font-size: 14px; }
 .icon-btn.sm { width: 24px; height: 24px; }
 
 /* ---------- inputs */
-.input, .textarea, .select { width: 100%; border: 1px solid var(--border); background: var(--surface); border-radius: var(--radius-sm); padding: 7px 10px; }
-.input:hover, .textarea:hover, .select:hover { border-color: var(--border-strong); }
+.input, .textarea, .select { width: 100%; border: 1px solid var(--border-strong); background: var(--surface); border-radius: var(--radius-sm); padding: 7px 10px; }
+.input:hover, .textarea:hover, .select:hover { border-color: var(--text-3); }
 .textarea { resize: vertical; min-height: 64px; font-family: inherit; }
 .textarea.code { font-family: var(--mono); font-size: 12.5px; }
 .label { font-size: 12.5px; font-weight: 600; color: var(--text-2); display: flex; align-items: center; gap: 6px; }

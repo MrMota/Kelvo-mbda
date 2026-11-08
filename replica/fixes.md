@@ -1,4 +1,4 @@
-# What users of the original want fixed, and what MBDAflow does about it
+# What users of the original want fixed, and what Kelvo does about it
 
 ## Sample, and how far to trust it
 
@@ -26,7 +26,7 @@ Complaints about things the original does.
 
 Features asked for by name. ✅ = Langflow has since shipped it (per its current docs), so for us it is parity, not an edge.
 
-| # | request | issues | votes | quote | original now | MBDAflow now |
+| # | request | issues | votes | quote | original now | Kelvo now |
 | --- | --- | --- | --- | --- | --- | --- |
 | M1 | Team collaboration: roles, flow sharing, org access control | 4 | 83 | "allow multiple users to view, edit, and collaborate on flows within the same self-hosted Langflow deployment" ([#8531](https://github.com/langflow-ai/langflow/issues/8531)) | partial | no (single user) |
 | M2 | SSO (OIDC/OAuth2), disable public sign-up | 2 | 70 | "cannot get security approval for a self hosted solution without Single Sign On (SSO)" ([#2855](https://github.com/langflow-ai/langflow/issues/2855)) | ✅ (external auth docs) | no |
@@ -61,7 +61,7 @@ Ranked by evidence × cheapness. All of these are new rows in `features.csv` wit
 | X2 | **Ollama-first polish**: show each model's capabilities (tools, vision, embedding) in the picker from one cached `/api/show` per model; warn when an agent uses a model without tool support; Ollama API-key field so ollama.com Cloud works | S–M | replica-build | H2 (6 issues, 16 votes) |
 | X3 | **Honest API errors**: map model-server failures to real status codes (404 model not pulled, 429, 502 unreachable, 504 timeout) with `node_id` and the provider's message | S | replica-backend | H4 (7 votes) |
 | X4 | **Skills from anywhere**: import a skill from a URL, a GitHub folder or a `.zip` of SKILL.md bundles; export all skills as one bundle | S | replica-build | M5 (21 votes): our differentiator, make it complete |
-| X5 | **Leave the canvas**: `mbdaflow exec flow.json "input"` headless runner + "Export → Python script" that runs a flow with only the `mbdaflow` package | M | replica-build | M4 (3 issues, 37 votes) |
+| X5 | **Leave the canvas**: `kelvo exec flow.json "input"` headless runner + "Export → Python script" that runs a flow with only the `kelvo` package | M | replica-build | M4 (3 issues, 37 votes) |
 | X6 | **Safe upgrades**: schema version table + ordered migrations; a `format_version` in flow JSON and an import upgrader; test every template still runs after migrating | M | replica-backend | H3 (4 issues, 8 votes, thin) |
 | X7 | **Version history** (snapshot on save, name, restore) | M | replica-build | M7 (14 votes), parity |
 | X8 | **Human approval for tool calls** (per-tool "requires approval", Approve/Reject in the Playground) | M | replica-build | M6 (19 votes), parity |
@@ -74,15 +74,15 @@ Not in the plan (yet), and why:
 ## 5. The angle
 
 **A. Local-first (recommended)**
-> For developers who run their own models and are tired of local models being an afterthought (heavy installs, flaky Ollama support, startups that hang without internet), MBDAflow is built on Ollama from the ground up: a three-package install, works fully offline, and every component speaks Ollama natively.
+> For developers who run their own models and are tired of local models being an afterthought (heavy installs, flaky Ollama support, startups that hang without internet), Kelvo is built on Ollama from the ground up: a three-package install, works fully offline, and every component speaks Ollama natively.
 > Evidence: U1, 22 issues, 89 votes (one platform: GitHub). Already true of the build (3 Python dependencies, no startup network calls, Ollama streaming through agents); X1–X3 make it provable.
 
 **B. Self-hosted for teams**
-> For companies that must self-host AI agents but can't pass security review without SSO and access control, MBDAflow gives every team private, shareable flows behind your own login.
+> For companies that must self-host AI agents but can't pass security review without SSO and access control, Kelvo gives every team private, shareable flows behind your own login.
 > Evidence: U2, 6 issues, 153 votes (one platform). Biggest demand, but the largest build and a different product.
 
 **C. Agents with skills**
-> For builders whose agents get worse as you cram more instructions in, MBDAflow agents carry a library of skills and load only the one they need, so small local models stay sharp.
+> For builders whose agents get worse as you cram more instructions in, Kelvo agents carry a library of skills and load only the one they need, so small local models stay sharp.
 > Evidence: M5, 1 issue, 21 votes. Thin as a market signal, so use it as the *feature that proves* angle A rather than as the angle itself.
 
 **Recommendation: A, with C as its headline feature.** It matches your brief (Ollama, agents, skills). It is backed by the widest spread of complaints in the sample, and the current build already delivers most of it. B is the larger market if you later want to sell to companies; it would sit on top of A, not replace it.

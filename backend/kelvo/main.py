@@ -22,7 +22,7 @@ from .components import REGISTRY, specs
 from .engine import Engine, FlowError, validate_graph
 from .templates import STARTER_SKILLS, TEMPLATES
 
-STATIC = Path(os.environ.get("MBDAFLOW_STATIC", Path(__file__).parent / "static"))
+STATIC = Path(os.environ.get("KELVO_STATIC", Path(__file__).parent / "static"))
 
 
 def seed() -> None:
@@ -42,10 +42,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     yield
 
 
-app = FastAPI(title="MBDAflow", version=__version__, lifespan=lifespan)
+app = FastAPI(title="Kelvo", version=__version__, lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.environ.get("MBDAFLOW_CORS", "http://localhost:5173,http://127.0.0.1:5173").split(","),
+    allow_origins=os.environ.get("KELVO_CORS", "http://localhost:5173,http://127.0.0.1:5173").split(","),
     allow_methods=["*"], allow_headers=["*"],
 )
 
@@ -71,7 +71,7 @@ def sse(event: str, data: dict[str, Any]) -> str:
 # ---------------------------------------------------------------- auth for public APIs
 
 def require_api_key(x_api_key: str | None = Header(None), authorization: str | None = Header(None)) -> None:
-    if os.environ.get("MBDAFLOW_REQUIRE_API_KEY", "1") == "0":
+    if os.environ.get("KELVO_REQUIRE_API_KEY", "1") == "0":
         return
     key = x_api_key or (authorization[7:] if authorization and authorization.lower().startswith("bearer ") else None)
     if not key:
@@ -121,7 +121,7 @@ async def ollama_models(base_url: str | None = None) -> dict[str, Any]:
     try:
         models = await ollama.list_models(base)
     except Exception as e:
-        raise HTTPException(502, str(e) if isinstance(e, ollama.OllamaError) else f"Cannot reach Ollama at {base}: {e}")
+        raise HTTPException(502, str(e) if isinstance(e, ollama.OllamaError) else f"Can't reach Ollama at {base}. Start it with `ollama serve`, or fix the URL in Settings → Models.")
     return {"url": base, "models": [
         {"name": m["name"], "size": m.get("size"), "family": (m.get("details") or {}).get("family"),
          "parameter_size": (m.get("details") or {}).get("parameter_size"), "modified_at": m.get("modified_at")}
@@ -610,7 +610,7 @@ def list_keys() -> list[dict[str, Any]]:
 
 @app.post("/api/api-keys")
 def create_key(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
-    key = "mbda-" + secrets.token_urlsafe(32)
+    key = "kelvo-" + secrets.token_urlsafe(32)
     kid = db.new_id()
     with db.conn() as c:
         c.execute("INSERT INTO api_keys(id,name,key_hash,prefix,created_at) VALUES (?,?,?,?,?)",

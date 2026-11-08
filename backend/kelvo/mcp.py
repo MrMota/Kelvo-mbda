@@ -45,7 +45,7 @@ async def handle(msg: dict[str, Any]) -> dict[str, Any] | None:
         return _result(id_, {
             "protocolVersion": params.get("protocolVersion") or PROTOCOL,
             "capabilities": {"tools": {"listChanged": False}},
-            "serverInfo": {"name": "mbdaflow", "version": __version__},
+            "serverInfo": {"name": "kelvo", "version": __version__},
         })
     if method == "ping":
         return _result(id_, {})

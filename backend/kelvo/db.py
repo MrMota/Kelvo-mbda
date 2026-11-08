@@ -14,7 +14,7 @@ SCHEMA = (Path(__file__).parent / "schema.sql").read_text()
 
 
 def db_path() -> str:
-    return os.environ.get("MBDAFLOW_DB", str(Path.home() / ".mbdaflow" / "mbdaflow.db"))
+    return os.environ.get("KELVO_DB", str(Path.home() / ".kelvo" / "kelvo.db"))
 
 
 def now() -> str:

@@ -151,7 +151,7 @@ function ApiKeys() {
       )}
       {created && (
         <Modal title="Your new API key" icon={<KeyRound size={18} />} onClose={() => setCreated(null)} footer={<button className="btn primary" onClick={() => setCreated(null)}>Done</button>}>
-          <p className="muted" style={{ margin: 0 }}>Copy it now. It won't be shown again.</p>
+          <p className="muted" style={{ margin: 0 }}>Copy it now. This is the only time you'll see it.</p>
           <Code>{created}</Code>
         </Modal>
       )}

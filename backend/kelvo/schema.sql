@@ -1,4 +1,4 @@
--- MBDAflow schema (SQLite). Single-tenant, self-hosted: one local owner, so no
+-- Kelvo schema (SQLite). Single-tenant, self-hosted: one local owner, so no
 -- user_id columns yet. Access rule: the UI is local; the run/MCP APIs require an
 -- API key checked once per request in the API layer (app/auth.py).
 -- ids are uuid4 text; times are ISO-8601 UTC text.

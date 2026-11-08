@@ -18,7 +18,7 @@ def _free_port() -> int:
 def fake_ollama_url():
     import uvicorn
 
-    from mbdaflow.fake_ollama import app
+    from kelvo.fake_ollama import app
 
     port = _free_port()
     server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning"))
@@ -34,12 +34,12 @@ def fake_ollama_url():
 
 @pytest.fixture()
 def client(tmp_path, fake_ollama_url, monkeypatch):
-    monkeypatch.setenv("MBDAFLOW_DB", str(tmp_path / "test.db"))
-    monkeypatch.setenv("MBDAFLOW_REQUIRE_API_KEY", "1")
+    monkeypatch.setenv("KELVO_DB", str(tmp_path / "test.db"))
+    monkeypatch.setenv("KELVO_REQUIRE_API_KEY", "1")
     from fastapi.testclient import TestClient
 
-    from mbdaflow import db
-    from mbdaflow.main import app
+    from kelvo import db
+    from kelvo.main import app
 
     with TestClient(app) as c:
         db.set_setting("ollama_base_url", fake_ollama_url)

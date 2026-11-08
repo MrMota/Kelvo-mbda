@@ -11,17 +11,17 @@ install:            ## install backend (editable) and frontend deps
 build:              ## build the UI into the Python package
 	cd frontend && npm run build
 
-run: build          ## run MBDAflow on http://127.0.0.1:7860
-	$(VENV)/bin/mbdaflow run
+run: build          ## run Kelvo on http://127.0.0.1:7860
+	$(VENV)/bin/kelvo run
 
 dev-backend:        ## API with auto-reload
-	$(VENV)/bin/mbdaflow run --reload
+	$(VENV)/bin/kelvo run --reload
 
 dev-frontend:       ## Vite dev server on :5173, proxies /api to :7860
 	cd frontend && npm run dev
 
 fake-ollama:        ## a stand-in Ollama on :11435 for demos/tests without a GPU
-	$(PY) -m mbdaflow.fake_ollama
+	$(PY) -m kelvo.fake_ollama
 
 test:               ## backend tests (spin up the fake Ollama themselves)
 	cd backend && ../$(PY) -m pytest -q

@@ -90,7 +90,7 @@ class CurrentDate(Component):
 
 
 def _check_public(url: str) -> None:
-    if os.environ.get("MBDAFLOW_ALLOW_PRIVATE_URLS") == "1":
+    if os.environ.get("KELVO_ALLOW_PRIVATE_URLS") == "1":
         return
     p = urlparse(url)
     if p.scheme not in ("http", "https") or not p.hostname:
@@ -98,7 +98,7 @@ def _check_public(url: str) -> None:
     for info in socket.getaddrinfo(p.hostname, None):
         ip = ipaddress.ip_address(info[4][0])
         if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved:
-            raise ValueError("URLs on private networks are blocked (set MBDAFLOW_ALLOW_PRIVATE_URLS=1 to allow).")
+            raise ValueError("URLs on private networks are blocked (set KELVO_ALLOW_PRIVATE_URLS=1 to allow).")
 
 
 def html_to_text(s: str) -> str:
@@ -126,7 +126,7 @@ class URLFetch(Component):
     async def out_text(self, ctx) -> str:
         url = (await ctx.text("url")).strip()
         _check_public(url)
-        async with httpx.AsyncClient(timeout=20, follow_redirects=True, headers={"User-Agent": "MBDAflow/0.1"}) as c:
+        async with httpx.AsyncClient(timeout=20, follow_redirects=True, headers={"User-Agent": "Kelvo/0.1"}) as c:
             r = await c.get(url)
         body = r.text
         if "html" in r.headers.get("content-type", ""):

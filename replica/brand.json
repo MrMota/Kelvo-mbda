@@ -1,0 +1,14 @@
+{
+  "name": "Kelvo",
+  "slug": "kelvo",
+  "avoid": ["Langflow", "Lang flow", "Lang-flow", "DataStax", "MBDAflow", "MBDA"],
+  "domains": ["langflow.org", "langflow.new", "datastax.com"],
+  "colors": ["#7528FC", "#F480FF", "#FF3276"],
+  "palette": {
+    "accent": "#0b7c70",
+    "accent_dark_mode": "#2bb8a6",
+    "accent_soft": "#e1f3f0",
+    "ink": "#121821",
+    "canvas": "#eef0f3"
+  }
+}

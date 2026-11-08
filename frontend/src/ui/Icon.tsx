@@ -17,15 +17,15 @@ export function Icon({ name, ...p }: { name: string } & LucideProps) {
 }
 
 export const CATEGORY_COLORS: Record<string, string> = {
-  "Input & Output": "#3b82f6",
-  Prompts: "#8b5cf6",
-  Models: "#e0457b",
-  Agents: "#0e9f8e",
-  Tools: "#22a559",
-  Memory: "#ef7d22",
-  "Vector Stores": "#14b8a6",
-  Processing: "#64748b",
-  Logic: "#d4a014",
+  "Input & Output": "#2f6fe4",
+  Prompts: "#0b7f9c",
+  Models: "#4a5568",
+  Agents: "#0b7c70",
+  Tools: "#1b8545",
+  Memory: "#c45a0c",
+  "Vector Stores": "#0b8478",
+  Processing: "#6b6560",
+  Logic: "#9a7206",
 };
 
 export const typeColor = (t: string) => `var(--t-${t}, #94a3b8)`;

@@ -112,7 +112,7 @@ export default function Skills() {
         <div className="grow">
           <h1>Skills</h1>
           <p className="muted" style={{ margin: "4px 0 0", maxWidth: 680 }}>
-            Packs of instructions your agents load only when a request needs them. The agent sees each skill's name and description; the full instructions enter its context when it calls <code>load_skill</code>. Small open models stay fast and focused.
+            Instructions your agents pick up only when a request calls for them. An agent always sees each skill's name and when to use it; the full text loads when it calls <code>load_skill</code>. That keeps small local models fast and on task.
           </p>
         </div>
         <button className="btn" onClick={importSkill}><Upload size={15} /> Import SKILL.md</button>

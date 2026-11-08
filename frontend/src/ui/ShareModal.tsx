@@ -33,11 +33,11 @@ export function ShareModal({ flow, initialTab = "api", onClose, onChange }: {
 
   const payload = `{"input_value": "Hello!", "session_id": "user-1", "output_type": "chat", "input_type": "chat"}`;
   const snippets = {
-    curl: `curl -X POST "${url}" \\\n  -H "Content-Type: application/json" \\\n  -H "x-api-key: $MBDAFLOW_API_KEY" \\\n  -d '${payload}'\n\n# Stream tokens and agent steps as server-sent events:\n# add ?stream=true to the URL`,
-    python: `import os, requests\n\nresp = requests.post(\n    "${url}",\n    headers={"x-api-key": os.environ["MBDAFLOW_API_KEY"]},\n    json=${payload.replace(/"(\w+)":/g, '"$1":')},\n    timeout=600,\n)\nresp.raise_for_status()\nprint(resp.json()["outputs"][0]["outputs"][0]["results"]["message"]["text"])`,
-    js: `const resp = await fetch("${url}", {\n  method: "POST",\n  headers: { "Content-Type": "application/json", "x-api-key": process.env.MBDAFLOW_API_KEY },\n  body: JSON.stringify(${payload}),\n});\nconst data = await resp.json();\nconsole.log(data.outputs[0].outputs[0].results.message.text);`,
+    curl: `curl -X POST "${url}" \\\n  -H "Content-Type: application/json" \\\n  -H "x-api-key: $KELVO_API_KEY" \\\n  -d '${payload}'\n\n# Stream tokens and agent steps as server-sent events:\n# add ?stream=true to the URL`,
+    python: `import os, requests\n\nresp = requests.post(\n    "${url}",\n    headers={"x-api-key": os.environ["KELVO_API_KEY"]},\n    json=${payload.replace(/"(\w+)":/g, '"$1":')},\n    timeout=600,\n)\nresp.raise_for_status()\nprint(resp.json()["outputs"][0]["outputs"][0]["results"]["message"]["text"])`,
+    js: `const resp = await fetch("${url}", {\n  method: "POST",\n  headers: { "Content-Type": "application/json", "x-api-key": process.env.KELVO_API_KEY },\n  body: JSON.stringify(${payload}),\n});\nconst data = await resp.json();\nconsole.log(data.outputs[0].outputs[0].results.message.text);`,
   };
-  const mcpConfig = JSON.stringify({ mcpServers: { mbdaflow: { type: "http", url: `${origin}/mcp`, headers: { "x-api-key": "YOUR_MBDAFLOW_API_KEY" } } } }, null, 2);
+  const mcpConfig = JSON.stringify({ mcpServers: { kelvo: { type: "http", url: `${origin}/mcp`, headers: { "x-api-key": "YOUR_KELVO_API_KEY" } } } }, null, 2);
 
   return (
     <Modal title="Share" icon={<Share2 size={18} />} onClose={onClose} size="lg">
@@ -73,7 +73,7 @@ export function ShareModal({ flow, initialTab = "api", onClose, onChange }: {
       {tab === "mcp" && (
         <>
           <p className="muted" style={{ margin: 0 }}>
-            Expose this flow as a tool on MBDAflow's MCP server so MCP clients (Claude Desktop, Cursor, other agents) can call it.
+            Expose this flow as a tool on Kelvo's MCP server so MCP clients (Claude Desktop, Cursor, other agents) can call it.
           </p>
           <div className="row">
             <Toggle on={!!flow.mcp_enabled} onChange={async (v) => { if (await save({ mcp_enabled: v ? 1 : 0 } as any)) toast(v ? "Exposed as MCP tool" : "Removed from MCP"); }} label="Expose as MCP tool" />
@@ -92,7 +92,7 @@ export function ShareModal({ flow, initialTab = "api", onClose, onChange }: {
       )}
       {tab === "export" && (
         <>
-          <p className="muted" style={{ margin: 0 }}>Download the flow as JSON. Import it on the Flows page of any MBDAflow install.</p>
+          <p className="muted" style={{ margin: 0 }}>Download the flow as JSON. Import it on the Flows page of any Kelvo install.</p>
           <div>
             <button className="btn primary" onClick={() => download(`${flow.name.replace(/[^\w-]+/g, "_")}.json`, JSON.stringify({ name: flow.name, description: flow.description, data: flow.data }, null, 2))}>
               <Download size={15} /> Download JSON

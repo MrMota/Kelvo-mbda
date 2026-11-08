@@ -37,7 +37,7 @@ async def llm_from_ctx(ctx, connected_field: str | None = "llm") -> LLMConfig:
     if not model:
         model = db.get_setting("default_model") or ""
     if not model:
-        raise ValueError("Choose a model (or set a default model in Settings → Models).")
+        raise ValueError("Pick a model here, or set a default in Settings → Models.")
     options: dict[str, Any] = {}
     t = await ctx.get("temperature")
     if t is not None and t != "":

@@ -1,4 +1,4 @@
-# Architecture: MBDAflow
+# Architecture: Kelvo
 
 ## Stack
 
@@ -11,7 +11,7 @@
 | canvas | @xyflow/react (React Flow) | the de-facto MIT node editor; typed handles, minimap, zoom |
 | styling | plain CSS with design tokens (CSS variables) | no build plugin, light + dark |
 | auth | none for the local UI; API keys (sha256-hashed) for `/api/v1/run` and `/mcp` | single-owner self-hosted tool, like the original's local mode |
-| hosting | one process: FastAPI serves the built SPA from `frontend/dist` | `pip install` + `mbdaflow run`, or Docker |
+| hosting | one process: FastAPI serves the built SPA from `frontend/dist` | `pip install` + `kelvo run`, or Docker |
 
 Deviation from the pack's default (Next.js + Postgres + Vercel): this is a self-hosted dev tool talking to a local model server, not a SaaS. One process and one SQLite file beat three managed services.
 
@@ -21,7 +21,7 @@ See `schema.sql`: 9 tables (projects, flows, messages, variables, api_keys, runs
 
 ## Engine
 
-- **Component registry** (`backend/mbdaflow/components/`): each component declares `inputs` (fields + typed handles), `outputs` (typed), and an async `run(ctx)`. The registry is served at `GET /api/components` and drives the sidebar, the node UI and edge validation — one source of truth.
+- **Component registry** (`backend/kelvo/components/`): each component declares `inputs` (fields + typed handles), `outputs` (typed), and an async `run(ctx)`. The registry is served at `GET /api/components` and drives the sidebar, the node UI and edge validation — one source of truth.
 - **Data types**: `Message`, `Text`, `Data`, `LanguageModel`, `Embeddings`, `Tool`, `Skill`, `VectorStore`. Edges are valid when output type ∈ input's accepted types.
 - **Graph run**: topological order from the output nodes backwards; each node runs once; outputs cached per run. Cycles rejected on save and on run.
 - **Tool mode**: any node with `tool_mode` exposes a `Tool` output. Calling the tool runs that node with the agent's arguments mapped onto its tool-able fields.

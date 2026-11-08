@@ -18,7 +18,7 @@ export function NewFlowModal({ projectId, onClose }: { projectId?: string; onClo
     } catch (e: any) { toast(e.message, "error"); }
   };
   return (
-    <Modal title="Start a new flow" onClose={onClose} size="lg">
+    <Modal title="New flow" onClose={onClose} size="lg">
       <div className="cards">
         <button className="card" onClick={() => create()} style={{ textAlign: "left", borderStyle: "dashed" }}>
           <span className="card-icon"><Plus size={18} /></span>
@@ -137,8 +137,8 @@ export default function Home() {
           {flows === null ? null : shown.length === 0 && !q ? (
             <div className="empty">
               <span className="card-icon" style={{ width: 44, height: 44 }}><Workflow size={22} /></span>
-              <h2>Build your first agent</h2>
-              <span>Start from a template like <b>Simple Agent</b>, or a blank canvas. Everything runs on your Ollama models.</span>
+              <h2>Your first agent is two clicks away</h2>
+              <span>Pick <b>Simple Agent</b> for one that already works, or start blank. Every model call goes to your own Ollama.</span>
               <button className="btn primary" onClick={() => setShowNew(true)}><Plus size={16} /> New Flow</button>
             </div>
           ) : shown.length === 0 ? (
@@ -165,7 +165,7 @@ export default function Home() {
                       <button onClick={() => { exportFlow(f.id); setMenu(null); }}><Download size={14} /> Export JSON</button>
                       <button className="danger" onClick={async () => {
                         setMenu(null);
-                        if (!confirm(`Delete “${f.name}”? Its chat history goes too.`)) return;
+                        if (!confirm(`Delete “${f.name}” and its chat history? This can't be undone.`)) return;
                         await api(`/api/flows/${f.id}`, { method: "DELETE" });
                         toast("Flow deleted");
                         load();

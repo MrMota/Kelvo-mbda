@@ -1,6 +1,6 @@
 // End-to-end click-through of the core flows (F01-F05).
 // Needs a running server (default http://127.0.0.1:7860) backed by an Ollama, or by
-// `python -m mbdaflow.fake_ollama`. Usage: node e2e/smoke.mjs [baseUrl] [screenshotDir]
+// `python -m kelvo.fake_ollama`. Usage: node e2e/smoke.mjs [baseUrl] [screenshotDir]
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
@@ -55,7 +55,7 @@ await step("F02 build from scratch with drag and drop + connect", async () => {
   await page.getByRole("button", { name: "New Flow" }).first().click();
   await page.getByRole("button", { name: /Blank Flow/ }).click();
   await page.waitForURL(/\/flow\//);
-  await page.getByText("Empty canvas").waitFor();
+  await page.getByText("Nothing here yet").waitFor();
   const canvas = page.locator(".react-flow__pane");
   const drop = async (name, x, y) => {
     const item = page.locator(".pal-item", { hasText: name }).first();
@@ -132,7 +132,7 @@ await step("F05 settings: create API key and see share snippets", async () => {
   await page.goto(BASE);
   await page.locator(".card", { hasText: "Simple Agent" }).first().click();
   await page.getByRole("button", { name: "Share" }).click();
-  await page.getByText("x-api-key: $MBDAFLOW_API_KEY").waitFor();
+  await page.getByText("x-api-key: $KELVO_API_KEY").waitFor();
   await shot(page, "11-share");
   await page.getByRole("tab", { name: "MCP server" }).click();
   await page.getByRole("switch", { name: "Expose as MCP tool" }).click();

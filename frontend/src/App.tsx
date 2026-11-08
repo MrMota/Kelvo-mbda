@@ -9,7 +9,7 @@ import Skills from "./pages/Skills";
 
 export function Brand() {
   return (
-    <NavLink to="/" className="brand" aria-label="MBDAflow home">
+    <NavLink to="/" className="brand" aria-label="Kelvo home">
       <span className="brand-mark">
         <svg width="16" height="16" viewBox="0 0 32 32" aria-hidden="true">
           <circle cx="9" cy="10" r="4" fill="currentColor" />
@@ -17,7 +17,7 @@ export function Brand() {
           <path d="M12 12.5 20 19.5" stroke="currentColor" strokeWidth="3" />
         </svg>
       </span>
-      MBDAflow
+      Kelvo
     </NavLink>
   );
 }
@@ -34,7 +34,7 @@ export function OllamaStatus() {
   return (
     <NavLink to="/settings" className="row faint" style={{ fontSize: 12.5 }} title={ok ? `Ollama at ${h.ollama.url}` : h?.ollama?.error ?? "Checking Ollama…"}>
       <span className={`status-dot ${h ? (ok ? "ok" : "err") : ""}`} />
-      {h ? (ok ? `Ollama · ${h.ollama.models} models` : "Ollama offline") : "…"}
+      {h ? (ok ? `Ollama · ${h.ollama.models} models` : "Ollama not running") : "…"}
     </NavLink>
   );
 }
@@ -46,7 +46,7 @@ export function ThemeToggle() {
     <button className="icon-btn" aria-label="Toggle theme" title="Toggle theme" onClick={() => {
       const next = dark ? "light" : "dark";
       document.documentElement.dataset.theme = next;
-      try { localStorage.setItem("mbdaflow-theme", next); } catch {}
+      try { localStorage.setItem("kelvo-theme", next); } catch {}
       setDark(!dark);
     }}>{dark ? <Sun size={17} /> : <Moon size={17} />}</button>
   );

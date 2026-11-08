@@ -1,8 +1,8 @@
 import json
 
-from mbdaflow.components.tools import safe_eval
-from mbdaflow.components.base import prompt_vars, fill_prompt
-from mbdaflow.components.logic import split_text
+from kelvo.components.tools import safe_eval
+from kelvo.components.base import prompt_vars, fill_prompt
+from kelvo.components.logic import split_text
 
 
 def events(resp):
@@ -117,7 +117,7 @@ def test_rag_template(client):
     assert "Context:" in msg and "database" in msg
     # ingest is idempotent
     build(client, f["id"], "again")
-    from mbdaflow import db
+    from kelvo import db
     with db.conn() as c:
         assert c.execute("SELECT COUNT(*) FROM vector_chunks").fetchone()[0] == 1
 
@@ -165,7 +165,7 @@ def test_missing_model_error(client):
         if n["data"]["type"] == "OllamaModel":
             n["data"]["params"]["model"] = "nonexistent:1b"
     evs = build(client, f["id"], "hi", data=data)
-    assert evs[-1]["event"] == "error" and "pull it first" in evs[-1]["data"]["error"]
+    assert evs[-1]["event"] == "error" and "Pull it in Settings" in evs[-1]["data"]["error"]
     runs = client.get(f"/api/flows/{f['id']}/runs").json()
     assert runs[0]["status"] == "error"
 
@@ -195,7 +195,7 @@ def test_mcp_server(client):
     f = client.post("/api/flows", json={"template": "basic-prompting"}).json()
     client.patch(f"/api/flows/{f['id']}", json={"mcp_enabled": True, "mcp_tool_name": "ask_expert", "mcp_description": "Ask an expert"})
     init = client.post("/mcp", headers=h, json={"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {}}).json()
-    assert init["result"]["serverInfo"]["name"] == "mbdaflow"
+    assert init["result"]["serverInfo"]["name"] == "kelvo"
     assert client.post("/mcp", headers=h, json={"jsonrpc": "2.0", "method": "notifications/initialized"}).status_code == 202
     tools = client.post("/mcp", headers=h, json={"jsonrpc": "2.0", "id": 2, "method": "tools/list"}).json()
     assert tools["result"]["tools"][0]["name"] == "ask_expert"

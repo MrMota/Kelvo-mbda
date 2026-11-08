@@ -7,7 +7,7 @@ from typing import Any, AsyncIterator
 
 import httpx
 
-TIMEOUT = float(os.environ.get("MBDAFLOW_OLLAMA_TIMEOUT", "600"))
+TIMEOUT = float(os.environ.get("KELVO_OLLAMA_TIMEOUT", "600"))
 
 
 class OllamaError(RuntimeError):
@@ -20,9 +20,9 @@ def _err(resp: httpx.Response, body: bytes) -> OllamaError:
     except Exception:
         msg = body.decode(errors="replace")
     if "does not support tools" in msg:
-        msg += " — pick a tool-capable model such as llama3.1, qwen2.5 / qwen3 or mistral-nemo."
+        msg += " — this model can't call tools. Pick one that can, such as qwen3, llama3.1 or mistral-nemo."
     if resp.status_code == 404 and "not found" in msg:
-        msg += " — pull it first (Settings → Models, or `ollama pull <model>`)."
+        msg += " — this model isn't on your Ollama yet. Pull it in Settings → Models, or run `ollama pull <model>`."
     return OllamaError(f"Ollama error {resp.status_code}: {msg}")
 
 
@@ -67,7 +67,7 @@ async def chat_stream(
                         raise OllamaError(f"Ollama error: {chunk['error']}")
                     yield chunk
     except httpx.ConnectError as e:
-        raise OllamaError(f"Cannot reach Ollama at {base_url}. Is `ollama serve` running?") from e
+        raise OllamaError(f"Can't reach Ollama at {base_url}. Start it with `ollama serve`, or fix the URL in Settings → Models.") from e
 
 
 async def chat(base_url: str, model: str, messages: list[dict[str, Any]], **kw: Any) -> dict[str, Any]:
@@ -88,7 +88,7 @@ async def embed(base_url: str, model: str, texts: list[str]) -> list[list[float]
                 raise _err(r, r.content)
             return r.json()["embeddings"]
     except httpx.ConnectError as e:
-        raise OllamaError(f"Cannot reach Ollama at {base_url}. Is `ollama serve` running?") from e
+        raise OllamaError(f"Can't reach Ollama at {base_url}. Start it with `ollama serve`, or fix the URL in Settings → Models.") from e
 
 
 async def pull(base_url: str, model: str) -> AsyncIterator[dict[str, Any]]:

@@ -1,6 +1,6 @@
 .venv
 **/node_modules
 **/__pycache__
-backend/mbdaflow/static
+backend/kelvo/static
 *.db
 replica/screens

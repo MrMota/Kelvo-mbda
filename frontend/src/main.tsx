@@ -8,7 +8,7 @@ import { StoreProvider } from "./store";
 import { ToastProvider } from "./ui/kit";
 
 try {
-  const t = localStorage.getItem("mbdaflow-theme");
+  const t = localStorage.getItem("kelvo-theme");
   if (t) document.documentElement.dataset.theme = t;
 } catch {}
 

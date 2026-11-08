@@ -166,8 +166,8 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
           {messages.length === 0 && (
             <div className="empty" style={{ margin: "auto 0", border: 0 }}>
               <Bot size={28} className="faint" />
-              {hasChatInput ? <><h3>Chat with your flow</h3><span>Messages go through the flow on your Ollama models. Agent tool calls show up here.</span></>
-                : <><h3>No Chat Input</h3><span>Add a Chat Input component to chat, or press Run to execute the flow once.</span></>}
+              {hasChatInput ? <><h3>Say something to your flow</h3><span>Replies come from your own Ollama models. When the agent uses a tool, you'll see the call and its result here.</span></>
+                : <><h3>This flow doesn't take chat</h3><span>Add a Chat Input to talk to it here, or press Run to run it once.</span></>}
             </div>
           )}
           {messages.map((m, i) => <MessageView key={m.id ?? i} m={m} />)}

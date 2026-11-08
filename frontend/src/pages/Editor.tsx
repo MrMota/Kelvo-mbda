@@ -63,7 +63,7 @@ function Palette({ onAdd, locked }: { onAdd: (key: string) => void; locked: bool
               </button>
               {open && items.map((c) => (
                 <div key={c.key} className="pal-item" draggable={!locked} title={c.description} role="button" tabIndex={0}
-                  onDragStart={(e) => { e.dataTransfer.setData("application/mbdaflow", c.key); e.dataTransfer.effectAllowed = "move"; }}
+                  onDragStart={(e) => { e.dataTransfer.setData("application/kelvo", c.key); e.dataTransfer.effectAllowed = "move"; }}
                   onClick={() => !locked && onAdd(c.key)} onKeyDown={(e) => e.key === "Enter" && !locked && onAdd(c.key)}>
                   <span className="pal-icon" style={{ color: CATEGORY_COLORS[c.category] }}><Icon name={c.icon} size={15} /></span>
                   <div className="grow" style={{ minWidth: 0 }}>
@@ -344,7 +344,7 @@ function EditorInner({ initial }: { initial: Flow }) {
         onRunEvent(e);
         if (e.event === "error") err = e.data.error;
       });
-      if (err) toast(err, "error"); else toast("Flow ran successfully");
+      if (err) toast(err, "error"); else toast("Run finished");
     } catch (e: any) {
       toast(e.message, "error");
     } finally {
@@ -391,7 +391,7 @@ function EditorInner({ initial }: { initial: Flow }) {
             onDragOver={(e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; }}
             onDrop={(e) => {
               e.preventDefault();
-              const key = e.dataTransfer.getData("application/mbdaflow");
+              const key = e.dataTransfer.getData("application/kelvo");
               if (key && !locked) addNode(key, rf.screenToFlowPosition({ x: e.clientX - 160, y: e.clientY - 30 }));
             }}>
             <ReactFlow
@@ -412,8 +412,8 @@ function EditorInner({ initial }: { initial: Flow }) {
             {nodes.length === 0 && (
               <div className="canvas-empty">
                 <div className="col" style={{ alignItems: "center" }}>
-                  <h2>Empty canvas</h2>
-                  <span>Drag components from the left, or click one to add it.<br />Try Chat Input → Agent → Chat Output.</span>
+                  <h2>Nothing here yet</h2>
+                  <span>Drag a component in from the left, or click one.<br />A good start: Chat Input → Agent → Chat Output.</span>
                 </div>
               </div>
             )}

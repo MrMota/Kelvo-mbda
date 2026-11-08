@@ -1,5 +1,5 @@
 [project]
-name = "mbdaflow"
+name = "kelvo"
 version = "0.1.0"
 description = "Visual builder for AI agents, tools and skills, powered by Ollama open models"
 requires-python = ">=3.10"
@@ -9,17 +9,17 @@ dependencies = ["fastapi>=0.110", "uvicorn[standard]>=0.27", "httpx>=0.27"]
 dev = ["pytest>=8", "pytest-asyncio>=0.23"]
 
 [project.scripts]
-mbdaflow = "mbdaflow.cli:main"
+kelvo = "kelvo.cli:main"
 
 [build-system]
 requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["mbdaflow*"]
+include = ["kelvo*"]
 
 [tool.setuptools.package-data]
-mbdaflow = ["schema.sql", "static/**/*"]
+kelvo = ["schema.sql", "static/**/*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

@@ -47,7 +47,7 @@ TEMPLATES: list[dict[str, Any]] = [
                 _n("chat_in", "ChatInput", 0, 300),
                 _n("calc", "Calculator", 0, -280, tool_mode=True),
                 _n("date", "CurrentDate", 0, 10, tool_mode=True),
-                _n("url", "URLFetch", 0, 560, tool_mode=True),
+                _n("url", "URLFetch", 0, 660, tool_mode=True),
                 _n("agent", "Agent", 420, 40),
                 _n("chat_out", "ChatOutput", 820, 260),
                 _note("note", 420, -150, "Pick a tool-capable model in the Agent (llama3.1, qwen2.5, qwen3, mistral-nemo), then open the Playground."),
@@ -128,7 +128,7 @@ TEMPLATES: list[dict[str, Any]] = [
         "icon": "database",
         "data": {
             "nodes": [
-                _n("doc", "TextInput", 0, -100, {"value": "Paste your document here. MBDAflow splits it into chunks, embeds each with an Ollama embedding model, and keeps the vectors in its own database."}, display_name="Document"),
+                _n("doc", "TextInput", 0, -100, {"value": "Paste your document here. Kelvo splits it into chunks, embeds each with an Ollama embedding model, and keeps the vectors in its own database."}, display_name="Document"),
                 _n("split", "SplitText", 380, -160, {"chunk_size": 800, "overlap": 100}),
                 _n("emb", "OllamaEmbeddings", 380, 220),
                 _n("chat_in", "ChatInput", 0, 420),

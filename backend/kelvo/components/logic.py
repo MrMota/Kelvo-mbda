@@ -180,7 +180,7 @@ class KnowledgeBase(Component):
     key = "KnowledgeBase"
     display = "Knowledge Base"
     category = "Vector Stores"
-    description = "A local vector store: ingest chunks, then search them by meaning. Stored in MBDAflow's database."
+    description = "A local vector store: ingest chunks, then search them by meaning. Stored in Kelvo's database."
     icon = "database"
     tool_output = "results"
     fields = [
