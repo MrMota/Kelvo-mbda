@@ -10,7 +10,7 @@
 | frontend | React 18 + TypeScript + Vite | standard, fast |
 | canvas | @xyflow/react (React Flow) | the de-facto MIT node editor; typed handles, minimap, zoom |
 | styling | plain CSS with design tokens (CSS variables) | no build plugin, light + dark |
-| auth | none for the local UI; API keys (sha256-hashed) for `/api/v1/run` and `/mcp` | single-owner self-hosted tool, like the original's local mode |
+| auth | one owner account (username + scrypt-hashed password, HttpOnly session cookie) for the editor and its API; API keys (sha256-hashed) for `/api/v1/run` and `/mcp` | personal tool: the owner only, no sign-up, no team features |
 | hosting | one process: FastAPI serves the built SPA from `frontend/dist` | `pip install` + `kelvo run`, or Docker |
 
 Deviation from the pack's default (Next.js + Postgres + Vercel): this is a self-hosted dev tool talking to a local model server, not a SaaS. One process and one SQLite file beat three managed services.

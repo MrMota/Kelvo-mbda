@@ -92,3 +92,21 @@ CREATE TABLE IF NOT EXISTS settings (
   key TEXT PRIMARY KEY,
   value TEXT NOT NULL
 );
+
+-- Single owner account. Kelvo is one person's tool: the API refuses a second user.
+CREATE TABLE IF NOT EXISTS users (
+  id TEXT PRIMARY KEY,
+  username TEXT NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,           -- scrypt$n$r$p$salt$hash
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS sessions (
+  token_hash TEXT PRIMARY KEY,           -- sha256 of the cookie value
+  user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at TEXT NOT NULL,
+  expires_at TEXT NOT NULL,
+  last_seen_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id);

@@ -13,6 +13,10 @@ services:
     depends_on: [ollama]
     environment:
       OLLAMA_BASE_URL: http://ollama:11434
+      # Your account, created on first start. Put these in a .env file next to this one.
+      # Leave them unset to use the one-time setup token from `docker compose logs kelvo`.
+      KELVO_USERNAME: ${KELVO_USERNAME:-}
+      KELVO_PASSWORD: ${KELVO_PASSWORD:-}
     volumes: [kelvo:/data]
     ports: ["7860:7860"]
 volumes:

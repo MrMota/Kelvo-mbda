@@ -36,12 +36,32 @@ def fake_ollama_url():
 def client(tmp_path, fake_ollama_url, monkeypatch):
     monkeypatch.setenv("KELVO_DB", str(tmp_path / "test.db"))
     monkeypatch.setenv("KELVO_REQUIRE_API_KEY", "1")
+    monkeypatch.setenv("KELVO_USERNAME", "me")
+    monkeypatch.setenv("KELVO_PASSWORD", "correct horse")
     from fastapi.testclient import TestClient
 
-    from kelvo import db
+    from kelvo import auth, db
     from kelvo.main import app
 
+    auth._fails.clear()
     with TestClient(app) as c:
+        assert c.post("/api/auth/login", json={"username": "me", "password": "correct horse"}).status_code == 200
         db.set_setting("ollama_base_url", fake_ollama_url)
         db.set_setting("default_model", "llama3.1:8b")
+        yield c
+
+
+@pytest.fixture()
+def fresh(tmp_path, monkeypatch):
+    """An app with no account yet (setup-token path) and no session."""
+    monkeypatch.setenv("KELVO_DB", str(tmp_path / "fresh.db"))
+    monkeypatch.delenv("KELVO_USERNAME", raising=False)
+    monkeypatch.delenv("KELVO_PASSWORD", raising=False)
+    from fastapi.testclient import TestClient
+
+    from kelvo import auth
+    from kelvo.main import app
+
+    auth._fails.clear()
+    with TestClient(app) as c:
         yield c

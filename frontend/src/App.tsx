@@ -1,7 +1,8 @@
-import { Moon, Settings as SettingsIcon, Sparkles, Sun, Workflow } from "lucide-react";
+import { LogOut, Moon, Settings as SettingsIcon, Sparkles, Sun, Workflow } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { api } from "./api";
+import { useAuth } from "./auth";
 import Editor from "./pages/Editor";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
@@ -39,6 +40,15 @@ export function OllamaStatus() {
   );
 }
 
+export function SignOut() {
+  const { username, signOut } = useAuth();
+  return (
+    <button className="icon-btn" aria-label={`Sign out ${username}`} title={`Signed in as ${username}. Sign out`} onClick={signOut}>
+      <LogOut size={17} />
+    </button>
+  );
+}
+
 export function ThemeToggle() {
   const [dark, setDark] = useState(() =>
     document.documentElement.dataset.theme ? document.documentElement.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches);
@@ -65,6 +75,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <span className="spacer" />
         <OllamaStatus />
         <ThemeToggle />
+        <SignOut />
       </header>
       <main className="page">{children}</main>
     </div>

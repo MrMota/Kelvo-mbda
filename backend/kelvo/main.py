@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, db, ollama
+from . import __version__, auth, db, ollama
 from .components import REGISTRY, specs
 from .engine import Engine, FlowError, validate_graph
 from .templates import STARTER_SKILLS, TEMPLATES
@@ -39,10 +39,13 @@ def seed() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     seed()
+    auth.bootstrap()
     yield
 
 
 app = FastAPI(title="Kelvo", version=__version__, lifespan=lifespan)
+app.add_middleware(auth.AuthMiddleware)
+app.include_router(auth.router)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=os.environ.get("KELVO_CORS", "http://localhost:5173,http://127.0.0.1:5173").split(","),
@@ -87,7 +90,9 @@ def require_api_key(x_api_key: str | None = Header(None), authorization: str | N
 # ---------------------------------------------------------------- health, registry, settings
 
 @app.get("/api/health")
-async def health() -> dict[str, Any]:
+async def health(request: Request) -> dict[str, Any]:
+    if not auth.session_user(request):
+        return {"ok": True}
     base = db.ollama_base_url()
     try:
         models = await ollama.list_models(base)

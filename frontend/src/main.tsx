@@ -4,6 +4,7 @@ import { BrowserRouter } from "react-router-dom";
 import "@xyflow/react/dist/style.css";
 import "./styles.css";
 import App from "./App";
+import { AuthGate } from "./auth";
 import { StoreProvider } from "./store";
 import { ToastProvider } from "./ui/kit";
 
@@ -16,9 +17,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <BrowserRouter>
       <ToastProvider>
-        <StoreProvider>
-          <App />
-        </StoreProvider>
+        <AuthGate>
+          <StoreProvider>
+            <App />
+          </StoreProvider>
+        </AuthGate>
       </ToastProvider>
     </BrowserRouter>
   </React.StrictMode>,

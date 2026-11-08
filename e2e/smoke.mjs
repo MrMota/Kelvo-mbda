@@ -1,6 +1,8 @@
 // End-to-end click-through of the core flows (F01-F05).
 // Needs a running server (default http://127.0.0.1:7860) backed by an Ollama, or by
-// `python -m kelvo.fake_ollama`. Usage: node e2e/smoke.mjs [baseUrl] [screenshotDir]
+// `python -m kelvo.fake_ollama`, started with KELVO_USERNAME / KELVO_PASSWORD
+// (defaults below, override with E2E_USER / E2E_PASS).
+// Usage: node e2e/smoke.mjs [baseUrl] [screenshotDir]
 import { createRequire } from "node:module";
 const require = createRequire(import.meta.url);
 const { chromium } = require("playwright");
@@ -20,6 +22,22 @@ const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
 const errors = [];
 page.on("pageerror", (e) => errors.push(e.message));
 page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+
+const USER = process.env.E2E_USER ?? "me";
+const PASS = process.env.E2E_PASS ?? "correct horse";
+
+await step("Sign-in screen blocks the app; wrong password is refused", async () => {
+  await page.goto(BASE);
+  await page.getByRole("heading", { name: "Sign in to Kelvo" }).waitFor();
+  await shot(page, "00-login");
+  await page.getByLabel("Username").fill(USER);
+  await page.getByLabel("Password").fill("not the password");
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByText("Wrong username or password.").waitFor();
+  await page.getByLabel("Password").fill(PASS);
+  await page.getByRole("button", { name: "Sign in" }).click();
+  await page.getByRole("heading", { name: "My Projects" }).waitFor();
+});
 
 await step("F08 home loads with empty state", async () => {
   await page.goto(BASE);
@@ -148,13 +166,22 @@ await step("Dark mode renders", async () => {
 });
 
 await step("Phone width home has no horizontal scroll", async () => {
-  const m = await browser.newPage({ viewport: { width: 390, height: 844 } });
+  const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, storageState: await page.context().storageState() });
+  const m = await ctx.newPage();
   await m.goto(BASE);
   await m.getByRole("heading", { name: "My Projects" }).waitFor();
   const over = await m.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   if (over) throw new Error("horizontal scroll at 390px");
   if (SHOTS) await m.screenshot({ path: `${SHOTS}/13-mobile.png` });
-  await m.close();
+  await ctx.close();
+});
+
+await step("Sign out returns to the sign-in screen", async () => {
+  await page.goto(BASE);
+  await page.getByRole("button", { name: /Sign out/ }).click();
+  await page.getByRole("heading", { name: "Sign in to Kelvo" }).waitFor();
+  await page.goto(`${BASE}/settings`);
+  await page.getByRole("heading", { name: "Sign in to Kelvo" }).waitFor();
 });
 
 await browser.close();

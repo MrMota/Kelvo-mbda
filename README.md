@@ -10,6 +10,7 @@ apps over a REST API or from any MCP client.
 - **Local RAG**: split text, embed it with an Ollama embedding model, and search it in Kelvo's own database.
 - **Run API** (`POST /api/v1/run/{flow}`) with sessions, runtime *tweaks*, and token streaming; **MCP server** (`/mcp`) exposes chosen flows as tools.
 - Global variables (`${NAME}` in any field), API keys, run logs, import/export, light and dark themes.
+- **Just for you**: one username/password account, no sign-up, no other users.
 
 ## Quick start
 
@@ -34,7 +35,13 @@ make install
 make run                        # → http://127.0.0.1:7860
 ```
 
-Open **Settings → Models**, check the Ollama URL, and pick a **default model**: every template uses it. Then **New Flow → Simple Agent → Playground**.
+**Sign in.** Kelvo has exactly one account: yours. There is no sign-up. Create it one of three ways:
+
+- set `KELVO_USERNAME` and `KELVO_PASSWORD` before the first start (Docker: put them in a `.env` file next to `docker-compose.yml`), or
+- open the app and enter the one-time **setup token** printed in the server log, or
+- run `kelvo set-password` on the server (also how you reset a forgotten password).
+
+Then open **Settings → Models**, check the Ollama URL, and pick a **default model**: every template uses it. Then **New Flow → Simple Agent → Playground**.
 
 No GPU at hand? `make fake-ollama` starts a stand-in Ollama on port 11435 that echoes and calls tools on cue, which is what the tests use.
 
@@ -88,11 +95,14 @@ In **Share → MCP server**, expose a flow as a tool and give it a clear name an
 | `OLLAMA_BASE_URL` | `http://127.0.0.1:11434` | used until set in Settings |
 | `KELVO_DB` | `~/.kelvo/kelvo.db` | SQLite file |
 | `KELVO_HOST` / `KELVO_PORT` | `127.0.0.1` / `7860` | |
+| `KELVO_USERNAME` / `KELVO_PASSWORD` | — | create your account on first start (ignored once it exists) |
+| `KELVO_SESSION_DAYS` | `30` | how long a sign-in lasts |
+| `KELVO_SECURE_COOKIE` | `0` | `1` marks the session cookie Secure (set it when you serve Kelvo over HTTPS) |
 | `KELVO_REQUIRE_API_KEY` | `1` | `0` disables keys on `/api/v1/run` and `/mcp` (local use only) |
 | `KELVO_ALLOW_PRIVATE_URLS` | `0` | let the URL tool fetch private-network addresses |
 | `KELVO_OLLAMA_TIMEOUT` | `600` | seconds per model call |
 
-The editor UI itself has no login: it is meant for `127.0.0.1` or a private network. Put it behind your own auth before exposing it.
+**Security.** The editor and its API need your sign-in (scrypt-hashed password, HttpOnly SameSite cookie, cross-site writes refused, 5 failed sign-ins lock that address for 60 s). The run API and MCP server need an API key instead. Kelvo binds to `127.0.0.1` by default; to reach it from your other devices, run it with `--host 0.0.0.0` on a private network or VPN (e.g. Tailscale), not on the open internet, and set `KELVO_SECURE_COOKIE=1` if you put HTTPS in front of it.
 
 ## Development
 

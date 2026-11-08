@@ -23,6 +23,7 @@ export async function api<T = any>(path: string, opts: { method?: string; body?:
   });
   const ct = res.headers.get("content-type") ?? "";
   const body = ct.includes("json") ? await res.json() : await res.text();
+  if (res.status === 401 && !path.startsWith("/api/auth/")) window.dispatchEvent(new Event("kelvo:unauthorized"));
   if (!res.ok) throw new ApiError(res.status, detail(body, `${res.status} ${res.statusText}`));
   return body as T;
 }
@@ -37,6 +38,7 @@ export async function stream(path: string, body: unknown, onEvent: (e: StreamEve
     body: JSON.stringify(body),
     signal,
   });
+  if (res.status === 401) window.dispatchEvent(new Event("kelvo:unauthorized"));
   if (!res.ok || !res.body) {
     let msg = `${res.status} ${res.statusText}`;
     try {

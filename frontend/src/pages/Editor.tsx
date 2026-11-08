@@ -7,7 +7,7 @@ import {
 } from "lucide-react";
 import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { OllamaStatus, ThemeToggle } from "../App";
+import { OllamaStatus, SignOut, ThemeToggle } from "../App";
 import { api, stream, type StreamEvent } from "../api";
 import { useStore } from "../store";
 import type { ComponentSpec, Flow, FlowGraph, NodeData, NodeRun } from "../types";
@@ -384,6 +384,7 @@ function EditorInner({ initial }: { initial: Flow }) {
           <button className="btn" onClick={() => setShare("api")}><Share2 size={15} /> Share</button>
           <button className={`btn ${showPg ? "" : "primary"}`} onClick={() => setShowPg(!showPg)}><Play size={15} /> Playground</button>
           <ThemeToggle />
+          <SignOut />
         </header>
         <div className="editor">
           <Palette onAdd={(k) => addNode(k)} locked={locked} />

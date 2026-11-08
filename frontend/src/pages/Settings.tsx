@@ -1,7 +1,8 @@
-import { Cpu, Download, KeyRound, Plus, RefreshCw, Trash2, Variable } from "lucide-react";
+import { Cpu, Download, KeyRound, Plus, RefreshCw, Trash2, UserRound, Variable } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { api, stream } from "../api";
+import { useAuth } from "../auth";
 import { useStore } from "../store";
 import { Code, Modal, timeAgo, useToast } from "../ui/kit";
 
@@ -159,6 +160,46 @@ function ApiKeys() {
   );
 }
 
+function Account() {
+  const { username, signOut, refresh } = useAuth();
+  const [name, setName] = useState(username);
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [repeat, setRepeat] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const toast = useToast();
+  const save = async () => {
+    setError(null);
+    if (next.length < 8) return setError("Use at least 8 characters for the new password.");
+    if (next !== repeat) return setError("The two new passwords don't match.");
+    try {
+      await api("/api/account/password", { body: { current_password: current, new_password: next, username: name } });
+      setCurrent(""); setNext(""); setRepeat("");
+      await refresh();
+      toast("Password changed. Other devices were signed out.");
+    } catch (e: any) { setError(e.message); }
+  };
+  return (
+    <div className="panel">
+      <h2>Your account</h2>
+      <p className="muted" style={{ margin: 0 }}>Kelvo has one account: yours. Nobody can sign up. If you forget the password, run <code>kelvo set-password</code> on the server.</p>
+      <label className="field" style={{ maxWidth: 360 }}><span className="label">Username</span>
+        <input className="input" autoComplete="username" value={name} onChange={(e) => setName(e.target.value)} /></label>
+      <label className="field" style={{ maxWidth: 360 }}><span className="label">Current password</span>
+        <input className="input" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} /></label>
+      <label className="field" style={{ maxWidth: 360 }}><span className="label">New password</span>
+        <input className="input" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} /></label>
+      <label className="field" style={{ maxWidth: 360 }}><span className="label">Repeat new password</span>
+        <input className="input" type="password" autoComplete="new-password" value={repeat} onChange={(e) => setRepeat(e.target.value)} /></label>
+      {error && <div className="error-text" role="alert">{error}</div>}
+      <div className="row">
+        <button className="btn primary" onClick={save} disabled={!current || !next}>Save</button>
+        <button className="btn" onClick={signOut}>Sign out</button>
+      </div>
+    </div>
+  );
+}
+
 export default function Settings() {
   const { tab = "models" } = useParams();
   return (
@@ -170,9 +211,10 @@ export default function Settings() {
             <NavLink to="/settings/models" className={() => `side-item ${tab === "models" ? "active" : ""}`}><Cpu size={15} /> Models</NavLink>
             <NavLink to="/settings/variables" className={() => `side-item ${tab === "variables" ? "active" : ""}`}><Variable size={15} /> Global variables</NavLink>
             <NavLink to="/settings/keys" className={() => `side-item ${tab === "keys" ? "active" : ""}`}><KeyRound size={15} /> API keys</NavLink>
+            <NavLink to="/settings/account" className={() => `side-item ${tab === "account" ? "active" : ""}`}><UserRound size={15} /> Account</NavLink>
           </div>
         </aside>
-        <section>{tab === "variables" ? <Variables /> : tab === "keys" ? <ApiKeys /> : <Models />}</section>
+        <section>{tab === "variables" ? <Variables /> : tab === "keys" ? <ApiKeys /> : tab === "account" ? <Account /> : <Models />}</section>
       </div>
     </div>
   );
