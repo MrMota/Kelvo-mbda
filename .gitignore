@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+*.egg-info/
+*.db
+*.db-wal
+*.db-shm
+node_modules/
+frontend/dist/
+backend/mbdaflow/static/
+.pytest_cache/
+test-results/
+playwright-report/
