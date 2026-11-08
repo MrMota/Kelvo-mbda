@@ -26,9 +26,9 @@ TEMPLATES: list[dict[str, Any]] = [
         "data": {
             "nodes": [
                 _n("chat_in", "ChatInput", 0, 160),
-                _n("prompt", "Prompt", 320, 80, {"template": "You are a friendly expert. Answer in a few sentences.\n\nQuestion: {question}"}),
-                _n("llm", "OllamaModel", 660, 60),
-                _n("chat_out", "ChatOutput", 1000, 180),
+                _n("prompt", "Prompt", 380, 60, {"template": "You are a friendly expert. Answer in a few sentences.\n\nQuestion: {question}"}),
+                _n("llm", "OllamaModel", 760, 0),
+                _n("chat_out", "ChatOutput", 1140, 160),
             ],
             "edges": [
                 _e("chat_in", "message", "prompt", "question"),
@@ -44,13 +44,13 @@ TEMPLATES: list[dict[str, Any]] = [
         "icon": "bot",
         "data": {
             "nodes": [
-                _n("chat_in", "ChatInput", 0, 260),
-                _n("calc", "Calculator", 0, -40, tool_mode=True),
-                _n("date", "CurrentDate", 0, 80, tool_mode=True),
-                _n("url", "URLFetch", 0, 420, tool_mode=True),
-                _n("agent", "Agent", 380, 60),
-                _n("chat_out", "ChatOutput", 780, 220),
-                _note("note", 380, -120, "Pick a tool-capable model in the Agent (llama3.1, qwen2.5, qwen3, mistral-nemo), then open the Playground."),
+                _n("chat_in", "ChatInput", 0, 300),
+                _n("calc", "Calculator", 0, -280, tool_mode=True),
+                _n("date", "CurrentDate", 0, 10, tool_mode=True),
+                _n("url", "URLFetch", 0, 560, tool_mode=True),
+                _n("agent", "Agent", 420, 40),
+                _n("chat_out", "ChatOutput", 820, 260),
+                _note("note", 420, -150, "Pick a tool-capable model in the Agent (llama3.1, qwen2.5, qwen3, mistral-nemo), then open the Playground."),
             ],
             "edges": [
                 _e("chat_in", "message", "agent", "input"),
@@ -68,21 +68,21 @@ TEMPLATES: list[dict[str, Any]] = [
         "icon": "sparkles",
         "data": {
             "nodes": [
-                _n("chat_in", "ChatInput", 0, 300),
-                _n("skill_email", "Skill", 0, -120, {
+                _n("chat_in", "ChatInput", 0, 60),
+                _n("skill_email", "Skill", -400, -320, {
                     "name": "email-writer",
                     "description": "Use when the user asks to write, reply to or polish an email.",
                     "body": "1. Ask nothing; infer tone from the request.\n2. Write a subject line, then the email.\n3. Keep it under 150 words, plain words, one clear ask.\n4. End with a short sign-off and [Name].",
                 }),
-                _n("skill_plan", "Skill", 0, 120, {
+                _n("skill_plan", "Skill", -400, 230, {
                     "name": "step-planner",
                     "description": "Use when the user wants a plan, checklist or steps to reach a goal.",
                     "body": "Return a numbered plan of 3–7 steps. Each step starts with a verb and has a 'done when' line. Finish with the single riskiest step.",
                 }),
-                _n("calc", "Calculator", 0, 460, tool_mode=True),
-                _n("agent", "Agent", 400, 80, {"library_skills": ["*"]}),
-                _n("chat_out", "ChatOutput", 800, 240),
-                _note("note", 400, -100, "Skills stay out of the context until the agent calls load_skill. Edit library skills on the Skills page."),
+                _n("calc", "Calculator", 0, 340, tool_mode=True),
+                _n("agent", "Agent", 420, 0, {"library_skills": ["*"]}),
+                _n("chat_out", "ChatOutput", 820, 220),
+                _note("note", 420, -170, "Skills stay out of the context until the agent calls load_skill. Edit library skills on the Skills page."),
             ],
             "edges": [
                 _e("chat_in", "message", "agent", "input"),
@@ -100,17 +100,17 @@ TEMPLATES: list[dict[str, Any]] = [
         "icon": "users",
         "data": {
             "nodes": [
-                _n("chat_in", "ChatInput", 0, 320),
-                _n("url", "URLFetch", 0, -60, tool_mode=True),
-                _n("researcher", "Agent", 360, -120, {
+                _n("chat_in", "ChatInput", 400, 520),
+                _n("url", "URLFetch", 0, -200, tool_mode=True),
+                _n("researcher", "Agent", 400, -420, {
                     "system_prompt": "You are a meticulous researcher. Fetch sources with your tools and return concise findings with the URLs you used.",
                     "memory": False,
                 }, tool_mode=True, tool_name="researcher", tool_description="Delegate a research question; returns findings with sources.", display_name="Researcher"),
-                _n("calc", "Calculator", 360, 420, tool_mode=True),
-                _n("lead", "Agent", 760, 120, {
+                _n("calc", "Calculator", 400, 200, tool_mode=True),
+                _n("lead", "Agent", 820, 0, {
                     "system_prompt": "You are the team lead. Break the request down, delegate research to the researcher tool, use the calculator for numbers, then write the final answer.",
                 }, display_name="Lead Agent"),
-                _n("chat_out", "ChatOutput", 1160, 260),
+                _n("chat_out", "ChatOutput", 1220, 220),
             ],
             "edges": [
                 _e("url", "tool", "researcher", "tools"),
@@ -129,13 +129,13 @@ TEMPLATES: list[dict[str, Any]] = [
         "data": {
             "nodes": [
                 _n("doc", "TextInput", 0, -100, {"value": "Paste your document here. MBDAflow splits it into chunks, embeds each with an Ollama embedding model, and keeps the vectors in its own database."}, display_name="Document"),
-                _n("split", "SplitText", 320, -100, {"chunk_size": 800, "overlap": 100}),
-                _n("emb", "OllamaEmbeddings", 320, 160),
-                _n("chat_in", "ChatInput", 0, 360),
-                _n("kb", "KnowledgeBase", 640, 40, {"collection": "docs"}),
-                _n("prompt", "Prompt", 980, 160, {"template": "Answer using only the context. If the answer is not there, say so.\n\nContext:\n{context}\n\nQuestion: {question}"}),
-                _n("llm", "OllamaModel", 1300, 120),
-                _n("chat_out", "ChatOutput", 1640, 220),
+                _n("split", "SplitText", 380, -160, {"chunk_size": 800, "overlap": 100}),
+                _n("emb", "OllamaEmbeddings", 380, 220),
+                _n("chat_in", "ChatInput", 0, 420),
+                _n("kb", "KnowledgeBase", 760, 0, {"collection": "docs"}),
+                _n("prompt", "Prompt", 1140, 160, {"template": "Answer using only the context. If the answer is not there, say so.\n\nContext:\n{context}\n\nQuestion: {question}"}),
+                _n("llm", "OllamaModel", 1520, 60),
+                _n("chat_out", "ChatOutput", 1900, 220),
             ],
             "edges": [
                 _e("doc", "text", "split", "input"),
@@ -157,12 +157,12 @@ TEMPLATES: list[dict[str, Any]] = [
         "data": {
             "nodes": [
                 _n("chat_in", "ChatInput", 0, 120),
-                _n("extract", "StructuredOutput", 320, 40, {
+                _n("extract", "StructuredOutput", 380, 0, {
                     "instructions": "Extract the contact details mentioned in the text.",
                     "schema": '{\n  "type": "object",\n  "properties": {\n    "name": {"type": "string"},\n    "email": {"type": "string"},\n    "company": {"type": "string"}\n  },\n  "required": ["name"]\n}',
                 }),
-                _n("parse", "Parser", 680, 100, {"template": "Name: {name}\nEmail: {email}\nCompany: {company}"}),
-                _n("chat_out", "ChatOutput", 1000, 140),
+                _n("parse", "Parser", 760, 60, {"template": "Name: {name}\nEmail: {email}\nCompany: {company}"}),
+                _n("chat_out", "ChatOutput", 1140, 120),
             ],
             "edges": [
                 _e("chat_in", "message", "extract", "input"),

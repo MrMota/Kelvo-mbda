@@ -1,0 +1,25 @@
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import "@xyflow/react/dist/style.css";
+import "./styles.css";
+import App from "./App";
+import { StoreProvider } from "./store";
+import { ToastProvider } from "./ui/kit";
+
+try {
+  const t = localStorage.getItem("mbdaflow-theme");
+  if (t) document.documentElement.dataset.theme = t;
+} catch {}
+
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <ToastProvider>
+        <StoreProvider>
+          <App />
+        </StoreProvider>
+      </ToastProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
+);

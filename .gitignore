@@ -10,3 +10,4 @@ backend/mbdaflow/static/
 .pytest_cache/
 test-results/
 playwright-report/
+*.tsbuildinfo

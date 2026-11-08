@@ -1,0 +1,20 @@
+# MBDAflow + Ollama. GPU users: uncomment the deploy block.
+services:
+  ollama:
+    image: ollama/ollama:latest
+    volumes: [ollama:/root/.ollama]
+    ports: ["11434:11434"]
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices: [{ driver: nvidia, count: all, capabilities: [gpu] }]
+  mbdaflow:
+    build: .
+    depends_on: [ollama]
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes: [mbdaflow:/data]
+    ports: ["7860:7860"]
+volumes:
+  ollama:
+  mbdaflow:

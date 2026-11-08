@@ -1,62 +1,62 @@
 feature,area,priority,original,clone,notes
-Projects page lists flows (grid/list),projects,must,yes,no,S01
-Create blank flow,projects,must,yes,no,S02
-Create flow from template,projects,must,yes,no,S02 - Simple Agent / Basic Prompting / RAG / Multi-agent / Skilled agent
-Duplicate / rename / delete flow,projects,must,yes,no,S01 card menu
-Import / export flow JSON,projects,must,yes,no,S01 + S03
-Folders / projects grouping,projects,should,yes,no,flows grouped by project
-Lock flow,projects,could,yes,no,
-Drag-drop canvas with pan/zoom/fit,editor,must,yes,no,S03
-Component sidebar with categories + search,editor,must,yes,no,S04
-Typed ports + edge validation,editor,must,yes,no,S03 port colours by type
-Component inspector / parameters panel,editor,must,yes,no,S05
-Sticky notes on canvas,editor,should,yes,no,
-Autosave flow,editor,must,yes,no,
-Undo/redo + keyboard shortcuts,editor,should,yes,no,Del / Ctrl+Z / Ctrl+S
-Run single component and see output,editor,should,yes,no,build status per node
+Projects page lists flows (grid/list),projects,must,yes,yes,S01
+Create blank flow,projects,must,yes,yes,S02
+Create flow from template,projects,must,yes,yes,S02 - Simple Agent / Basic Prompting / RAG / Multi-agent / Skilled agent
+Duplicate / rename / delete flow,projects,must,yes,yes,S01 card menu
+Import / export flow JSON,projects,must,yes,yes,S01 + S03
+Folders / projects grouping,projects,should,yes,yes,flows grouped by project
+Lock flow,projects,could,yes,yes,
+Drag-drop canvas with pan/zoom/fit,editor,must,yes,yes,S03
+Component sidebar with categories + search,editor,must,yes,yes,S04
+Typed ports + edge validation,editor,must,yes,yes,S03 port colours by type
+Component inspector / parameters panel,editor,must,yes,yes,S05
+Sticky notes on canvas,editor,should,yes,yes,
+Autosave flow,editor,must,yes,yes,
+Undo/redo + keyboard shortcuts,editor,should,yes,yes,"Del / Ctrl+Z / Ctrl+S; Ctrl+Z / Ctrl+Shift+Z, Delete"
+Run single component and see output,editor,should,yes,partial,build status per node; partial: whole-flow Run shows per-node output previews; no single-node run
 Version history,editor,could,yes,no,
-Chat Input / Chat Output components,components,must,yes,no,
-Text Input / Text Output,components,should,yes,no,
-Prompt Template with {variable} ports,components,must,yes,no,dynamic ports from template
-Ollama language model component,components,must,yes,no,base URL + model dropdown + refresh + temperature
-Ollama embeddings component,components,must,yes,no,
-Agent component (instructions + tools + model),agents,must,yes,no,Ollama tool calling loop
-Tool Mode: any component becomes a tool,agents,must,yes,no,toolset port
-Agent as a tool (multi-agent),agents,must,yes,no,
-Calculator tool,components,must,yes,no,
-Current date tool,components,should,yes,no,
-URL fetch tool,components,should,yes,no,
+Chat Input / Chat Output components,components,must,yes,yes,
+Text Input / Text Output,components,should,yes,yes,
+Prompt Template with {variable} ports,components,must,yes,yes,dynamic ports from template
+Ollama language model component,components,must,yes,yes,base URL + model dropdown + refresh + temperature
+Ollama embeddings component,components,must,yes,yes,
+Agent component (instructions + tools + model),agents,must,yes,yes,Ollama tool calling loop
+Tool Mode: any component becomes a tool,agents,must,yes,yes,toolset port
+Agent as a tool (multi-agent),agents,must,yes,yes,
+Calculator tool,components,must,yes,yes,
+Current date tool,components,should,yes,yes,
+URL fetch tool,components,should,yes,yes,
 Web search tool,components,could,yes,no,needs network
-Run Flow (flow as a tool),components,should,yes,no,
-Message History / chat memory,components,must,yes,no,session_id scoped
-Structured output (JSON schema),components,should,yes,no,Ollama format param
-Parser / text template,components,should,yes,no,
-If-Else router,components,should,yes,no,
-Split text,components,should,yes,no,
-Vector store / knowledge base (local),components,should,yes,no,in-DB vectors + cosine search
+Run Flow (flow as a tool),components,should,yes,yes,
+Message History / chat memory,components,must,yes,yes,session_id scoped
+Structured output (JSON schema),components,should,yes,yes,Ollama format param
+Parser / text template,components,should,yes,yes,
+If-Else router,components,should,yes,yes,
+Split text,components,should,yes,yes,
+Vector store / knowledge base (local),components,should,yes,yes,in-DB vectors + cosine search
 Human approval for tool calls,agents,could,yes,no,
-Skills: reusable instruction packs agents load on demand,skills,must,no,no,ADDITION - user request; SKILL.md format
-Skills library page (create/edit/import/export),skills,must,no,no,ADDITION - S13/S14
-Skill component wired into Agent,skills,must,no,no,ADDITION
-Playground chat with streaming,playground,must,yes,no,S06
-Playground shows agent tool calls,playground,must,yes,no,
-Playground sessions sidebar + delete,playground,should,yes,no,
-Edit/delete messages (memory),playground,could,yes,no,
-Run API POST /api/v1/run/{flow},api,must,yes,no,input_value session_id tweaks
-Streaming run (SSE),api,should,yes,no,
-Endpoint name alias,api,should,yes,no,
-API access modal with curl/python/js,api,must,yes,no,S07
-API keys,api,must,yes,no,S12
-Tweaks (override params at runtime),api,should,yes,no,
+Skills: reusable instruction packs agents load on demand,skills,must,no,yes,ADDITION - user request; SKILL.md format
+Skills library page (create/edit/import/export),skills,must,no,yes,ADDITION - S13/S14
+Skill component wired into Agent,skills,must,no,yes,ADDITION
+Playground chat with streaming,playground,must,yes,yes,S06
+Playground shows agent tool calls,playground,must,yes,yes,
+Playground sessions sidebar + delete,playground,should,yes,yes,
+Edit/delete messages (memory),playground,could,yes,partial,API exists (PATCH/DELETE /api/messages); no UI yet
+Run API POST /api/v1/run/{flow},api,must,yes,yes,input_value session_id tweaks
+Streaming run (SSE),api,should,yes,yes,
+Endpoint name alias,api,should,yes,yes,
+API access modal with curl/python/js,api,must,yes,yes,S07
+API keys,api,must,yes,yes,S12
+Tweaks (override params at runtime),api,should,yes,yes,
 Webhook trigger,api,could,yes,no,
-Flows served as MCP tools,mcp,should,yes,no,S09 JSON-RPC endpoint
+Flows served as MCP tools,mcp,should,yes,yes,S09 JSON-RPC endpoint
 MCP client tools component,mcp,could,yes,no,
-Global variables (generic/credential),settings,must,yes,no,S10
-Model provider settings (Ollama URL / list / pull),settings,must,yes,no,S11
-Logs / run traces,observability,should,yes,no,
+Global variables (generic/credential),settings,must,yes,yes,S10
+Model provider settings (Ollama URL / list / pull),settings,must,yes,yes,S11
+Logs / run traces,observability,should,yes,yes,
 Embed chat widget,share,could,yes,no,
 Shareable playground,share,could,yes,no,
-Custom Python components (code editor),components,skip,yes,no,security: arbitrary code exec - out of first scope
-Hosted cloud / enterprise SSO,platform,skip,yes,no,original's business; not functionality
-100+ third-party bundles,components,skip,yes,no,partner integrations; Ollama-only by request
-Langflow Store / community templates,platform,skip,yes,no,the network and its users
+Custom Python components (code editor),components,skip,yes,skip,security: arbitrary code exec - out of first scope
+Hosted cloud / enterprise SSO,platform,skip,yes,skip,original's business; not functionality
+100+ third-party bundles,components,skip,yes,skip,partner integrations; Ollama-only by request
+Langflow Store / community templates,platform,skip,yes,skip,the network and its users
