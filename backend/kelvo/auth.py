@@ -127,11 +127,15 @@ LOCAL_HOSTS = {"127.0.0.1", "localhost", "[::1]", "::1"}
 
 
 def _is_https(request: Request) -> bool:
-    """Mark the cookie Secure when the browser is on HTTPS: directly, via a proxy that says so,
-    or (KELVO_SECURE_COOKIE=1) on any address other than this machine's own loopback. That way
-    https://….ts.net gets a Secure cookie while http://127.0.0.1 on the PC itself keeps working."""
+    """Mark the cookie Secure exactly when the browser is on HTTPS: directly, via a proxy that says
+    so, or per the request's Origin (sign-in is a browser POST, which always carries one). So
+    https://….ts.net gets a Secure cookie while http://127.0.0.1 and http://<home-wifi-ip> keep
+    working side by side. Without an Origin, KELVO_SECURE_COOKIE=1 decides (non-loopback → Secure)."""
     if request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").lower() == "https":
         return True
+    origin = request.headers.get("origin")
+    if origin:  # the address the browser is actually on: https://….ts.net → Secure; http://192.168.x.x → not
+        return origin.lower().startswith("https://")
     if os.environ.get("KELVO_SECURE_COOKIE") == "1":
         host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").rsplit(":", 1)[0]
         return host not in LOCAL_HOSTS

@@ -56,7 +56,8 @@ Everything is in **`windows/`** (and the `kelvo-windows-*.zip` download, which a
 2. `ollama pull qwen3:30b` and pick it as the default model. Ollama for Windows uses the NVIDIA GPU directly; `ollama ps` should say "100% GPU".
 3. Install as an app: Edge **⋯ → Apps → Install Kelvo**, or Chrome's install icon in the address bar.
 4. **`enable-phone.cmd`** (after installing Tailscale and turning on MagicDNS + HTTPS Certificates): runs `tailscale serve`, saves `KELVO_SECURE_COOKIE` / `KELVO_ALLOWED_ORIGINS` for your user, restarts Kelvo, and **prints your server address**.
-5. Also: `start-kelvo.cmd`, `stop-kelvo.cmd`, `uninstall.cmd` (keeps your data unless you type DELETE).
+5. **`enable-home-wifi.cmd`** (no Tailscale, home only): Kelvo listens on your home network (`KELVO_HOST=0.0.0.0`), a firewall rule allows port 7860 on *Private* networks only, and it prints `http://<pc-ip>:7860` for the phone. Plain http, so use the Android app (browser install needs HTTPS). Run again to turn off. Works alongside Tailscale: the sign-in cookie is HTTPS-only exactly when the browser is on HTTPS.
+6. Also: `start-kelvo.cmd`, `stop-kelvo.cmd`, `uninstall.cmd` (keeps your data unless you type DELETE).
 
 Data: `%USERPROFILE%\.kelvo\kelvo.db`; back up with `%LOCALAPPDATA%\Kelvo\venv\Scripts\kelvo.exe backup`.
 

@@ -6,7 +6,8 @@ You use Kelvo in Edge or Chrome, installed as an app - on this PC and on your ph
 
 WHAT'S IN THIS FOLDER
   install.cmd        install or update Kelvo (double-click)
-  enable-phone.cmd   set up phone access with Tailscale, shows your server address
+  enable-phone.cmd   phone access anywhere, with Tailscale (HTTPS); shows your server address
+  enable-home-wifi.cmd  phone access at home only, no Tailscale; shows your phone address
   start-kelvo.cmd    start Kelvo (if stopped) and open it
   stop-kelvo.cmd     stop Kelvo (it starts again at your next sign-in)
   uninstall.cmd      remove Kelvo (asks before deleting your data)
@@ -34,7 +35,17 @@ WHAT'S IN THIS FOLDER
   - Chrome: the install icon at the right end of the address bar
   It gets its own window, Start-menu entry and taskbar icon.
 
-4. USE KELVO ON YOUR PHONE
+4a. PHONE AT HOME ONLY (no Tailscale)
+  - Double-click enable-home-wifi.cmd and answer Yes to the one permission prompt
+    (it allows Kelvo through Windows Firewall on Private networks only).
+  - It prints YOUR PHONE ADDRESS, like  http://192.168.1.50:7860
+  - On the phone: join the same Wi-Fi, open the Kelvo app, enter that address.
+  - Works only on your home Wi-Fi, over plain http. Browser "Install app" and the
+    offline page need HTTPS, so use the Kelvo Android app for this.
+  - If Windows calls your Wi-Fi "Public", the script tells you how to set it to Private.
+  - Run it again to turn it off. You can use it together with Tailscale (4b).
+
+4b. USE KELVO ON YOUR PHONE ANYWHERE (Tailscale)
   - Install Tailscale on this PC (https://tailscale.com/download/windows) and sign in.
   - In the Tailscale admin console (login.tailscale.com) > DNS:
     turn on MagicDNS and HTTPS Certificates.

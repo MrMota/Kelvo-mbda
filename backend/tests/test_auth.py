@@ -124,3 +124,15 @@ def test_secure_cookie_for_https_setups(client, monkeypatch):
     monkeypatch.delenv("KELVO_SECURE_COOKIE")
     r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"}, headers={"X-Forwarded-Proto": "https"})
     assert "secure" in r.headers["set-cookie"].lower()
+
+
+def test_tailscale_and_home_wifi_side_by_side(client, monkeypatch):
+    """With phone-over-Tailscale enabled (KELVO_SECURE_COOKIE=1), home Wi-Fi (plain http) must still sign in."""
+    monkeypatch.setenv("KELVO_SECURE_COOKIE", "1")
+    client.post("/api/auth/logout")
+    wifi = {"Host": "192.168.1.50:7860", "Origin": "http://192.168.1.50:7860"}
+    r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"}, headers=wifi)
+    assert r.status_code == 200 and "secure" not in r.headers["set-cookie"].lower()
+    ts = {"Host": "pc.tail1.ts.net", "Origin": "https://pc.tail1.ts.net"}
+    r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"}, headers=ts)
+    assert r.status_code == 200 and "secure" in r.headers["set-cookie"].lower()
