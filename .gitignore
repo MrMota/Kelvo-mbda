@@ -17,3 +17,4 @@ backups/
 android/build/
 *.jks
 *.keystore
+dist/

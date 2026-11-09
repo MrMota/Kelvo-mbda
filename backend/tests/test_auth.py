@@ -116,4 +116,11 @@ def test_secure_cookie_for_https_setups(client, monkeypatch):
     monkeypatch.setenv("KELVO_SECURE_COOKIE", "1")
     client.post("/api/auth/logout")
     r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"})
+    assert "secure" in r.headers["set-cookie"].lower()  # testserver: not loopback → Secure
+    # the PC itself on http://127.0.0.1 keeps a normal cookie, so local sign-in still works
+    r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"}, headers={"Host": "127.0.0.1:7860"})
+    assert "secure" not in r.headers["set-cookie"].lower()
+    # behind a proxy that reports HTTPS, always Secure
+    monkeypatch.delenv("KELVO_SECURE_COOKIE")
+    r = client.post("/api/auth/login", json={"username": "me", "password": "correct horse"}, headers={"X-Forwarded-Proto": "https"})
     assert "secure" in r.headers["set-cookie"].lower()

@@ -11,6 +11,8 @@ apps over a REST API or from any MCP client.
 - **Run API** (`POST /api/v1/run/{flow}`) with sessions, runtime *tweaks*, and token streaming; **MCP server** (`/mcp`) exposes chosen flows as tools.
 - Global variables (`${NAME}` in any field), API keys, run logs, import/export, light and dark themes.
 - **Just for you**: one username/password account, no sign-up, no other users.
+- **Installable app (PWA)**: Edge/Chrome install it on your PC or phone; when your server is off you get a clear "Can't reach Kelvo" page.
+- **Windows without Docker**: `windows/install.cmd` (see `windows/README.txt`).
 - **On your phone**: install it from Chrome, or use the Android app in `android/` (it asks for your server address).
 
 ## Quick start

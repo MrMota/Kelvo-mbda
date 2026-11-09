@@ -26,3 +26,11 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </BrowserRouter>
   </React.StrictMode>,
 );
+
+// Service worker: fast start + a "Can't reach Kelvo" page when your server is offline.
+// Browsers only allow it on https:// or localhost; elsewhere Kelvo simply works without it.
+if ("serviceWorker" in navigator && import.meta.env.PROD && window.isSecureContext) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("/sw.js").catch(() => {});
+  });
+}

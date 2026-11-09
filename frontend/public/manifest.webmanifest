@@ -1,4 +1,5 @@
 {
+  "id": "/",
   "name": "Kelvo",
   "short_name": "Kelvo",
   "description": "Your AI agents, on your own models.",
@@ -7,9 +8,15 @@
   "display": "standalone",
   "background_color": "#f6f7f9",
   "theme_color": "#0b7c70",
+  "categories": ["productivity", "developer"],
   "icons": [
     { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
     { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Flows", "url": "/", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Skills", "url": "/skills", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Models", "url": "/settings/models", "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }] }
   ]
 }

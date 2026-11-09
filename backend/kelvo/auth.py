@@ -119,8 +119,23 @@ def start_session(response: Response, request: Request, user_id: str) -> None:
         c.execute("DELETE FROM sessions WHERE expires_at < ?", (now.isoformat(timespec="seconds"),))
         c.execute("INSERT INTO sessions VALUES (?,?,?,?,?)", (_hash(tok), user_id, now.isoformat(timespec="seconds"),
                   (now + timedelta(days=SESSION_DAYS)).isoformat(timespec="seconds"), now.isoformat(timespec="seconds")))
-    secure = request.url.scheme == "https" or os.environ.get("KELVO_SECURE_COOKIE") == "1"
+    secure = _is_https(request)
     response.set_cookie(COOKIE, tok, max_age=SESSION_DAYS * 86400, httponly=True, samesite="lax", secure=secure, path="/")
+
+
+LOCAL_HOSTS = {"127.0.0.1", "localhost", "[::1]", "::1"}
+
+
+def _is_https(request: Request) -> bool:
+    """Mark the cookie Secure when the browser is on HTTPS: directly, via a proxy that says so,
+    or (KELVO_SECURE_COOKIE=1) on any address other than this machine's own loopback. That way
+    https://….ts.net gets a Secure cookie while http://127.0.0.1 on the PC itself keeps working."""
+    if request.url.scheme == "https" or request.headers.get("x-forwarded-proto", "").lower() == "https":
+        return True
+    if os.environ.get("KELVO_SECURE_COOKIE") == "1":
+        host = (request.headers.get("x-forwarded-host") or request.headers.get("host") or "").rsplit(":", 1)[0]
+        return host not in LOCAL_HOSTS
+    return False
 
 
 def session_user(request: Request) -> dict | None:

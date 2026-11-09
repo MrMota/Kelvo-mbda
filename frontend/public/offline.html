@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b7c70" />
+<title>Kelvo · can't connect</title>
+<link rel="icon" href="/icon-192.png" />
+<style>
+:root { --bg:#f6f7f9; --surface:#ffffff; --border:#dfe3e9; --text:#121821; --text-2:#4a5565; --accent:#0b7c70; --accent-strong:#086358; --accent-text:#ffffff; color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0d1117; --surface:#151b23; --border:#2a3340; --text:#e8ecf1; --text-2:#aab3bf; --accent:#2bb8a6; --accent-strong:#4fd2c0; --accent-text:#04211d; color-scheme: dark; } }
+:root[data-theme="dark"] { --bg:#0d1117; --surface:#151b23; --border:#2a3340; --text:#e8ecf1; --text-2:#aab3bf; --accent:#2bb8a6; --accent-strong:#4fd2c0; --accent-text:#04211d; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 16px/1.5 "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: grid; place-items: center; padding: 16px; }
+.card { width: min(420px, 100%); background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 28px; text-align: center; }
+img { width: 48px; height: 48px; border-radius: 12px; }
+h1 { font-size: 22px; margin: 14px 0 8px; letter-spacing: -.01em; }
+p { color: var(--text-2); margin: 0 0 10px; }
+ul { text-align: left; color: var(--text-2); padding-left: 20px; margin: 12px 0 20px; }
+button { height: 46px; width: 100%; border: 0; border-radius: 10px; background: var(--accent); color: var(--accent-text); font-weight: 600; font-size: 16px; font-family: inherit; cursor: pointer; }
+button:hover { background: var(--accent-strong); }
+button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+</style>
+</head>
+<body>
+  <main class="card">
+    <img src="/icon-192.png" alt="" />
+    <h1>Can't reach Kelvo</h1>
+    <p>Kelvo runs on your own computer, and it isn't answering right now.</p>
+    <ul>
+      <li>Is the computer on, and is Kelvo running on it?</li>
+      <li>On your phone or laptop: is Tailscale on?</li>
+    </ul>
+    <button type="button" onclick="location.reload()">Try again</button>
+  </main>
+  <script>
+    try { var t = localStorage.getItem("kelvo-theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+    // come back by itself as soon as the network does
+    window.addEventListener("online", function () { location.reload(); });
+  </script>
+</body>
+</html>

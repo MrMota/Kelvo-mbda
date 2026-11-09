@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import os
+import sys
 
 
 def main() -> None:
@@ -12,6 +13,7 @@ def main() -> None:
     run.add_argument("--port", type=int, default=int(os.environ.get("KELVO_PORT", "7860")))
     run.add_argument("--db", help="path to the SQLite database")
     run.add_argument("--reload", action="store_true")
+    run.add_argument("--log-file", help="write logs here instead of the console (for running in the background)")
     pw = sub.add_parser("set-password", help="create your account, or reset its username/password")
     pw.add_argument("--db", help="path to the SQLite database")
     bk = sub.add_parser("backup", help="copy the database safely while Kelvo runs")
@@ -32,6 +34,13 @@ def main() -> None:
     if args.cmd == "set-password":
         set_password()
         return
+    if args.log_file:
+        # Background mode (e.g. pythonw on Windows has no console): send everything to a file.
+        from pathlib import Path
+
+        Path(args.log_file).parent.mkdir(parents=True, exist_ok=True)
+        log = open(args.log_file, "a", buffering=1, encoding="utf-8")
+        sys.stdout = sys.stderr = log
     import uvicorn
 
     print(f"Kelvo on http://{args.host}:{args.port}  (Ollama: {os.environ.get('OLLAMA_BASE_URL', 'from settings, default http://127.0.0.1:11434')})")

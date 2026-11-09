@@ -48,6 +48,22 @@ Steps, in order: **section 2** (driver, toolkit, Kelvo, models, `bash deploy/che
 
 **Sandbox-only notes:** the Docker build here needed this sandbox's proxy settings and a mirror for one base image (Docker Hub rate-limited the shared IP). Those changes live only in a scratch copy of the Dockerfile; the repo's `Dockerfile` is unchanged and needs nothing special on your machine. **Not tested here:** a real Ollama with real models (a stand-in was used), a GPU, and Tailscale.
 
+## 2a. Windows, no Docker (your PC)
+
+Everything is in **`windows/`** (and the `kelvo-windows-*.zip` download, which adds the ready-built Kelvo package). See `windows/README.txt`. In short:
+
+1. **`install.cmd`**: checks Python 3.10+ and Ollama (offers `winget` installs), installs Kelvo into `%LOCALAPPDATA%\Kelvo`, creates your account, starts Kelvo in the background at every Windows sign-in (Startup folder, no console window, log in `%LOCALAPPDATA%\Kelvo\kelvo.log`), and opens `http://127.0.0.1:7860`.
+2. `ollama pull qwen3:30b` and pick it as the default model. Ollama for Windows uses the NVIDIA GPU directly; `ollama ps` should say "100% GPU".
+3. Install as an app: Edge **⋯ → Apps → Install Kelvo**, or Chrome's install icon in the address bar.
+4. **`enable-phone.cmd`** (after installing Tailscale and turning on MagicDNS + HTTPS Certificates): runs `tailscale serve`, saves `KELVO_SECURE_COOKIE` / `KELVO_ALLOWED_ORIGINS` for your user, restarts Kelvo, and **prints your server address**.
+5. Also: `start-kelvo.cmd`, `stop-kelvo.cmd`, `uninstall.cmd` (keeps your data unless you type DELETE).
+
+Data: `%USERPROFILE%\.kelvo\kelvo.db`; back up with `%LOCALAPPDATA%\Kelvo\venv\Scripts\kelvo.exe backup`.
+
+**Tested here:** the package installs into a fresh Python environment and serves the whole app; background logging; the PWA (service worker, offline page, installability). **Not tested:** the `.ps1` scripts themselves. No Windows or PowerShell was available in the build sandbox; they were reviewed by hand and kept to plain PowerShell 5.1.
+
+**The PWA:** a service worker caches the app's code and, when your server can't be reached, shows a "Can't reach Kelvo" page with Try again instead of a browser error. Your data is never cached; it always comes live from your server. Start-menu/app-icon shortcuts: Flows, Skills, Models.
+
 ## 2. Install on your machine: Linux + NVIDIA GPU (Docker)
 
 Written for Ubuntu/Debian. Other distributions: same steps, use NVIDIA's instructions for your package manager in step B. **Not tested on real GPU hardware.** The build sandbox has no GPU. The config is validated, and `deploy/check-gpu.sh` tells you on your machine whether the GPU is really used.
