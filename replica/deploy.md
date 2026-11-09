@@ -96,7 +96,7 @@ If NVIDIA changes these commands, their current version is in the NVIDIA Contain
 **C. Kelvo + Ollama on the GPU.**
 
 ```bash
-git clone https://github.com/MrMota/MBDAflow.git kelvo && cd kelvo
+git clone https://github.com/MrMota/Kelvo-mbda.git kelvo && cd kelvo
 cp .env.example .env     # set KELVO_USERNAME and KELVO_PASSWORD; the GPU line is already on
 docker compose up -d --build
 docker compose exec ollama ollama pull qwen3:30b          # your 32 GB GPU: see 'Your setup'
@@ -125,7 +125,7 @@ Open **http://127.0.0.1:7860**, sign in, then **Settings → Models**: pick your
 ### Without Docker (systemd, Linux)
 
 ```bash
-git clone https://github.com/MrMota/MBDAflow.git ~/kelvo && cd ~/kelvo
+git clone https://github.com/MrMota/Kelvo-mbda.git ~/kelvo && cd ~/kelvo
 make install && make build
 .venv/bin/kelvo set-password          # create your account
 ```

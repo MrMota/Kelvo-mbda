@@ -7,7 +7,7 @@
 #
 # Run once. Back up the folder it creates: every future APK must be signed with this key.
 $ErrorActionPreference = 'Stop'
-$Repo      = 'MrMota/MBDAflow'
+$Repo      = 'MrMota/Kelvo-mbda'
 $KeyDir    = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Kelvo signing key'
 $Keystore  = Join-Path $KeyDir 'kelvo-release.jks'
 $PassFile  = Join-Path $KeyDir 'password.txt'
