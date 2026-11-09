@@ -10,6 +10,7 @@ WHAT'S IN THIS FOLDER
   start-kelvo.cmd    start Kelvo (if stopped) and open it
   stop-kelvo.cmd     stop Kelvo (it starts again at your next sign-in)
   uninstall.cmd      remove Kelvo (asks before deleting your data)
+  create-release-key.cmd  one-time: your APK signing key + the two GitHub secrets
   kelvo-*.whl        Kelvo itself - keep it next to install.cmd
 
 1. INSTALL

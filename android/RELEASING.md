@@ -12,6 +12,10 @@ Each release runs the backend tests first; nothing is published if they fail.
 
 ## One-time: create your signing key (Windows)
 
+**Easiest:** double-click **`windows/create-release-key.cmd`**. It finds (or installs) Java, creates the key with a random 32-character password in `Documents\Kelvo signing key`, then puts each secret on your clipboard in turn and opens GitHub's "New repository secret" page, so you only paste twice. It clears the clipboard at the end and shows the certificate fingerprint. The manual steps below do the same thing.
+
+### Manually
+
 Android only installs an update if it's signed with the **same key** as the installed app. So you create one key, keep it safe forever, and give GitHub a copy as an encrypted secret.
 
 1. Install Java (for `keytool`), in a terminal:
