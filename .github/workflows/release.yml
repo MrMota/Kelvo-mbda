@@ -96,26 +96,11 @@ jobs:
           KELVO_VERSION="$V" KELVO_KEYSTORE="$ks" bash android/build.sh
           rm -f "$ks"
           cp android/build/kelvo.apk "dist/kelvo-$V.apk"
-          apksigner verify --print-certs "dist/kelvo-$V.apk" | grep -m1 'SHA-256' | sed 's/.*: //' > dist/signer.txt
 
       - name: Checksums and notes
         run: |
-          cd dist
-          sha256sum "kelvo-$V.apk" "kelvo-windows-$V.zip" > SHA256SUMS.txt
-          {
-            echo "## Install"
-            echo ""
-            echo "- **Android:** download \`kelvo-$V.apk\` on your phone and open it. Turn on Tailscale, then enter your server address (\`https://<pc>.<tailnet>.ts.net\`)."
-            echo "- **Windows (no Docker):** unzip \`kelvo-windows-$V.zip\` and double-click \`install.cmd\`. Updating: run it again; your data is kept."
-            echo ""
-            echo "APK signing certificate (SHA-256): \`$(cat signer.txt)\`"
-            echo "Every release is signed with this same key, so new versions install over the old one."
-            echo ""
-            echo "### Checksums (SHA-256)"
-            echo '```'
-            cat SHA256SUMS.txt
-            echo '```'
-          } > notes.md
+          (cd dist && sha256sum "kelvo-$V.apk" "kelvo-windows-$V.zip" > SHA256SUMS.txt)
+          bash scripts/release-notes.sh "$V" dist > dist/notes.md
 
       - name: Publish the release
         env:

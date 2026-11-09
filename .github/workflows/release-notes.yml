@@ -1,0 +1,51 @@
+# Rewrites the notes of an existing release from the files attached to it (no rebuild):
+# install steps, the APK signing fingerprint and checksums, via scripts/release-notes.sh.
+# GitHub > Actions > Release notes > Run workflow, version e.g. 0.2.1
+name: Release notes
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Existing release to refresh, like 0.2.1"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  notes:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Version
+        env:
+          RAW: ${{ inputs.version }}
+        run: |
+          v="${RAW#v}"
+          if ! [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Version must look like 1.2.3 (got '$RAW')"; exit 1
+          fi
+          echo "V=$v" >> "$GITHUB_ENV"
+
+      - name: apksigner (reads the APK's signing certificate)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq apksigner
+
+      - name: Download the release files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist
+          gh release download "v$V" -D dist -p "kelvo-$V.apk" -p "kelvo-windows-$V.zip" -p SHA256SUMS.txt
+          (cd dist && sha256sum -c SHA256SUMS.txt)   # the files are exactly the ones published
+
+      - name: Write and apply the notes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/release-notes.sh "$V" dist > dist/notes.md
+          gh release edit "v$V" --notes-file dist/notes.md
