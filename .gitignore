@@ -13,3 +13,7 @@ playwright-report/
 *.tsbuildinfo
 .env
 backups/
+
+android/build/
+*.jks
+*.keystore

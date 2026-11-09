@@ -64,7 +64,20 @@ export async function stream(path: string, body: unknown, onEvent: (e: StreamEve
   }
 }
 
+type AndroidBridge = { save: (base64: string, filename: string, mime: string) => void; changeServer: () => void };
+/** Present when Kelvo runs inside the Kelvo Android app. */
+export const androidApp = (): AndroidBridge | undefined => (window as unknown as { KelvoAndroid?: AndroidBridge }).KelvoAndroid;
+
 export function download(filename: string, content: string, type = "application/json") {
+  const app = androidApp();
+  if (app) {
+    // the Android app saves through the system "Save to…" picker
+    const bytes = new TextEncoder().encode(content);
+    let bin = "";
+    bytes.forEach((b) => (bin += String.fromCharCode(b)));
+    app.save(btoa(bin), filename, type);
+    return;
+  }
   const url = URL.createObjectURL(new Blob([content], { type }));
   const a = document.createElement("a");
   a.href = url;

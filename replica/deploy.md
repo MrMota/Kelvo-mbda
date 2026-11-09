@@ -147,6 +147,8 @@ Kelvo stays bound to `127.0.0.1`; Tailscale's `serve` puts HTTPS in front of it 
 
 Use the same `https://….ts.net` address on your computer too: with `KELVO_SECURE_COOKIE=1` the sign-in cookie only travels over HTTPS.
 
+**Or the Kelvo APK (Android):** `android/README.md`. Install `kelvo.apk`, turn on Tailscale, enter the same `https://….ts.net` address. It adds a "Can't reach Kelvo" retry screen, Android's Save-to picker for exports, and a way to change the server address.
+
 **Never run `tailscale funnel`.** Funnel publishes the service to the whole internet; `serve` keeps it inside your tailnet.
 
 **On the phone, what works well:** the Playground (chat, live tool-call cards, sessions), the flow list, Skills, Settings, run logs, starting flows from templates. On narrow screens the editor's top bar folds Run, Share, Logs, notes, undo/redo and sign-out into a **⋯** menu. Building big flows on the canvas is still easier on a computer.

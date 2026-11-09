@@ -1,7 +1,7 @@
 import { Cpu, Download, KeyRound, Plus, RefreshCw, Trash2, UserRound, Variable } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
-import { api, stream } from "../api";
+import { androidApp, api, stream } from "../api";
 import { useAuth } from "../auth";
 import { useStore } from "../store";
 import { Code, Modal, timeAgo, useToast } from "../ui/kit";
@@ -208,6 +208,12 @@ function Account() {
         <button className="btn primary" onClick={save} disabled={!current || !next}>Save</button>
         <button className="btn" onClick={signOut}>Sign out</button>
       </div>
+      {androidApp() && (
+        <div className="row" style={{ borderTop: "1px solid var(--border)", paddingTop: 14 }}>
+          <span className="grow muted">This phone app connects to your Kelvo server by its address.</span>
+          <button className="btn" onClick={() => androidApp()!.changeServer()}>Change server address</button>
+        </div>
+      )}
     </div>
   );
 }
