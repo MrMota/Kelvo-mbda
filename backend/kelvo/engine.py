@@ -27,6 +27,16 @@ from .components.base import (
 
 Emit = Callable[[str, dict[str, Any]], Awaitable[None]]
 VAR_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
+APPROVAL_TIMEOUT = 300.0
+PENDING_APPROVALS: dict[str, "asyncio.Future[bool]"] = {}
+
+
+def resolve_approval(aid: str, approved: bool) -> bool:
+    fut = PENDING_APPROVALS.get(aid)
+    if fut is None or fut.done():
+        return False
+    fut.set_result(bool(approved))
+    return True
 MAX_DEPTH = 4
 
 
@@ -78,6 +88,7 @@ class Engine:
         tweaks: dict[str, Any] | None = None,
         depth: int = 0,
         persist: bool = True,
+        interactive: bool = False,
     ):
         self.flow = flow
         self.flow_id: str = flow["id"]
@@ -93,6 +104,7 @@ class Engine:
         self.emit = emit or _noop
         self.depth = depth
         self.persist = persist
+        self.interactive = interactive  # a person is watching (Playground) and can approve actions
         self.variables = db.variables_map()
         self.memo: dict[tuple[str, str], Any] = {}
         self.locks: dict[tuple[str, str], asyncio.Lock] = {}
@@ -178,6 +190,8 @@ class Engine:
         d = node["data"]
         comp = self.component(node_id)
         params = d.get("params", {})
+        if hasattr(comp, "toolset"):  # e.g. Files: several tools from one component
+            return comp.toolset(NodeCtx(self, node_id, {}))
         connected = {e["targetHandle"] for e in self.edges if e["target"] == node_id}
         tparams = [f for f in comp.all_fields(params) if f.tool_param and f.name not in connected]
         props: dict[str, Any] = {}
@@ -218,6 +232,25 @@ class Engine:
             for o in comp.outputs[:1]:
                 await self.resolve(nid, o.name)
         return {"session_id": self.session_id, "outputs": self.outputs}
+
+    # ------------------------------------------------------------ approvals
+    async def ask_approval(self, node_id: str, tool: str, summary: str, details: dict[str, Any]) -> bool:
+        """Pause until the person in the Playground approves or rejects (5 min → rejected).
+        Runs nobody is watching (API, MCP) are never approved."""
+        if not self.interactive:
+            return False
+        aid = db.new_id()
+        fut: asyncio.Future[bool] = asyncio.get_running_loop().create_future()
+        PENDING_APPROVALS[aid] = fut
+        await self.emit("approval", {"id": aid, "node_id": node_id, "tool": tool, "summary": summary, "details": details})
+        try:
+            ok = await asyncio.wait_for(fut, timeout=APPROVAL_TIMEOUT)
+        except asyncio.TimeoutError:
+            ok = False
+        finally:
+            PENDING_APPROVALS.pop(aid, None)
+        await self.emit("approval_done", {"id": aid, "approved": ok})
+        return ok
 
     # ------------------------------------------------------------ messages
     def store_message(self, msg: Message) -> Message:

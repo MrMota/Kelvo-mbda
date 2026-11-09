@@ -59,7 +59,7 @@ No GPU at hand? `make fake-ollama` starts a stand-in Ollama on port 11435 that e
 | Prompts | Prompt Template (each `{variable}` becomes an input port) |
 | Models | Ollama, Ollama Embeddings, Structured Output |
 | Agents | Agent, Skill |
-| Tools | Calculator, Current Date, URL, Run Flow |
+| Tools | Web Search, URL, Files, Command Line, Calculator, Current Date, Run Flow |
 | Memory | Message History |
 | Vector Stores | Knowledge Base (local) |
 | Processing | Parser, Split Text |
@@ -70,7 +70,22 @@ Click the wrench on a component to put it in **tool mode**: its *Toolset* output
 
 ## Templates
 
-Basic Prompting · Simple Agent · Skilled Agent · Multi-Agent Team · Document Q&A (local RAG) · Structured Extraction
+Basic Prompting · Simple Agent · **Power Agent** · Skilled Agent · Multi-Agent Team · Document Q&A (local RAG) · Structured Extraction
+
+## A smarter, more capable agent
+
+Start from the **Power Agent** template. It wires an Agent to:
+
+- **Web Search**: DuckDuckGo with no key, or Brave / Tavily (free API key, more reliable) / your own SearXNG. Put keys in a global variable, e.g. `${TAVILY_API_KEY}`.
+- **URL**: reads the pages it found.
+- **Files**: `list_files`, `read_file`, `write_file`, `edit_file`, confined to one workspace folder (`~/KelvoWorkspace` by default, or `KELVO_WORKSPACE`). Paths that leave it (`..`, absolute paths, symlinks) are refused. Optional read-only and ask-before-writing.
+- **Command Line**: runs commands in the workspace with a timeout. **Every command waits for your Approve in the Playground**; runs nobody is watching (API, MCP) never execute commands.
+
+What makes it smarter:
+1. **A bigger tool-capable model**: `qwen3:30b` on a 32 GB GPU.
+2. **Think before answering** (Agent setting, on in Power Agent): reasoning models such as qwen3 work through the problem first.
+3. **Context window 16384+** (Agent → Advanced) so long pages and files fit.
+4. **Skills** for tasks you repeat, and clear Agent instructions.
 
 ## Calling a flow
 

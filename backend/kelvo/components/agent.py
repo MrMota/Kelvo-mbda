@@ -111,6 +111,8 @@ class Agent(Component):
         Field("library_skills", "Library skills", "skills", [], info="Skills from your library this agent can load."),
         Field("llm", "Language Model", "str", accepts=[LLM], show_field=False, info="Optional: overrides the model below."),
         *MODEL_FIELDS,
+        Field("think", "Think before answering", "bool", False,
+              info="Reasoning models (qwen3, deepseek-r1…) work the problem through first: slower, smarter."),
         Field("memory", "Chat memory", "bool", True, advanced=True, info="Include this session's earlier messages."),
         Field("n_messages", "Messages to remember", "int", 20, advanced=True),
         Field("max_iterations", "Max tool rounds", "int", 8, advanced=True),
@@ -141,11 +143,12 @@ class Agent(Component):
         steps: list[dict[str, Any]] = []
         max_rounds = max(1, int(await ctx.get("max_iterations", 8)))
         final = ""
+        think = True if await ctx.get("think", False) else None
         for round_no in range(max_rounds + 1):
             content, calls = "", []
             offer_tools = [t.schema() for t in tools] if tools and round_no < max_rounds else None
             async for ch in ollama.chat_stream(cfg.base_url, cfg.model, messages, tools=offer_tools,
-                                               options=cfg.options, keep_alive=cfg.keep_alive):
+                                               options=cfg.options, keep_alive=cfg.keep_alive, think=think):
                 m = ch.get("message") or {}
                 tok = m.get("content") or ""
                 if tok:

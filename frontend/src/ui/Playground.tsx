@@ -1,10 +1,34 @@
-import { Bot, ChevronRight, Loader2, Maximize2, Minimize2, MoreHorizontal, Plus, Send, Square, Trash2, User, Wrench, X } from "lucide-react";
+import { Bot, Check, ChevronRight, Loader2, Maximize2, Minimize2, MoreHorizontal, Plus, Send, ShieldAlert, Square, Trash2, User, Wrench, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, newSessionId, stream, type StreamEvent } from "../api";
 import type { ChatMessage, FlowGraph, Step } from "../types";
 import { Menu, timeAgo, useToast } from "./kit";
 
 type Session = { session_id: string; count: number; last: string; title: string | null };
+
+type Approval = { id: string; tool: string; summary: string; details: Record<string, unknown>; answering?: boolean };
+
+/** An agent is waiting for you: run this command / write this file? Nothing happens until you choose. */
+function ApprovalCard({ a, onAnswer }: { a: Approval; onAnswer: (approve: boolean) => void }) {
+  const cmd = a.details.command as string | undefined;
+  return (
+    <div className="approval" role="alertdialog" aria-label={`Approve ${a.tool}?`}>
+      <div className="row" style={{ gap: 8 }}>
+        <ShieldAlert size={18} color="var(--warn)" />
+        <b className="grow">{cmd ? "Run this command on your computer?" : `Allow this ${a.tool} action?`}</b>
+      </div>
+      <pre className="approval-cmd">{cmd ?? a.summary}</pre>
+      {"folder" in a.details && <div className="help">In {String(a.details.folder)}{a.details.shell && a.details.shell !== "default" ? ` · ${String(a.details.shell)}` : ""}</div>}
+      {!cmd && Object.keys(a.details).length > 0 && (
+        <pre className="approval-cmd" style={{ fontSize: 12 }}>{JSON.stringify(a.details, null, 2)}</pre>
+      )}
+      <div className="row" style={{ justifyContent: "flex-end" }}>
+        <button className="btn sm" disabled={a.answering} onClick={() => onAnswer(false)}><X size={14} /> Reject</button>
+        <button className="btn primary sm" disabled={a.answering} onClick={() => onAnswer(true)}><Check size={14} /> Approve</button>
+      </div>
+    </div>
+  );
+}
 
 function StepCard({ step }: { step: Step }) {
   const running = step.status === "running";
@@ -47,6 +71,7 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
+  const [approvals, setApprovals] = useState<Approval[]>([]);
   const [full, setFull] = useState(false);
   const [menu, setMenu] = useState<string | null>(null);
   const abort = useRef<AbortController | null>(null);
@@ -68,7 +93,7 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
   useEffect(() => {
     loadSessions().then((s) => { if (s[0]) openSession(s[0].session_id); });
   }, [loadSessions, openSession]);
-  useEffect(() => { bottom.current?.scrollIntoView({ block: "end" }); }, [messages]);
+  useEffect(() => { bottom.current?.scrollIntoView({ block: "end" }); }, [messages, approvals]);
 
   const send = async () => {
     const input = text.trim();
@@ -110,6 +135,10 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
             const m: ChatMessage = { sender: "machine", sender_name: "Text Output", text: e.data.text };
             return i < 0 ? [...ms, m] : [...ms.slice(0, i), m, ...ms.slice(i)];
           });
+        } else if (e.event === "approval") {
+          setApprovals((as) => [...as, e.data as Approval]);
+        } else if (e.event === "approval_done") {
+          setApprovals((as) => as.filter((x) => x.id !== e.data.id));
         } else if (e.event === "error") {
           patchDraft((d) => ({ ...d, streaming: false, error: true, text: e.data.error }));
         }
@@ -171,6 +200,17 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
             </div>
           )}
           {messages.map((m, i) => <MessageView key={m.id ?? i} m={m} />)}
+          {approvals.map((a) => (
+            <ApprovalCard key={a.id} a={a} onAnswer={async (approve) => {
+              setApprovals((as) => as.map((x) => (x.id === a.id ? { ...x, answering: true } : x)));
+              try {
+                await api(`/api/approvals/${a.id}`, { body: { approve } });
+              } catch (err: any) {
+                toast(err.message, "error");
+              }
+              setApprovals((as) => as.filter((x) => x.id !== a.id));
+            }} />
+          ))}
           <div ref={bottom} />
         </div>
         <div className="pg-input">

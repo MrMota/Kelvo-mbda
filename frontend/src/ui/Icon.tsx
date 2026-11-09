@@ -1,12 +1,12 @@
 import {
   Binary, Bot, Box, Braces, Calculator, Calendar, Cpu, Database, FileText, Globe, History,
-  MessageSquare, MessageSquareReply, ScanText, Scissors, Sparkles, Split, Table, Type, Users, Workflow,
+  Folder, MessageSquare, MessageSquareReply, ScanText, Scissors, Search, Sparkles, Split, Table, Terminal, Type, Users, Workflow,
   type LucideProps,
 } from "lucide-react";
 
 const ICONS: Record<string, React.ComponentType<LucideProps>> = {
   bot: Bot, box: Box, braces: Braces, calculator: Calculator, calendar: Calendar, cpu: Cpu, database: Database,
-  "file-text": FileText, globe: Globe, history: History, "message-square": MessageSquare,
+  "file-text": FileText, folder: Folder, search: Search, terminal: Terminal, globe: Globe, history: History, "message-square": MessageSquare,
   "message-square-reply": MessageSquareReply, "scan-text": ScanText, scissors: Scissors, sparkles: Sparkles,
   split: Split, table: Table, type: Type, users: Users, workflow: Workflow, binary: Binary,
 };

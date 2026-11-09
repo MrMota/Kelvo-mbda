@@ -283,6 +283,8 @@ h3 { font-size: 14px; }
 .step summary { display: flex; align-items: center; gap: 7px; padding: 6px 9px; cursor: pointer; list-style: none; font-weight: 600; }
 .step summary::-webkit-details-marker { display: none; }
 .step pre { margin: 0; padding: 0 9px 8px; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; color: var(--text-2); }
+.approval { border: 1.5px solid var(--warn); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--warn) 7%, var(--surface)); margin-left: 38px; }
+.approval-cmd { margin: 0; padding: 8px 10px; background: var(--surface-2); border-radius: 7px; white-space: pre-wrap; word-break: break-all; font: 13px var(--mono); max-height: 200px; overflow: auto; }
 .pg-input { border-top: 1px solid var(--border); padding: 12px 12px max(12px, env(safe-area-inset-bottom)); }
 .pg-box { display: flex; align-items: flex-end; gap: 8px; border: 1px solid var(--border); border-radius: 12px; padding: 6px 6px 6px 12px; background: var(--surface); }
 .pg-box:focus-within { border-color: var(--accent); }

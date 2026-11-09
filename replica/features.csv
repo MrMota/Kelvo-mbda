@@ -67,3 +67,8 @@ Import skills from URL / GitHub folder / zip; export all skills,fixes,should,no,
 Headless runner (mbdaflow exec) + export flow as Python script,fixes,should,no,no,X5 - M4 export code (3 issues 37 votes)
 Schema migrations + flow format_version upgrader,fixes,should,no,no,X6 - H3 upgrades break flows (4 issues 8 votes; thin)
 Owner sign-in (single account; setup token / env / CLI reset; no sign-up),auth,must,no,yes,User decision 2026-11-08: personal tool for one person; launch files removed; no team features
+Web search tool (DuckDuckGo / Brave / Tavily / SearXNG),agents,must,yes,yes,User request 2026-11-09
+Files tool: list/read/write/edit in a sandboxed workspace,agents,must,no,yes,User request 2026-11-09; path escapes refused
+Command line tool with per-command approval,agents,must,no,yes,User request 2026-11-09; never runs in unattended (API/MCP) runs
+Human approval for tool calls,agents,should,yes,yes,approval card in Playground (Command Line; optional for Files writes)
+Agent 'Think before answering' (reasoning models),agents,should,no,yes,Ollama think option

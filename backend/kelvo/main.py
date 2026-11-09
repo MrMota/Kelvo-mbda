@@ -19,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import __version__, auth, db, ollama
 from .components import REGISTRY, specs
-from .engine import Engine, FlowError, validate_graph
+from .engine import Engine, FlowError, resolve_approval, validate_graph
 from .templates import STARTER_SKILLS, TEMPLATES
 
 STATIC = Path(os.environ.get("KELVO_STATIC", Path(__file__).parent / "static"))
@@ -304,13 +304,14 @@ def validate(flow_id: str, body: dict[str, Any] = Body(None)) -> dict[str, Any]:
 
 # ---------------------------------------------------------------- running
 
-async def _run_stream(flow: dict[str, Any], input_value: str, session_id: str | None, tweaks: dict[str, Any] | None) -> AsyncIterator[str]:
+async def _run_stream(flow: dict[str, Any], input_value: str, session_id: str | None, tweaks: dict[str, Any] | None,
+                      interactive: bool = False) -> AsyncIterator[str]:
     q: asyncio.Queue[tuple[str, dict[str, Any]] | None] = asyncio.Queue()
 
     async def emit(event: str, data: dict[str, Any]) -> None:
         await q.put((event, data))
 
-    engine = Engine(flow, input_value=input_value, session_id=session_id, emit=emit, tweaks=tweaks)
+    engine = Engine(flow, input_value=input_value, session_id=session_id, emit=emit, tweaks=tweaks, interactive=interactive)
     run_id = _run_start(engine)
 
     async def work() -> None:
@@ -358,7 +359,7 @@ async def build(flow_id: str, body: dict[str, Any] = Body(...)) -> StreamingResp
     if body.get("data"):
         flow = {**flow, "data": body["data"]}
     return StreamingResponse(
-        _run_stream(flow, str(body.get("input_value", "")), body.get("session_id"), body.get("tweaks")),
+        _run_stream(flow, str(body.get("input_value", "")), body.get("session_id"), body.get("tweaks"), interactive=True),
         media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
@@ -393,6 +394,14 @@ async def run_flow(flow_id: str, request: Request, stream: bool = False) -> Any:
             ],
         }],
     }
+
+
+@app.post("/api/approvals/{aid}")
+def answer_approval(aid: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Approve or reject an action an agent is waiting on (e.g. a command line)."""
+    if not resolve_approval(aid, bool(body.get("approve"))):
+        raise HTTPException(404, "That request isn't waiting any more (it was answered, timed out, or the run ended).")
+    return {"ok": True}
 
 
 # ---------------------------------------------------------------- playground memory & logs

@@ -214,6 +214,25 @@ await step("Installable: manifest and home-screen icon", async () => {
   if (!(await page.request.get(`${BASE}/apple-touch-icon.png`)).ok()) throw new Error("no apple-touch-icon");
 });
 
+await step("Power Agent: command waits for Approve; Reject blocks it", async () => {
+  await page.goto(BASE);
+  await page.getByRole("button", { name: "New Flow" }).first().click();
+  await page.getByRole("button", { name: /Power Agent/ }).click();
+  await page.waitForURL(/\/flow\//);
+  await page.getByRole("button", { name: "Playground", exact: true }).click();
+  await page.getByLabel("Message", { exact: true }).fill("tool:command_line:echo approved-run-ok");
+  await page.getByRole("button", { name: "Send" }).click();
+  const card = page.getByRole("alertdialog");
+  await card.getByText("echo approved-run-ok").waitFor({ timeout: 15000 });
+  await shot(page, "15-approval");
+  await card.getByRole("button", { name: "Approve" }).click();
+  await page.locator(".msg-text", { hasText: "approved-run-ok" }).first().waitFor({ timeout: 15000 });
+  await page.getByLabel("Message", { exact: true }).fill("tool:command_line:echo must-not-run");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.getByRole("alertdialog").getByRole("button", { name: "Reject" }).click({ timeout: 15000 });
+  await page.locator(".msg-text", { hasText: "did not approve" }).waitFor({ timeout: 15000 });
+});
+
 await step("Sign out returns to the sign-in screen", async () => {
   await page.goto(BASE);
   await page.getByRole("button", { name: /Sign out/ }).click();

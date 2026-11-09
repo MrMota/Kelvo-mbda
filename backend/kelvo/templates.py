@@ -62,6 +62,46 @@ TEMPLATES: list[dict[str, Any]] = [
         },
     },
     {
+        "id": "power-agent",
+        "name": "Power Agent",
+        "description": "Searches the web, reads pages, writes and edits files, and runs commands (you approve each one).",
+        "icon": "terminal",
+        "data": {
+            "nodes": [
+                _n("chat_in", "ChatInput", 0, 880),
+                _n("search", "WebSearch", 0, -600, tool_mode=True),
+                _n("url", "URLFetch", 0, -280, tool_mode=True),
+                _n("files", "Files", 0, 20, tool_mode=True),
+                _n("shell", "Shell", 0, 380, tool_mode=True),
+                _n("calc", "Calculator", 0, 1180, tool_mode=True),
+                _n("agent", "Agent", 460, 120, {
+                    "system_prompt": (
+                        "You are a capable assistant working on the user's own computer.\n"
+                        "- For anything current or factual you're unsure of: web_search, then read the best 1-3 results with the url tool. Cite the URLs you used.\n"
+                        "- Work with files only through list_files, read_file, write_file and edit_file, inside the workspace. Read a file before editing it; keep edits small and exact.\n"
+                        "- Use the command line for things only a command can do (running code, git, converting files). Say in one line why before each command; the user approves it.\n"
+                        "- Plan briefly, do the work, then answer clearly and say what you changed."
+                    ),
+                    "think": True,
+                    "library_skills": ["*"],
+                    "num_ctx": 16384,
+                    "max_iterations": 15,
+                }),
+                _n("chat_out", "ChatOutput", 880, 380),
+                _note("note", 460, -120, "Pick a model marked 'tools' (qwen3:30b on a big GPU). Files and commands stay in your KelvoWorkspace folder; every command waits for your Approve in the Playground."),
+            ],
+            "edges": [
+                _e("chat_in", "message", "agent", "input"),
+                _e("search", "tool", "agent", "tools"),
+                _e("url", "tool", "agent", "tools"),
+                _e("files", "tool", "agent", "tools"),
+                _e("shell", "tool", "agent", "tools"),
+                _e("calc", "tool", "agent", "tools"),
+                _e("agent", "response", "chat_out", "input"),
+            ],
+        },
+    },
+    {
         "id": "skilled-agent",
         "name": "Skilled Agent",
         "description": "An agent that loads skills only when a request needs them.",

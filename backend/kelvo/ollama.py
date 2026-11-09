@@ -47,6 +47,8 @@ def _err(resp: httpx.Response, body: bytes) -> OllamaError:
         msg = json.loads(body).get("error", body.decode())
     except Exception:
         msg = body.decode(errors="replace")
+    if "does not support thinking" in msg:
+        msg += " — turn off 'Think before answering' on this Agent, or pick a reasoning model such as qwen3."
     if "does not support tools" in msg:
         msg += " — this model can't call tools. Pick one that can, such as qwen3, llama3.1 or mistral-nemo."
     if resp.status_code == 404 and "not found" in msg:
@@ -71,6 +73,7 @@ async def chat_stream(
     options: dict[str, Any] | None = None,
     fmt: Any = None,
     keep_alive: str | None = None,
+    think: bool | None = None,
 ) -> AsyncIterator[dict[str, Any]]:
     """Yields Ollama /api/chat stream chunks."""
     payload: dict[str, Any] = {"model": model, "messages": messages, "stream": True}
@@ -82,6 +85,8 @@ async def chat_stream(
         payload["format"] = fmt
     if keep_alive:
         payload["keep_alive"] = keep_alive
+    if think is not None:
+        payload["think"] = think  # reasoning models (qwen3, deepseek-r1…) think first; the thinking streams separately
     try:
         async with _client(TIMEOUT) as client:
             async with client.stream("POST", f"{base_url}/api/chat", json=payload) as r:

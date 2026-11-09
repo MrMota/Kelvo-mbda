@@ -22,6 +22,7 @@ MODELS = ["llama3.1:8b", "qwen2.5:7b", "gemma2:2b", "nomic-embed-text:latest"]
 CAPS = {"llama3.1:8b": ["completion", "tools"], "qwen2.5:7b": ["completion", "tools"],
         "gemma2:2b": ["completion"], "nomic-embed-text:latest": ["embedding"]}
 SEEN_AUTH: list[str] = []
+SEEN_THINK: list[object] = []
 
 
 @app.post("/api/show")
@@ -55,6 +56,7 @@ async def embed(req: Request):
 @app.post("/api/chat")
 async def chat(req: Request):
     body = await req.json()
+    SEEN_THINK.append(body.get("think"))
     if "tools" in body and body.get("tools") and "tools" not in CAPS.get(body["model"], ["tools"]):
         return JSONResponse({"error": f"registry.ollama.ai/library/{body['model']} does not support tools"}, status_code=400)
     if body["model"] not in MODELS and body["model"].split(":")[0] not in [m.split(":")[0] for m in MODELS]:
