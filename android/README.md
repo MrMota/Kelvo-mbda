@@ -20,6 +20,10 @@ The address is remembered. To change it: Kelvo → Settings → Account → **Ch
 
 Kelvo's features and updates come from your server, so the app itself rarely needs updating.
 
+## Releases
+
+Signed release APKs are published on the repository's **Releases** page by GitHub Actions. One-time key setup and how to cut a release: **`RELEASING.md`**.
+
 ## Build it yourself (Ubuntu/Debian)
 
 ```bash

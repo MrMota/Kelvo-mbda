@@ -13,7 +13,7 @@ apps over a REST API or from any MCP client.
 - **Just for you**: one username/password account, no sign-up, no other users.
 - **Installable app (PWA)**: Edge/Chrome install it on your PC or phone; when your server is off you get a clear "Can't reach Kelvo" page.
 - **Windows without Docker**: `windows/install.cmd` (see `windows/README.txt`).
-- **On your phone**: install it from Chrome, or use the Android app in `android/` (it asks for your server address).
+- **On your phone**: install it from Chrome, or use the Android app in `android/` (it asks for your server address). Signed APKs are published as GitHub Releases (`android/RELEASING.md`).
 
 ## Quick start
 
