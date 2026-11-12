@@ -1,8 +1,9 @@
-import { LogOut, Moon, Settings as SettingsIcon, Sparkles, Sun, Workflow } from "lucide-react";
+import { LogOut, MessageCircle, Moon, Settings as SettingsIcon, Sparkles, Sun, Workflow } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, Route, Routes, useLocation } from "react-router-dom";
 import { api } from "./api";
 import { useAuth } from "./auth";
+import Chat from "./pages/Chat";
 import Editor from "./pages/Editor";
 import Home from "./pages/Home";
 import Settings from "./pages/Settings";
@@ -68,6 +69,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <header className="topbar">
         <Brand />
         <nav className="nav">
+          <NavLink to="/chat"><MessageCircle size={16} /><span>Chat</span></NavLink>
           <NavLink to="/" end><Workflow size={16} /><span>Flows</span></NavLink>
           <NavLink to="/skills"><Sparkles size={16} /><span>Skills</span></NavLink>
           <NavLink to="/settings"><SettingsIcon size={16} /><span>Settings</span></NavLink>
@@ -91,6 +93,8 @@ export default function App() {
     <Shell>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/chat" element={<Chat />} />
+        <Route path="/chat/:flowId" element={<Chat />} />
         <Route path="/skills" element={<Skills />} />
         <Route path="/skills/:id" element={<Skills />} />
         <Route path="/settings" element={<Settings />} />

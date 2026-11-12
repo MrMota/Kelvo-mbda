@@ -40,8 +40,20 @@ class ChatInput(Component):
             sender_name=await ctx.text("sender_name", "User") or "User",
             session_id=await ctx.text("session_id") or ctx.session_id,
         )
-        if await ctx.get("store", True) and text:
-            ctx.engine.store_message(msg)
+        block = ""
+        if ctx.engine.files:
+            from .. import uploads
+            from .power import default_workspace
+
+            ws = default_workspace()
+            ws.mkdir(parents=True, exist_ok=True)
+            metas, block = uploads.attach(ctx.engine.files, ws.resolve())
+            msg.properties["files"] = metas
+        if await ctx.get("store", True) and (text or block):
+            ctx.engine.store_message(msg)  # history keeps your words + the file names, not the file contents
+        if block:
+            return Message(text=text + block, sender=msg.sender, sender_name=msg.sender_name,
+                           session_id=msg.session_id, properties=msg.properties, id=msg.id)
         return msg
 
 

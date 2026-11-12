@@ -7,6 +7,7 @@ whose call re-runs that node with the agent's arguments as overrides.
 from __future__ import annotations
 
 import asyncio
+import inspect
 import json
 import re
 import time
@@ -89,6 +90,7 @@ class Engine:
         depth: int = 0,
         persist: bool = True,
         interactive: bool = False,
+        files: list[str] | None = None,
     ):
         self.flow = flow
         self.flow_id: str = flow["id"]
@@ -105,11 +107,13 @@ class Engine:
         self.depth = depth
         self.persist = persist
         self.interactive = interactive  # a person is watching (Playground) and can approve actions
+        self.files = files or []  # ids of files attached to this message (kelvo.uploads)
         self.variables = db.variables_map()
         self.memo: dict[tuple[str, str], Any] = {}
         self.locks: dict[tuple[str, str], asyncio.Lock] = {}
         self.instances: dict[str, Component] = {}
         self.stored_message_ids: set[str] = set()
+        self.closers: list[Callable[[], Awaitable[None]]] = []  # e.g. MCP connections, closed when the run ends
         self.outputs: list[dict[str, Any]] = []  # chat/text outputs for API response
         self.trace: list[dict[str, Any]] = []
         self._apply_tweaks(tweaks or {})
@@ -155,7 +159,7 @@ class Engine:
                 return self.memo[key]
             node = self.nodes[node_id]
             if output == "tool":
-                value = self.make_tool(node_id)
+                value = await self.make_tool(node_id)
             else:
                 value = await self._run_output(node_id, output, overrides={})
             self.memo[key] = value
@@ -185,13 +189,14 @@ class Engine:
         )
         return value
 
-    def make_tool(self, node_id: str) -> list[ToolDef]:
+    async def make_tool(self, node_id: str) -> list[ToolDef]:
         node = self.nodes[node_id]
         d = node["data"]
         comp = self.component(node_id)
         params = d.get("params", {})
-        if hasattr(comp, "toolset"):  # e.g. Files: several tools from one component
-            return comp.toolset(NodeCtx(self, node_id, {}))
+        if hasattr(comp, "toolset"):  # e.g. Files, MCP Tools: several tools from one component
+            res = comp.toolset(NodeCtx(self, node_id, {}))
+            return await res if inspect.isawaitable(res) else res
         connected = {e["targetHandle"] for e in self.edges if e["target"] == node_id}
         tparams = [f for f in comp.all_fields(params) if f.tool_param and f.name not in connected]
         props: dict[str, Any] = {}
@@ -225,12 +230,19 @@ class Engine:
             raise FlowError(problems[0])
         if self.depth > MAX_DEPTH:
             raise FlowError("Run Flow nested too deeply.")
-        for nid in self.terminals():
-            comp = self.component(nid)
-            if self.nodes[nid]["data"].get("tool_mode"):
-                continue  # a dangling tool does nothing on its own
-            for o in comp.outputs[:1]:
-                await self.resolve(nid, o.name)
+        try:
+            for nid in self.terminals():
+                comp = self.component(nid)
+                if self.nodes[nid]["data"].get("tool_mode"):
+                    continue  # a dangling tool does nothing on its own
+                for o in comp.outputs[:1]:
+                    await self.resolve(nid, o.name)
+        finally:
+            for close in reversed(self.closers):
+                try:
+                    await close()
+                except Exception:
+                    pass
         return {"session_id": self.session_id, "outputs": self.outputs}
 
     # ------------------------------------------------------------ approvals

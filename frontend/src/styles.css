@@ -164,6 +164,8 @@ h3 { font-size: 14px; }
 .status-dot.ok { background: var(--ok); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ok) 20%, transparent); }
 .status-dot.err { background: var(--danger); }
 .page { flex: 1; overflow: auto; }
+.chat-page { position: relative; height: 100%; display: flex; min-height: 0; }
+.page:has(.chat-page) { overflow: hidden; display: flex; flex-direction: column; }
 .container { max-width: 1180px; margin: 0 auto; padding: 28px 24px 60px; }
 
 /* ---------- home */
@@ -277,12 +279,39 @@ h3 { font-size: 14px; }
 .msg-body { min-width: 0; flex: 1; }
 .msg-name { font-size: 12px; font-weight: 650; color: var(--text-2); margin-bottom: 3px; display: flex; gap: 6px; align-items: center; }
 .msg-text { white-space: pre-wrap; word-break: break-word; }
+.md-reply { white-space: normal; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md p, .md ul, .md ol, .md pre, .md table, .md blockquote { margin: 0 0 10px; }
+.md h1, .md h2, .md h3, .md h4 { margin: 14px 0 6px; font-size: 16px; line-height: 1.3; }
+.md h1 { font-size: 19px; } .md h2 { font-size: 17px; }
+.md ul, .md ol { padding-left: 22px; }
+.md li + li { margin-top: 3px; }
+.md a { color: var(--accent-strong); text-decoration: underline; }
+.md code { font-family: var(--mono); font-size: 12.5px; background: var(--surface-2); padding: 1px 5px; border-radius: 4px; }
+.md pre { background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; overflow: auto; }
+.md pre code { background: none; padding: 0; white-space: pre; }
+.md table { border-collapse: collapse; display: block; overflow-x: auto; max-width: 100%; }
+.md th, .md td { border: 1px solid var(--border); padding: 5px 9px; text-align: left; }
+.md th { background: var(--surface-2); }
+.md blockquote { border-left: 3px solid var(--border-strong); padding-left: 10px; color: var(--text-2); }
+.md hr { border: 0; border-top: 1px solid var(--border); margin: 12px 0; }
+.md img { max-width: 100%; }
 .msg-text.err { color: var(--danger); }
 .steps { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 8px; }
 .step { border: 1px solid var(--border); border-radius: 8px; background: var(--surface-2); font-size: 12.5px; }
 .step summary { display: flex; align-items: center; gap: 7px; padding: 6px 9px; cursor: pointer; list-style: none; font-weight: 600; }
 .step summary::-webkit-details-marker { display: none; }
 .step pre { margin: 0; padding: 0 9px 8px; white-space: pre-wrap; word-break: break-word; max-height: 220px; overflow: auto; color: var(--text-2); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 6px; }
+.chip { display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 9px; border-radius: 99px; background: var(--surface-2); border: 1px solid var(--border); font-size: 12.5px; max-width: 260px; }
+.chip-x { border: 0; background: none; cursor: pointer; color: var(--text-3); display: grid; place-items: center; padding: 2px; border-radius: 50%; }
+.chip-x:hover { color: var(--text); background: var(--surface-3); }
+.history-btn { display: none; }
+.playground.page { width: auto; flex: 1; border-left: 0; }
+.playground.page .pg-sessions { width: 250px; }
+.playground.page .pg-msgs { padding: 24px max(16px, calc(50% - 400px)); }
+.playground.page .pg-input { padding: 12px max(12px, calc(50% - 400px)) 16px; }
 .approval { border: 1.5px solid var(--warn); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--warn) 7%, var(--surface)); margin-left: 38px; }
 .approval-cmd { margin: 0; padding: 8px 10px; background: var(--surface-2); border-radius: 7px; white-space: pre-wrap; word-break: break-all; font: 13px var(--mono); max-height: 200px; overflow: auto; }
 .pg-input { border-top: 1px solid var(--border); padding: 12px 12px max(12px, env(safe-area-inset-bottom)); }
@@ -316,6 +345,8 @@ h3 { font-size: 14px; }
   .inspector { position: absolute; right: 0; top: 0; bottom: 0; z-index: 15; box-shadow: var(--shadow-lg); }
   .playground { position: absolute; inset: 0; width: auto; z-index: 20; }
   .pg-sessions { display: none; }
+  .pg-sessions.open { display: flex; position: absolute; inset: 0; z-index: 30; width: auto !important; background: var(--surface); }
+  .history-btn { display: inline-grid; }
   .skill-editor { grid-template-columns: 1fr; }
   .nav a span { display: none; }
 }

@@ -185,7 +185,7 @@ public class MainActivity extends Activity {
         if (web == null) web = buildWebView();
         if (web.getParent() != null) ((ViewGroup) web.getParent()).removeView(web);
         setContentView(web);
-        web.loadUrl(serverUrl + "/");
+        web.loadUrl(serverUrl + "/chat");
     }
 
     private boolean isOwnServer(Uri u) {

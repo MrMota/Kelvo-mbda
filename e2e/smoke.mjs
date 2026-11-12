@@ -233,6 +233,91 @@ await step("Power Agent: command waits for Approve; Reject blocks it", async () 
   await page.locator(".msg-text", { hasText: "did not approve" }).waitFor({ timeout: 15000 });
 });
 
+await step("Chat: Markdown replies render; HTML in replies is neutralised", async () => {
+  await page.goto(`${BASE}/chat`);
+  await page.getByRole("combobox", { name: "Agent" }).waitFor();
+  const basic = (await page.request.post(`${BASE}/api/flows`, { data: { template: "basic-prompting", name: "Echo Bot" } }).then((r) => r.json()));
+  await page.goto(`${BASE}/chat/${basic.id}`);
+  await page.getByRole("heading", { name: "What can I help with?" }).waitFor();
+  await page.getByLabel("Message", { exact: true }).fill("x\n# Big Title\n\n- one\n- two\n\n| a | b |\n|---|---|\n| 1 | 2 |\n\n<img src=x onerror=\"window.__xss=1\">");
+  await page.keyboard.press("Enter");
+  await page.locator(".md-reply h1", { hasText: "Big Title" }).waitFor({ timeout: 15000 });
+  if ((await page.locator(".md-reply li").count()) < 2) throw new Error("list not rendered");
+  if (!(await page.locator(".md-reply td", { hasText: "2" }).count())) throw new Error("table not rendered");
+  await page.waitForTimeout(300);
+  if (await page.evaluate(() => window.__xss)) throw new Error("XSS executed");
+  if (await page.locator(".md-reply img[onerror]").count()) throw new Error("onerror attribute survived");
+  await shot(page, "16-chat-markdown");
+});
+
+await step("Chat: attach a file; the agent reads it; chip stays in history", async () => {
+  await page.getByRole("button", { name: "New chat" }).click();
+  await page.locator('input[type="file"]').setInputFiles({ name: "meeting-notes.txt", mimeType: "text/plain", buffer: Buffer.from("Decision: ship Kelvo 0.4 on Friday") });
+  await page.locator(".pg-input .chip", { hasText: "meeting-notes.txt" }).waitFor();
+  await page.getByLabel("Message", { exact: true }).fill("What was decided?");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.locator(".md-reply", { hasText: "ship Kelvo 0.4 on Friday" }).waitFor({ timeout: 15000 });
+  await page.reload();
+  await page.locator(".msg.user .chip", { hasText: "meeting-notes.txt" }).waitFor({ timeout: 10000 });
+  await shot(page, "17-chat-file");
+});
+
+await step("Chat: switch agents, new chat, search history", async () => {
+  const picker = page.getByRole("combobox", { name: "Agent" });
+  const options = await picker.locator("option").allTextContents();
+  if (options.length < 2) throw new Error("expected several agents");
+  const before = page.url();
+  await picker.selectOption({ label: options.find((o) => o !== "Echo Bot") });
+  await page.waitForURL((u) => u.toString() !== before);
+  await page.getByRole("heading", { name: "What can I help with?" }).waitFor();
+  await picker.selectOption({ label: "Echo Bot" });
+  await page.waitForURL((u) => u.toString() === before);
+  await page.locator(".pg-sessions .side-item", { hasText: "What was decided?" }).waitFor();
+});
+
+await step("Settings: memory add and delete", async () => {
+  await page.goto(`${BASE}/settings/memory`);
+  await page.getByLabel("New memory").fill("Prefers answers in bullet points");
+  await page.getByRole("button", { name: "Add" }).click();
+  await page.getByText("Prefers answers in bullet points").waitFor();
+  await page.getByRole("button", { name: "Delete memory" }).first().click();
+  await page.getByText("Nothing remembered yet.").waitFor();
+});
+
+await step("Schedules: create, run now, result lands in Chat", async () => {
+  await page.goto(`${BASE}/settings/schedules`);
+  await page.getByRole("heading", { name: "Schedules" }).waitFor();
+  await page.getByRole("combobox", { name: "Flow" }).selectOption({ label: "Echo Bot" });
+  await page.getByPlaceholder(/Search this week/).fill("Daily briefing please");
+  await page.getByRole("button", { name: "Add schedule" }).click();
+  await page.getByText("“Daily briefing please”").waitFor();
+  await page.getByRole("button", { name: "Run now" }).first().click();
+  await page.getByText("Ran: the result is in Chat").waitFor({ timeout: 20000 });
+  await shot(page, "18-schedules");
+  await page.getByRole("link", { name: "Echo Bot" }).first().click();
+  await page.locator(".pg-sessions .side-item", { hasText: "Daily briefing please" }).waitFor({ timeout: 10000 });
+});
+
+await step("Palette offers MCP Tools", async () => {
+  await page.goto(BASE);
+  await page.locator(".card", { hasText: "Echo Bot" }).first().click();
+  await page.getByLabel("Search components").fill("MCP");
+  await page.locator(".pal-item", { hasText: "MCP Tools" }).waitFor();
+});
+
+await step("Phone: Chat page with history drawer", async () => {
+  const ctx = await browser.newContext({ ...devices["iPhone 13"], storageState: await page.context().storageState() });
+  const m = await ctx.newPage();
+  await m.goto(`${BASE}/chat`);
+  await m.getByRole("combobox", { name: "Agent" }).waitFor();
+  if (await m.evaluate(() => document.documentElement.scrollWidth > window.innerWidth)) throw new Error("sideways scroll");
+  await m.getByRole("button", { name: "Chat history" }).tap();
+  await m.locator(".pg-sessions.open").waitFor();
+  if (SHOTS) await m.screenshot({ path: `${SHOTS}/19-phone-chat-history.png` });
+  await m.getByRole("button", { name: "Close history" }).tap();
+  await ctx.close();
+});
+
 await step("Sign out returns to the sign-in screen", async () => {
   await page.goto(BASE);
   await page.getByRole("button", { name: /Sign out/ }).click();

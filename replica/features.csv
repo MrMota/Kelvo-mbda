@@ -72,3 +72,9 @@ Files tool: list/read/write/edit in a sandboxed workspace,agents,must,no,yes,Use
 Command line tool with per-command approval,agents,must,no,yes,User request 2026-11-09; never runs in unattended (API/MCP) runs
 Human approval for tool calls,agents,should,yes,yes,approval card in Playground (Command Line; optional for Files writes)
 Agent 'Think before answering' (reasoning models),agents,should,no,yes,Ollama think option
+Markdown rendering of replies (sanitized),chat,must,yes,yes,0.4.0
+Chat screen (pick agent; searchable history; app start page),chat,must,yes,yes,0.4.0
+File upload in chat (PDF/DOCX/text) with citations,chat,must,yes,yes,0.4.0; copied to workspace for the Files tool
+MCP client (MCP Tools component: HTTP + local command),agents,must,yes,yes,0.4.0
+Long-term memory (remember/forget; Settings → Memory),agents,should,no,yes,0.4.0
+Scheduled runs (daily/interval; results in Chat),automation,should,no,yes,0.4.0

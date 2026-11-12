@@ -83,9 +83,10 @@ TEMPLATES: list[dict[str, Any]] = [
                         "- Plan briefly, do the work, then answer clearly and say what you changed."
                     ),
                     "think": True,
+                    "long_term_memory": True,
                     "library_skills": ["*"],
                     "num_ctx": 16384,
-                    "max_iterations": 15,
+                    "max_iterations": 20,
                 }),
                 _n("chat_out", "ChatOutput", 880, 380),
                 _note("note", 460, -120, "Pick a model marked 'tools' (qwen3:30b on a big GPU). Files and commands stay in your KelvoWorkspace folder; every command waits for your Approve in the Playground."),

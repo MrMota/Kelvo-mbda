@@ -1,10 +1,11 @@
-import { Cpu, Download, KeyRound, Plus, RefreshCw, Trash2, UserRound, Variable } from "lucide-react";
+import { Brain, CalendarClock, Cpu, Download, KeyRound, Plus, RefreshCw, Trash2, UserRound, Variable } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { androidApp, api, stream } from "../api";
 import { useAuth } from "../auth";
 import { useStore } from "../store";
 import { Code, Modal, timeAgo, useToast } from "../ui/kit";
+import { SchedulesPanel } from "../ui/Schedules";
 
 function Models() {
   const { models, modelsError, refreshModels, settings, refreshSettings } = useStore();
@@ -172,6 +173,52 @@ function ApiKeys() {
   );
 }
 
+function Memory() {
+  const [mems, setMems] = useState<any[] | null>(null);
+  const [text, setText] = useState("");
+  const [edit, setEdit] = useState<{ id: string; text: string } | null>(null);
+  const toast = useToast();
+  const load = () => api<any[]>("/api/memories").then(setMems);
+  useEffect(() => { load(); }, []);
+  return (
+    <div className="panel">
+      <div className="row"><h2 className="grow">Memory</h2>
+        {!!mems?.length && <button className="btn danger sm" onClick={async () => { if (confirm("Forget everything? Agents start from scratch.")) { await api("/api/memories", { method: "DELETE" }); load(); } }}>Forget everything</button>}
+      </div>
+      <p className="muted" style={{ margin: 0 }}>Facts your agents keep across chats, when <b>Long-term memory</b> is on in the Agent (it is in Power Agent). Agents add and remove these themselves; you can too.</p>
+      <div className="row">
+        <input className="input" value={text} onChange={(e) => setText(e.target.value)} placeholder="e.g. My projects are in D:\code" aria-label="New memory"
+          onKeyDown={async (e) => { if (e.key === "Enter" && text.trim()) { try { await api("/api/memories", { body: { text } }); setText(""); load(); } catch (err: any) { toast(err.message, "error"); } } }} />
+        <button className="btn primary" disabled={!text.trim()} onClick={async () => { try { await api("/api/memories", { body: { text } }); setText(""); load(); } catch (err: any) { toast(err.message, "error"); } }}><Plus size={15} /> Add</button>
+      </div>
+      {mems && mems.length === 0 ? <div className="empty">Nothing remembered yet.</div> : (
+        <table className="table"><tbody>{mems?.map((m) => (
+          <tr key={m.id}>
+            <td>{edit && edit.id === m.id ? (
+              <input className="input" autoFocus value={edit.text} onChange={(e) => setEdit({ id: m.id, text: e.target.value })} aria-label="Edit memory"
+                onKeyDown={async (e) => { const v = e.currentTarget.value; if (e.key === "Enter") { await api(`/api/memories/${m.id}`, { method: "PATCH", body: { text: v } }); setEdit(null); load(); } if (e.key === "Escape") setEdit(null); }} />
+            ) : <span onDoubleClick={() => setEdit({ id: m.id, text: m.text })}>{m.text}</span>}</td>
+            <td className="faint" style={{ whiteSpace: "nowrap", fontSize: 12 }}>{timeAgo(m.updated_at)}</td>
+            <td style={{ textAlign: "right", whiteSpace: "nowrap" }}>
+              <button className="btn ghost sm" onClick={() => setEdit({ id: m.id, text: m.text })}>Edit</button>
+              <button className="icon-btn sm" aria-label="Delete memory" onClick={async () => { await api(`/api/memories/${m.id}`, { method: "DELETE" }); load(); }}><Trash2 size={14} /></button>
+            </td>
+          </tr>))}</tbody></table>
+      )}
+    </div>
+  );
+}
+
+function Schedules() {
+  return (
+    <div className="panel">
+      <h2>Schedules</h2>
+      <p className="muted" style={{ margin: 0 }}>Send a message to a flow automatically: daily at a time, or every few minutes. Kelvo must be running. Results show up in Chat.</p>
+      <SchedulesPanel />
+    </div>
+  );
+}
+
 function Account() {
   const { username, signOut, refresh } = useAuth();
   const [name, setName] = useState(username);
@@ -229,10 +276,12 @@ export default function Settings() {
             <NavLink to="/settings/models" className={() => `side-item ${tab === "models" ? "active" : ""}`}><Cpu size={15} /> Models</NavLink>
             <NavLink to="/settings/variables" className={() => `side-item ${tab === "variables" ? "active" : ""}`}><Variable size={15} /> Global variables</NavLink>
             <NavLink to="/settings/keys" className={() => `side-item ${tab === "keys" ? "active" : ""}`}><KeyRound size={15} /> API keys</NavLink>
+            <NavLink to="/settings/memory" className={() => `side-item ${tab === "memory" ? "active" : ""}`}><Brain size={15} /> Memory</NavLink>
+            <NavLink to="/settings/schedules" className={() => `side-item ${tab === "schedules" ? "active" : ""}`}><CalendarClock size={15} /> Schedules</NavLink>
             <NavLink to="/settings/account" className={() => `side-item ${tab === "account" ? "active" : ""}`}><UserRound size={15} /> Account</NavLink>
           </div>
         </aside>
-        <section>{tab === "variables" ? <Variables /> : tab === "keys" ? <ApiKeys /> : tab === "account" ? <Account /> : <Models />}</section>
+        <section>{tab === "variables" ? <Variables /> : tab === "keys" ? <ApiKeys /> : tab === "account" ? <Account /> : tab === "memory" ? <Memory /> : tab === "schedules" ? <Schedules /> : <Models />}</section>
       </div>
     </div>
   );

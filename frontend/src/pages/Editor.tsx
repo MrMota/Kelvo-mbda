@@ -3,7 +3,7 @@ import {
   type Connection, type Edge, type Node,
 } from "@xyflow/react";
 import {
-  ArrowLeft, Check, ChevronDown, ChevronRight, Copy, Loader2, Lock, LogOut, MoreHorizontal, Play, Redo2, ScrollText, Search, Share2, StickyNote, Trash2, Undo2, X, Zap,
+  ArrowLeft, CalendarClock, Check, ChevronDown, ChevronRight, Copy, Loader2, Lock, LogOut, MoreHorizontal, Play, Redo2, ScrollText, Search, Share2, StickyNote, Trash2, Undo2, X, Zap,
 } from "lucide-react";
 import { Fragment, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -15,6 +15,7 @@ import { FieldInput } from "../ui/FieldInput";
 import { ComponentNode, EditorCtx, NoteNode, nodeFields, outputType } from "../ui/FlowNode";
 import { CATEGORY_COLORS, Icon, typeColor } from "../ui/Icon";
 import { Menu, Modal, timeAgo, useToast } from "../ui/kit";
+import { SchedulesPanel } from "../ui/Schedules";
 import { useAuth } from "../auth";
 import { Playground } from "../ui/Playground";
 import { ShareModal } from "../ui/ShareModal";
@@ -219,6 +220,7 @@ function EditorInner({ initial }: { initial: Flow }) {
   const [showPg, setShowPg] = useState(false);
   const [share, setShare] = useState<null | "api" | "mcp" | "export">(null);
   const [showLogs, setShowLogs] = useState(false);
+  const [showSchedules, setShowSchedules] = useState(false);
   const [running, setRunning] = useState(false);
   const [more, setMore] = useState(false);
   const { signOut } = useAuth();
@@ -398,6 +400,7 @@ function EditorInner({ initial }: { initial: Flow }) {
             <OllamaStatus />
             <button className="btn ghost" onClick={addNote} disabled={locked} title="Add note"><StickyNote size={15} /> Note</button>
             <button className="btn ghost" onClick={() => setShowLogs(true)}><ScrollText size={15} /> Logs</button>
+            <button className="btn ghost" onClick={() => setShowSchedules(true)}><CalendarClock size={15} /> Schedule</button>
             <button className="btn" onClick={runOnce} disabled={running} title="Run the whole flow once">{running ? <Loader2 size={15} className="spin" /> : <Zap size={15} />} Run</button>
             <button className="btn" onClick={() => setShare("api")}><Share2 size={15} /> Share</button>
           </span>
@@ -413,6 +416,7 @@ function EditorInner({ initial }: { initial: Flow }) {
                 <button onClick={() => { setMore(false); runOnce(); }} disabled={running}><Zap size={14} /> Run once</button>
                 <button onClick={() => { setMore(false); setShare("api"); }}><Share2 size={14} /> Share</button>
                 <button onClick={() => { setMore(false); setShowLogs(true); }}><ScrollText size={14} /> Logs</button>
+                <button onClick={() => { setMore(false); setShowSchedules(true); }}><CalendarClock size={14} /> Schedule</button>
                 <button onClick={() => { setMore(false); addNote(); }} disabled={locked}><StickyNote size={14} /> Add note</button>
                 <button onClick={() => { setMore(false); undo(); }} disabled={locked}><Undo2 size={14} /> Undo</button>
                 <button onClick={() => { setMore(false); redo(); }} disabled={locked}><Redo2 size={14} /> Redo</button>
@@ -464,6 +468,11 @@ function EditorInner({ initial }: { initial: Flow }) {
       </div>
       {share && <ShareModal flow={{ ...flow, data: toGraph(nodes, edges) }} initialTab={share} onClose={() => setShare(null)} onChange={setFlow} />}
       {showLogs && <LogsModal flowId={flow.id} onClose={() => setShowLogs(false)} />}
+      {showSchedules && (
+        <Modal title="Schedule this flow" icon={<CalendarClock size={18} />} onClose={() => setShowSchedules(false)}>
+          <SchedulesPanel flowId={flow.id} />
+        </Modal>
+      )}
     </EditorCtx.Provider>
   );
 }

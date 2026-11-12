@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, auth, db, ollama
+from . import __version__, auth, db, memory, ollama, schedules, uploads
 from .components import REGISTRY, specs
 from .engine import Engine, FlowError, resolve_approval, validate_graph
 from .templates import STARTER_SKILLS, TEMPLATES
@@ -40,7 +40,9 @@ def seed() -> None:
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     seed()
     auth.bootstrap()
+    ticker = asyncio.create_task(schedules.loop())
     yield
+    ticker.cancel()
 
 
 app = FastAPI(title="Kelvo", version=__version__, lifespan=lifespan)
@@ -201,6 +203,7 @@ def _summary(f: dict[str, Any]) -> dict[str, Any]:
     out = {k: v for k, v in f.items() if k != "data"}
     out["node_count"] = len(types)
     out["kind"] = "agent" if "Agent" in types else "flow"
+    out["has_chat"] = "ChatInput" in types
     return out
 
 
@@ -305,13 +308,14 @@ def validate(flow_id: str, body: dict[str, Any] = Body(None)) -> dict[str, Any]:
 # ---------------------------------------------------------------- running
 
 async def _run_stream(flow: dict[str, Any], input_value: str, session_id: str | None, tweaks: dict[str, Any] | None,
-                      interactive: bool = False) -> AsyncIterator[str]:
+                      interactive: bool = False, files: list[str] | None = None) -> AsyncIterator[str]:
     q: asyncio.Queue[tuple[str, dict[str, Any]] | None] = asyncio.Queue()
 
     async def emit(event: str, data: dict[str, Any]) -> None:
         await q.put((event, data))
 
-    engine = Engine(flow, input_value=input_value, session_id=session_id, emit=emit, tweaks=tweaks, interactive=interactive)
+    engine = Engine(flow, input_value=input_value, session_id=session_id, emit=emit, tweaks=tweaks, interactive=interactive,
+                    files=files)
     run_id = _run_start(engine)
 
     async def work() -> None:
@@ -359,7 +363,8 @@ async def build(flow_id: str, body: dict[str, Any] = Body(...)) -> StreamingResp
     if body.get("data"):
         flow = {**flow, "data": body["data"]}
     return StreamingResponse(
-        _run_stream(flow, str(body.get("input_value", "")), body.get("session_id"), body.get("tweaks"), interactive=True),
+        _run_stream(flow, str(body.get("input_value", "")), body.get("session_id"), body.get("tweaks"), interactive=True,
+                    files=[str(f) for f in body.get("files") or []]),
         media_type="text/event-stream", headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
 
@@ -374,9 +379,10 @@ async def run_flow(flow_id: str, request: Request, stream: bool = False) -> Any:
     input_value = str(body.get("input_value", "") or "")
     session_id = body.get("session_id")
     tweaks = body.get("tweaks")
+    files = [str(f) for f in body.get("files") or []]
     if stream or body.get("stream"):
-        return StreamingResponse(_run_stream(flow, input_value, session_id, tweaks), media_type="text/event-stream")
-    engine = Engine(flow, input_value=input_value, session_id=session_id, tweaks=tweaks)
+        return StreamingResponse(_run_stream(flow, input_value, session_id, tweaks, files=files), media_type="text/event-stream")
+    engine = Engine(flow, input_value=input_value, session_id=session_id, tweaks=tweaks, files=files)
     rid = _run_start(engine)
     try:
         res = await engine.run()
@@ -394,6 +400,94 @@ async def run_flow(flow_id: str, request: Request, stream: bool = False) -> Any:
             ],
         }],
     }
+
+
+# ---------------------------------------------------------------- scheduled runs
+
+@app.get("/api/schedules")
+def list_schedules(flow_id: str | None = None) -> list[dict[str, Any]]:
+    return schedules.list_all(flow_id)
+
+
+@app.post("/api/flows/{flow_id}/schedules")
+def create_schedule(flow_id: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    try:
+        return schedules.create(get_flow(flow_id)["id"], body)
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.patch("/api/schedules/{sid}")
+def update_schedule(sid: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    try:
+        return schedules.update(sid, body)
+    except LookupError as e:
+        raise HTTPException(404, str(e))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.delete("/api/schedules/{sid}")
+def delete_schedule(sid: str) -> dict[str, Any]:
+    with db.conn() as c:
+        c.execute("DELETE FROM schedules WHERE id=?", (sid,))
+    return {"ok": True}
+
+
+@app.post("/api/schedules/{sid}/run")
+async def run_schedule_now(sid: str) -> dict[str, Any]:
+    if not schedules.get(sid):
+        raise HTTPException(404, "Schedule not found")
+    return await schedules.run_schedule(sid)
+
+
+# ---------------------------------------------------------------- long-term memory
+
+@app.get("/api/memories")
+def list_memories() -> list[dict[str, Any]]:
+    return memory.all_memories()
+
+
+@app.post("/api/memories")
+def add_memory(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    try:
+        return memory.add(str(body.get("text", "")))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+
+
+@app.patch("/api/memories/{mid}")
+def edit_memory(mid: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    try:
+        m = memory.update(mid, str(body.get("text", "")))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
+    if not m:
+        raise HTTPException(404, "Memory not found")
+    return m
+
+
+@app.delete("/api/memories/{mid}")
+def delete_memory(mid: str) -> dict[str, Any]:
+    with db.conn() as c:
+        c.execute("DELETE FROM memories WHERE id=?", (mid,))
+    return {"ok": True}
+
+
+@app.delete("/api/memories")
+def delete_all_memories() -> dict[str, Any]:
+    with db.conn() as c:
+        n = c.execute("DELETE FROM memories").rowcount
+    return {"deleted": n}
+
+
+@app.post("/api/uploads")
+def upload(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Attach a file in chat: JSON {name, data: base64}. Returns its id for the next message."""
+    try:
+        return uploads.save_upload(str(body.get("name", "file")), str(body.get("data", "")))
+    except ValueError as e:
+        raise HTTPException(422, str(e))
 
 
 @app.post("/api/approvals/{aid}")

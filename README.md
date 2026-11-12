@@ -59,7 +59,7 @@ No GPU at hand? `make fake-ollama` starts a stand-in Ollama on port 11435 that e
 | Prompts | Prompt Template (each `{variable}` becomes an input port) |
 | Models | Ollama, Ollama Embeddings, Structured Output |
 | Agents | Agent, Skill |
-| Tools | Web Search, URL, Files, Command Line, Calculator, Current Date, Run Flow |
+| Tools | Web Search, URL, Files, Command Line, MCP Tools, Calculator, Current Date, Run Flow |
 | Memory | Message History |
 | Vector Stores | Knowledge Base (local) |
 | Processing | Parser, Split Text |
@@ -71,6 +71,14 @@ Click the wrench on a component to put it in **tool mode**: its *Toolset* output
 ## Templates
 
 Basic Prompting · Simple Agent · **Power Agent** · Skilled Agent · Multi-Agent Team · Document Q&A (local RAG) · Structured Extraction
+
+## Chat, files, memory, schedules
+
+- **Chat** (top menu, and the start page of the installed app): ChatGPT-style chat with any agent. Pick the agent at the top, keep a searchable history of chats, start new ones. Replies render Markdown (headings, lists, tables, code); HTML in replies is sanitized.
+- **Attach files** with the paperclip: PDF, Word (.docx), text and code. The agent gets their text with the file names to cite; the originals are copied to `KelvoWorkspace/uploads` so the Files tool can read long documents in full. Scanned PDFs without a text layer and images can't be read yet.
+- **Long-term memory** (Agent setting, on in Power Agent): agents `remember` lasting facts about you and `forget` outdated ones; you can see and edit everything in **Settings → Memory**.
+- **Schedules**: run a flow daily at a time (pick weekdays) or every N minutes, with a fixed message. Set them in the editor (**Schedule**) or **Settings → Schedules**. Results appear as a chat in Chat. Uses the computer's local time; Kelvo must be running; a run missed while the PC was off runs once on start. Commands that need approval don't run in scheduled runs.
+- **MCP Tools**: give an agent the tools of any MCP server: an HTTP URL (Streamable HTTP, optional headers) or a local command such as `npx -y @modelcontextprotocol/server-filesystem C:\notes` (needs Node). Filter tools, add a name prefix, or require approval per call.
 
 ## A smarter, more capable agent
 
@@ -85,7 +93,8 @@ What makes it smarter:
 1. **A bigger tool-capable model**: `qwen3:30b` on a 32 GB GPU.
 2. **Think before answering** (Agent setting, on in Power Agent): reasoning models such as qwen3 work through the problem first.
 3. **Context window 16384+** (Agent → Advanced) so long pages and files fit.
-4. **Skills** for tasks you repeat, and clear Agent instructions.
+4. **Max tool rounds** (Agent → Advanced, default 20): how many rounds of tool calls before the agent must answer.
+5. **Skills** for tasks you repeat, and clear Agent instructions.
 
 ## Calling a flow
 

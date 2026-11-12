@@ -110,3 +110,31 @@ CREATE TABLE IF NOT EXISTS sessions (
   last_seen_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS sessions_user ON sessions(user_id);
+
+-- Long-term memory: facts agents remember about you across chats (Settings → Memory).
+CREATE TABLE IF NOT EXISTS memories (
+  id TEXT PRIMARY KEY,
+  text TEXT NOT NULL,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+
+-- Scheduled runs: send a message to a flow daily at a time, or every N minutes.
+CREATE TABLE IF NOT EXISTS schedules (
+  id TEXT PRIMARY KEY,
+  flow_id TEXT NOT NULL REFERENCES flows(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  message TEXT NOT NULL,
+  kind TEXT NOT NULL CHECK (kind IN ('daily', 'interval')),
+  time_of_day TEXT,                 -- daily: HH:MM (this computer's local time)
+  days TEXT NOT NULL DEFAULT '0123456', -- daily: weekdays it runs, 0 = Monday
+  every_minutes INTEGER,            -- interval
+  enabled INTEGER NOT NULL DEFAULT 1 CHECK (enabled IN (0,1)),
+  next_run TEXT,                    -- ISO local time
+  last_run TEXT,
+  last_status TEXT,
+  last_output TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS schedules_due ON schedules(enabled, next_run);

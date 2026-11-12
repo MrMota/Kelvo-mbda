@@ -1,8 +1,9 @@
-import { Bot, Check, ChevronRight, Loader2, Maximize2, Minimize2, MoreHorizontal, Plus, Send, ShieldAlert, Square, Trash2, User, Wrench, X } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Bot, Check, ChevronRight, FileText, History, Loader2, Maximize2, Minimize2, MoreHorizontal, Paperclip, Plus, Search, Send, ShieldAlert, Square, Trash2, User, Wrench, X } from "lucide-react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { api, newSessionId, stream, type StreamEvent } from "../api";
-import type { ChatMessage, FlowGraph, Step } from "../types";
+import type { Attachment, ChatMessage, FlowGraph, Step } from "../types";
 import { Menu, timeAgo, useToast } from "./kit";
+import { Markdown } from "./Markdown";
 
 type Session = { session_id: string; count: number; last: string; title: string | null };
 
@@ -52,19 +53,41 @@ function MessageView({ m }: { m: ChatMessage }) {
       <div className="msg-body">
         <div className="msg-name">{m.sender_name}{m.properties?.source?.source && <span className="faint" style={{ fontWeight: 500 }}>· {m.properties.source.source}</span>}</div>
         {steps.length > 0 && <div className="steps">{steps.map((s, i) => <StepCard key={i} step={s} />)}</div>}
-        {(m.text || m.streaming) && <div className={`msg-text ${m.error ? "err" : ""} ${m.streaming ? "cursor" : ""}`}>{m.text}</div>}
+        {(m.properties?.files?.length ?? 0) > 0 && (
+          <div className="chips">{m.properties!.files!.map((f) => <span key={f.id ?? f.name} className="chip"><FileText size={12} /> {f.name}</span>)}</div>
+        )}
+        {(m.text || m.streaming) && (m.sender === "machine" && !m.error
+          ? <Markdown text={m.text} className={`msg-text md-reply ${m.streaming ? "cursor" : ""}`} />
+          : <div className={`msg-text ${m.error ? "err" : ""} ${m.streaming ? "cursor" : ""}`}>{m.text}</div>)}
         {!m.text && !m.streaming && !steps.length && <div className="faint">(empty reply)</div>}
       </div>
     </div>
   );
 }
 
-export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }: {
+const MAX_UPLOAD = 25 * 1024 * 1024;
+
+function readAsBase64(f: File): Promise<string> {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(String(r.result).split(",", 2)[1] ?? "");
+    r.onerror = () => rej(r.error);
+    r.readAsDataURL(f);
+  });
+}
+
+/**
+ * The chat: used as the editor's Playground panel (variant "panel", runs the unsaved graph)
+ * and as the Chat page (variant "page", runs the saved flow).
+ */
+export function Playground({ flowId, getGraph, hasChatInput = true, onEvent, onClose, variant = "panel", header }: {
   flowId: string;
-  getGraph: () => FlowGraph;
-  hasChatInput: boolean;
-  onEvent: (e: StreamEvent) => void;
-  onClose: () => void;
+  getGraph?: () => FlowGraph;
+  hasChatInput?: boolean;
+  onEvent?: (e: StreamEvent) => void;
+  onClose?: () => void;
+  variant?: "panel" | "page";
+  header?: ReactNode;
 }) {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [sessionId, setSessionId] = useState<string>(() => newSessionId());
@@ -74,6 +97,10 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
   const [approvals, setApprovals] = useState<Approval[]>([]);
   const [full, setFull] = useState(false);
   const [menu, setMenu] = useState<string | null>(null);
+  const [query, setQuery] = useState("");
+  const [showHistory, setShowHistory] = useState(false);
+  const [files, setFiles] = useState<(Attachment & { uploading?: boolean })[]>([]);
+  const fileInput = useRef<HTMLInputElement>(null);
   const abort = useRef<AbortController | null>(null);
   const bottom = useRef<HTMLDivElement>(null);
   const toast = useToast();
@@ -91,17 +118,41 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
   }, [flowId]);
 
   useEffect(() => {
+    setMessages([]);
+    setSessionId(newSessionId());
+    setFiles([]);
     loadSessions().then((s) => { if (s[0]) openSession(s[0].session_id); });
   }, [loadSessions, openSession]);
+
+  const attach = async (list: FileList | null) => {
+    for (const f of Array.from(list ?? [])) {
+      if (f.size > MAX_UPLOAD) { toast(`${f.name} is larger than 25 MB.`, "error"); continue; }
+      const tmp = `tmp-${Math.random().toString(36).slice(2)}`;
+      setFiles((fs) => [...fs, { id: tmp, name: f.name, size: f.size, uploading: true }]);
+      try {
+        const up = await api<Attachment>("/api/uploads", { body: { name: f.name, data: await readAsBase64(f) } });
+        setFiles((fs) => fs.map((x) => (x.id === tmp ? up : x)));
+        if (up.warning) toast(up.warning);
+      } catch (err: any) {
+        toast(`${f.name}: ${err.message}`, "error");
+        setFiles((fs) => fs.filter((x) => x.id !== tmp));
+      }
+    }
+    if (fileInput.current) fileInput.current.value = "";
+  };
+  const newChat = () => { setSessionId(newSessionId()); setMessages([]); setShowHistory(false); };
   useEffect(() => { bottom.current?.scrollIntoView({ block: "end" }); }, [messages, approvals]);
 
   const send = async () => {
     const input = text.trim();
-    if (busy || (hasChatInput && !input)) return;
+    const ready = files.filter((f) => !f.uploading);
+    if (busy || files.some((f) => f.uploading) || (hasChatInput && !input && !ready.length)) return;
     setText("");
+    setFiles([]);
     setBusy(true);
     const draft: ChatMessage = { sender: "machine", sender_name: "AI", text: "", streaming: true, properties: { steps: [] } };
-    setMessages((ms) => [...ms, ...(input ? [{ sender: "user" as const, sender_name: "User", text: input }] : []), draft]);
+    const mine: ChatMessage = { sender: "user", sender_name: "User", text: input, properties: { files: ready } };
+    setMessages((ms) => [...ms, ...(input || ready.length ? [mine] : []), draft]);
     const patchDraft = (fn: (d: ChatMessage) => ChatMessage | null) =>
       setMessages((ms) => {
         const i = ms.findIndex((m) => m.streaming);
@@ -111,8 +162,8 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
       });
     abort.current = new AbortController();
     try {
-      await stream(`/api/flows/${flowId}/build`, { input_value: input, session_id: sessionId, data: getGraph() }, (e) => {
-        onEvent(e);
+      await stream(`/api/flows/${flowId}/build`, { input_value: input, session_id: sessionId, data: getGraph?.(), files: ready.map((f) => f.id) }, (e) => {
+        onEvent?.(e);
         if (e.event === "token") patchDraft((d) => ({ ...d, text: d.text + e.data.chunk }));
         else if (e.event === "token_reset") patchDraft((d) => ({ ...d, text: "" }));
         else if (e.event === "step") {
@@ -153,17 +204,24 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
   };
 
   return (
-    <aside className={`playground ${full ? "full" : ""}`} aria-label="Playground">
-      <div className="pg-sessions">
+    <aside className={`playground ${variant} ${full ? "full" : ""}`} aria-label={variant === "page" ? "Chat" : "Playground"}>
+      <div className={`pg-sessions ${showHistory ? "open" : ""}`}>
         <div className="panel-head" style={{ padding: "10px 10px 8px" }}>
-          <span className="section-title grow">Sessions</span>
-          <button className="icon-btn sm" aria-label="New session" title="New session" onClick={() => { setSessionId(newSessionId()); setMessages([]); }}><Plus size={15} /></button>
+          <span className="section-title grow">{variant === "page" ? "Chats" : "Sessions"}</span>
+          <button className="icon-btn sm" aria-label="New session" title="New chat" onClick={newChat}><Plus size={15} /></button>
+          {showHistory && <button className="icon-btn sm" aria-label="Close history" onClick={() => setShowHistory(false)}><X size={15} /></button>}
         </div>
+        {sessions.length > 4 && (
+          <div className="search" style={{ padding: "6px 8px 0" }}>
+            <Search size={14} style={{ left: 18 }} />
+            <input className="input" style={{ height: 30, fontSize: 13 }} placeholder="Search chats" value={query} onChange={(e) => setQuery(e.target.value)} aria-label="Search chats" />
+          </div>
+        )}
         <div className="side-list" style={{ padding: 6, overflow: "auto" }}>
           {!sessions.some((s) => s.session_id === sessionId) && <button className="side-item active"><span className="ellipsis">New chat</span></button>}
-          {sessions.map((s) => (
+          {sessions.filter((s) => !query || (s.title || s.session_id).toLowerCase().includes(query.toLowerCase())).map((s) => (
             <div key={s.session_id} style={{ position: "relative" }}>
-              <button className={`side-item ${s.session_id === sessionId ? "active" : ""}`} onClick={() => openSession(s.session_id)} title={s.session_id}>
+              <button className={`side-item ${s.session_id === sessionId ? "active" : ""}`} onClick={() => { openSession(s.session_id); setShowHistory(false); }} title={s.session_id}>
                 <span className="grow col" style={{ gap: 0, minWidth: 0 }}>
                   <span className="ellipsis">{s.title || s.session_id}</span>
                   <span className="faint" style={{ fontSize: 11 }}>{timeAgo(s.last)} · {s.count}</span>
@@ -187,15 +245,17 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
       </div>
       <div className="pg-main">
         <div className="panel-head">
-          <h2 className="grow">Playground</h2>
-          <button className="icon-btn" aria-label={full ? "Exit full screen" : "Full screen"} onClick={() => setFull(!full)}>{full ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>
-          <button className="icon-btn" aria-label="Close playground" onClick={onClose}><X size={17} /></button>
+          <button className="icon-btn history-btn" aria-label="Chat history" title="Chat history" onClick={() => setShowHistory(true)}><History size={17} /></button>
+          {header ?? <h2 className="grow">Playground</h2>}
+          {variant === "page" && <button className="btn sm" onClick={newChat}><Plus size={14} /> New chat</button>}
+          {variant === "panel" && <button className="icon-btn" aria-label={full ? "Exit full screen" : "Full screen"} onClick={() => setFull(!full)}>{full ? <Minimize2 size={16} /> : <Maximize2 size={16} />}</button>}
+          {onClose && <button className="icon-btn" aria-label="Close playground" onClick={onClose}><X size={17} /></button>}
         </div>
         <div className="pg-msgs">
           {messages.length === 0 && (
             <div className="empty" style={{ margin: "auto 0", border: 0 }}>
               <Bot size={28} className="faint" />
-              {hasChatInput ? <><h3>Say something to your flow</h3><span>Replies come from your own Ollama models. When the agent uses a tool, you'll see the call and its result here.</span></>
+              {hasChatInput ? <><h3>{variant === "page" ? "What can I help with?" : "Say something to your flow"}</h3><span>Replies come from your own Ollama models. Attach files with the paperclip. When the agent uses a tool, you'll see the call and its result here.</span></>
                 : <><h3>This flow doesn't take chat</h3><span>Add a Chat Input to talk to it here, or press Run to run it once.</span></>}
             </div>
           )}
@@ -214,19 +274,32 @@ export function Playground({ flowId, getGraph, hasChatInput, onEvent, onClose }:
           <div ref={bottom} />
         </div>
         <div className="pg-input">
+          {files.length > 0 && (
+            <div className="chips" style={{ marginBottom: 8 }}>
+              {files.map((f) => (
+                <span key={f.id} className="chip">
+                  {f.uploading ? <Loader2 size={12} className="spin" /> : <FileText size={12} />} {f.name}
+                  <button className="chip-x" aria-label={`Remove ${f.name}`} onClick={() => setFiles((fs) => fs.filter((x) => x.id !== f.id))}><X size={11} /></button>
+                </span>
+              ))}
+            </div>
+          )}
           <div className="pg-box">
+            <input ref={fileInput} type="file" multiple hidden onChange={(e) => attach(e.target.files)} />
+            <button className="icon-btn" aria-label="Attach files" title="Attach files (PDF, Word, text, code…)" disabled={!hasChatInput}
+              onClick={() => fileInput.current?.click()}><Paperclip size={17} /></button>
             <textarea rows={1} value={text} placeholder={hasChatInput ? "Send a message…" : "This flow has no Chat Input"} aria-label="Message"
               onChange={(e) => setText(e.target.value)} disabled={!hasChatInput}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} />
             {busy ? (
               <button className="btn sm" onClick={() => abort.current?.abort()} aria-label="Stop"><Square size={13} /> Stop</button>
             ) : (
-              <button className="btn primary sm" onClick={send} disabled={hasChatInput ? !text.trim() : false} aria-label={hasChatInput ? "Send" : "Run"}>
+              <button className="btn primary sm" onClick={send} disabled={hasChatInput ? (!text.trim() && !files.length) || files.some((f) => f.uploading) : false} aria-label={hasChatInput ? "Send" : "Run"}>
                 <Send size={14} />{hasChatInput ? "" : " Run"}
               </button>
             )}
           </div>
-          <div className="help" style={{ marginTop: 6 }}>Session <code>{sessionId}</code> · Enter to send, Shift+Enter for a new line</div>
+          {variant === "panel" && <div className="help" style={{ marginTop: 6 }}>Session <code>{sessionId}</code> · Enter to send, Shift+Enter for a new line</div>}
         </div>
       </div>
     </aside>

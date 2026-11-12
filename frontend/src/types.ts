@@ -56,17 +56,19 @@ export type Flow = {
   updated_at: string;
   node_count?: number;
   kind?: string;
+  has_chat?: boolean;
 };
 export type Project = { id: string; name: string; flow_count?: number };
 export type Template = { id: string; name: string; description: string; icon: string; data: FlowGraph };
 export type Skill = { id: string; name: string; description: string; body: string; updated_at: string };
 export type Step = { type: string; name: string; input: unknown; output?: string; status?: string; error?: boolean };
+export type Attachment = { id: string; name: string; size: number; kind?: string; chars?: number; warning?: string };
 export type ChatMessage = {
   id?: string;
   sender: "user" | "machine";
   sender_name: string;
   text: string;
-  properties?: { steps?: Step[]; source?: { source?: string } };
+  properties?: { steps?: Step[]; source?: { source?: string }; files?: Attachment[] };
   error?: boolean;
   streaming?: boolean;
 };

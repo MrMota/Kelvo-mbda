@@ -71,6 +71,28 @@ def skill_tool(skills: list[SkillDef]) -> ToolDef:
     )
 
 
+def memory_tools() -> list[ToolDef]:
+    from .. import memory as ltm
+
+    async def remember(a: dict[str, Any]) -> str:
+        try:
+            m = ltm.add(str(a.get("fact") or a.get("input") or ""))
+        except ValueError as e:
+            return str(e)
+        return f"Remembered [{m['id'][:8]}]: {m['text']}"
+
+    async def forget(a: dict[str, Any]) -> str:
+        mid = str(a.get("memory_id") or a.get("input") or "")
+        return "Forgotten." if ltm.delete(mid) else f"No single memory matches '{mid}'. Use an id from the memory list."
+
+    return [
+        ToolDef("remember", "Save a lasting fact or preference about the user for future chats.",
+                {"type": "object", "properties": {"fact": {"type": "string", "description": "One short fact, e.g. 'Uses Windows 11 with an RTX 5090'"}}, "required": ["fact"]}, remember),
+        ToolDef("forget", "Delete a memory that is wrong or outdated.",
+                {"type": "object", "properties": {"memory_id": {"type": "string", "description": "The id shown in brackets, e.g. 3f9a1c2b"}}, "required": ["memory_id"]}, forget),
+    ]
+
+
 def _args(raw: Any) -> dict[str, Any]:
     if isinstance(raw, dict):
         return raw
@@ -113,9 +135,12 @@ class Agent(Component):
         *MODEL_FIELDS,
         Field("think", "Think before answering", "bool", False,
               info="Reasoning models (qwen3, deepseek-r1…) work the problem through first: slower, smarter."),
+        Field("long_term_memory", "Long-term memory", "bool", False,
+              info="Remember facts about you across chats (Settings → Memory)."),
         Field("memory", "Chat memory", "bool", True, advanced=True, info="Include this session's earlier messages."),
         Field("n_messages", "Messages to remember", "int", 20, advanced=True),
-        Field("max_iterations", "Max tool rounds", "int", 8, advanced=True),
+        Field("max_iterations", "Max tool rounds", "int", 20, advanced=True,
+              info="How many rounds of tool calls before the agent must answer. Each round can call several tools."),
     ]
     outputs = [Output("response", "Response", MESSAGE)]
 
@@ -130,6 +155,11 @@ class Agent(Component):
         if skills:
             system += "\n" + skills_prompt(skills)
             tools.append(skill_tool(skills))
+        if await ctx.get("long_term_memory", False) and not ctx.overrides:
+            from .. import memory as ltm
+
+            system += "\n" + ltm.prompt_block()
+            tools += memory_tools()
         tools = _dedupe(tools)
         by_name = {t.name: t for t in tools}
 
@@ -141,7 +171,7 @@ class Agent(Component):
         messages.append({"role": "user", "content": task})
 
         steps: list[dict[str, Any]] = []
-        max_rounds = max(1, int(await ctx.get("max_iterations", 8)))
+        max_rounds = max(1, int(await ctx.get("max_iterations", 20)))
         final = ""
         think = True if await ctx.get("think", False) else None
         for round_no in range(max_rounds + 1):

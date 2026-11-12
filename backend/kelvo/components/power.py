@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import html
+import json
 import os
 import re
 import subprocess
@@ -305,3 +306,97 @@ class Shell(Component):
         if len(out) > MAX_OUTPUT:
             out = out[:MAX_OUTPUT] + f"\n[… output cut at {MAX_OUTPUT} characters]"
         return f"$ {cmd}\n(exit code {r.returncode})\n{out.strip()}"
+
+
+# ---------------------------------------------------------------- MCP servers
+
+def _json_param(ctx, name: str) -> dict[str, str]:
+    raw = ctx.engine.substitute(str(ctx.params.get(name) or "").strip())
+    if not raw:
+        return {}
+    try:
+        val = json.loads(raw)
+    except ValueError as e:
+        raise ValueError(f"{name} must be JSON, like {{\"x-api-key\": \"${{MY_KEY}}\"}}") from e
+    if not isinstance(val, dict):
+        raise ValueError(f"{name} must be a JSON object")
+    return {str(k): str(v) for k, v in val.items()}
+
+
+def _tool_name(prefix: str, name: str) -> str:
+    return (re.sub(r"[^A-Za-z0-9_-]", "_", prefix + name) or "tool")[:64]
+
+
+class MCPTools(Component):
+    key = "MCPTools"
+    display = "MCP Tools"
+    category = "Tools"
+    description = ("Give an agent the tools of any MCP server: an HTTP URL, or a local command such as "
+                   "'npx -y @modelcontextprotocol/server-filesystem C:\\\\notes'.")
+    icon = "plug"
+    tool_default = True
+    fields = [
+        Field("transport", "Server type", "select", "http", options=["http", "command"],
+              info="http = a URL (Streamable HTTP). command = a program Kelvo starts on this PC (stdio)."),
+        Field("url", "Server URL", "str", "", placeholder="http://127.0.0.1:8000/mcp"),
+        Field("headers", "Headers (JSON)", "json", "", placeholder='{"Authorization": "Bearer ${MY_TOKEN}"}', advanced=True,
+              info="Sent with every request; use global variables for keys."),
+        Field("command", "Command", "str", "", placeholder="npx -y @modelcontextprotocol/server-filesystem C:\\notes",
+              info="For server type 'command'. Needs Node (npx) or uv (uvx) installed for most servers."),
+        Field("env", "Environment (JSON)", "json", "", placeholder='{"GITHUB_TOKEN": "${GITHUB_TOKEN}"}', advanced=True),
+        Field("only", "Only these tools", "str", "", advanced=True, placeholder="read_file, search",
+              info="Comma-separated tool names; blank = all."),
+        Field("prefix", "Tool name prefix", "str", "", advanced=True, placeholder="gh_",
+              info="Avoids name clashes when an agent uses several servers."),
+        Field("require_approval", "Ask before every call", "bool", False,
+              info="Each call waits for your Approve in the Playground. Unattended runs then can't use these tools."),
+        Field("timeout", "Timeout (seconds)", "int", 60, advanced=True),
+    ]
+    outputs = [Output("tools", "Available tools", TEXT)]
+
+    async def _connect(self, ctx):
+        from ..mcp_client import HTTPClient, MCPError, StdioClient
+
+        timeout = max(5, min(600, int(ctx.params.get("timeout") or 60)))
+        if (ctx.params.get("transport") or "http") == "command":
+            cmd = ctx.engine.substitute(str(ctx.params.get("command") or "")).strip()
+            ws = default_workspace()
+            ws.mkdir(parents=True, exist_ok=True)  # servers start in the workspace; it may not exist yet
+            client = StdioClient(cmd, env=_json_param(ctx, "env"), cwd=str(ws), timeout=timeout)
+        else:
+            url = ctx.engine.substitute(str(ctx.params.get("url") or "")).strip()
+            if not url.startswith(("http://", "https://")):
+                raise MCPError("Set the MCP server URL (http:// or https://).")
+            client = HTTPClient(url, headers=_json_param(ctx, "headers"), timeout=timeout)
+        ctx.engine.closers.append(client.close)
+        await client.start()
+        tools = await client.list_tools()
+        only = {t.strip() for t in str(ctx.params.get("only") or "").split(",") if t.strip()}
+        if only:
+            tools = [t for t in tools if t.get("name") in only]
+        return client, tools
+
+    async def out_tools(self, ctx) -> str:
+        _, tools = await self._connect(ctx)
+        if not tools:
+            return "Connected. The server offers no tools."
+        return "\n".join(f"- {t['name']}: {(t.get('description') or '').strip()[:200]}" for t in tools)
+
+    async def toolset(self, ctx) -> list[ToolDef]:
+        client, tools = await self._connect(ctx)
+        prefix = str(ctx.params.get("prefix") or "")
+        approve = bool(ctx.params.get("require_approval"))
+        out: list[ToolDef] = []
+        for t in tools:
+            real = t["name"]
+
+            async def call(args: dict[str, Any], real: str = real) -> str:
+                if approve and not await ctx.engine.ask_approval(
+                        ctx.node_id, "MCP tool", f"{real}({json.dumps(args, ensure_ascii=False)[:400]})", {"tool": real, "arguments": args}):
+                    return f"The user did not approve calling {real}."
+                return await client.call_tool(real, args)
+
+            schema = t.get("inputSchema") or {"type": "object", "properties": {}}
+            schema.setdefault("type", "object")
+            out.append(ToolDef(_tool_name(prefix, real), (t.get("description") or real).strip()[:1000], schema, call))
+        return out

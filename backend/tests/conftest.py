@@ -36,6 +36,7 @@ def fake_ollama_url():
 def client(tmp_path, fake_ollama_url, monkeypatch):
     monkeypatch.setenv("KELVO_DB", str(tmp_path / "test.db"))
     monkeypatch.setenv("KELVO_REQUIRE_API_KEY", "1")
+    monkeypatch.setenv("KELVO_SCHEDULER", "0")  # tests drive the scheduler by hand
     monkeypatch.setenv("KELVO_USERNAME", "me")
     monkeypatch.setenv("KELVO_PASSWORD", "correct horse")
     from fastapi.testclient import TestClient
