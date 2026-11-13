@@ -132,9 +132,24 @@ for ($i = 0; $i -lt 40; $i++) {
 if (-not $Up) { Fail "Kelvo did not start. Look at the log: $LogFile" }
 Say "Kelvo is running at $Url"
 
-if ($OllamaUp -and (Ask 'Download qwen3:30b now (about 19 GB, the recommended agent model for a 32 GB GPU)?')) {
-    ollama pull qwen3:30b
+# Pick a model that fits this GPU fully (model + context memory), so agents stay fast.
+$VramMB = 0
+try {
+    $q = & nvidia-smi --query-gpu=memory.total --format=csv,noheader,nounits 2>$null | Select-Object -First 1
+    if ($q) { $VramMB = [int]("$q".Trim()) }
+} catch { }
+if     ($VramMB -ge 22000) { $Model = 'qwen3:30b'; $Ctx = 16384; $Size = 'about 19 GB' }
+elseif ($VramMB -ge 14000) { $Model = 'qwen3:14b'; $Ctx = 16384; $Size = 'about 9 GB' }
+elseif ($VramMB -ge 10000) { $Model = 'qwen3:8b';  $Ctx = 32768; $Size = 'about 5 GB' }
+elseif ($VramMB -ge 6000)  { $Model = 'qwen3:4b';  $Ctx = 16384; $Size = 'about 3 GB' }
+else                       { $Model = 'qwen3:4b';  $Ctx = 8192;  $Size = 'about 3 GB' }
+if ($VramMB -gt 0) { Say ("GPU memory: {0:N1} GB -> recommended model {1} with Context window {2}." -f ($VramMB / 1024), $Model, $Ctx) }
+else { Say "No NVIDIA GPU found: $Model will run on the CPU (slower)." }
+if ($OllamaUp -and (Ask "Download $Model now ($Size) and make it Kelvo's default model?")) {
+    ollama pull $Model
     ollama pull nomic-embed-text
+    & $KelvoExe set-default-model $Model
+    Say "In each Agent, set Context window (Advanced) to $Ctx. The Coding Agent template already uses 32768."
 }
 
 Start-Process $Url

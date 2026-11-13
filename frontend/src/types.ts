@@ -68,7 +68,7 @@ export type ChatMessage = {
   sender: "user" | "machine";
   sender_name: string;
   text: string;
-  properties?: { steps?: Step[]; source?: { source?: string }; files?: Attachment[] };
+  properties?: { steps?: Step[]; source?: { source?: string }; files?: Attachment[]; thinking?: string; status?: string; warning?: string };
   error?: boolean;
   streaming?: boolean;
 };

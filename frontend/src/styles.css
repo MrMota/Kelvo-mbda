@@ -312,6 +312,13 @@ h3 { font-size: 14px; }
 .playground.page .pg-sessions { width: 250px; }
 .playground.page .pg-msgs { padding: 24px max(16px, calc(50% - 400px)); }
 .playground.page .pg-input { padding: 12px max(12px, calc(50% - 400px)) 16px; }
+.notice { display: flex; align-items: flex-start; gap: 7px; font-size: 13px; color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; margin: 2px 0 8px; }
+.notice.warn { color: var(--text); border-color: color-mix(in srgb, var(--warn) 50%, var(--border)); background: color-mix(in srgb, var(--warn) 8%, var(--surface)); }
+.notice svg { flex: none; margin-top: 2px; }
+.thinking { margin: 2px 0 8px; font-size: 13px; color: var(--text-2); }
+.thinking summary { cursor: pointer; display: inline-flex; align-items: center; gap: 6px; list-style: none; font-weight: 600; }
+.thinking summary::-webkit-details-marker { display: none; }
+.thinking-text { white-space: pre-wrap; border-left: 2px solid var(--border-strong); padding: 4px 0 4px 10px; margin-top: 6px; max-height: 220px; overflow: auto; }
 .approval { border: 1.5px solid var(--warn); border-radius: 10px; padding: 12px; display: flex; flex-direction: column; gap: 8px; background: color-mix(in srgb, var(--warn) 7%, var(--surface)); margin-left: 38px; }
 .approval-cmd { margin: 0; padding: 8px 10px; background: var(--surface-2); border-radius: 7px; white-space: pre-wrap; word-break: break-all; font: 13px var(--mono); max-height: 200px; overflow: auto; }
 .pg-input { border-top: 1px solid var(--border); padding: 12px 12px max(12px, env(safe-area-inset-bottom)); }

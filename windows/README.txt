@@ -24,9 +24,12 @@ WHAT'S IN THIS FOLDER
     "More info" > "Run anyway" (or right-click the .zip > Properties > Unblock before unzipping).
 
 2. PICK A MODEL
-  - In a terminal:  ollama pull qwen3:30b   (about 19 GB; fits fully in a 32 GB GPU)
+  - install.cmd suggests a model for your GPU and can download it. By GPU memory:
+      6-8 GB: qwen3:4b    10-12 GB: qwen3:8b (Context window 32768)
+      16 GB: qwen3:14b    24 GB+: qwen3:30b
+  - Or in a terminal:  ollama pull qwen3:8b
                     ollama pull nomic-embed-text
-  - In Kelvo: Settings > Models > Default model = qwen3:30b.
+  - In Kelvo: Settings > Models > Default model = that model.
     Agents need a model tagged "tools".
   - Check it runs on the GPU: send a message, then run  ollama ps  -> "100% GPU".
 

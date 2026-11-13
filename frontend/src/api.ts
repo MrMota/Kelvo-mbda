@@ -31,7 +31,8 @@ export async function api<T = any>(path: string, opts: { method?: string; body?:
 export type StreamEvent = { event: string; data: any };
 
 /** POST and read a text/event-stream of `data: {event, data}` lines. */
-export async function stream(path: string, body: unknown, onEvent: (e: StreamEvent) => void, signal?: AbortSignal) {
+export async function stream(path: string, body: unknown, onEvent: (e: StreamEvent) => void, signal?: AbortSignal,
+                             onActivity?: () => void) {
   const res = await fetch(path, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -52,6 +53,7 @@ export async function stream(path: string, body: unknown, onEvent: (e: StreamEve
   for (;;) {
     const { value, done } = await reader.read();
     if (done) break;
+    onActivity?.();  // includes keep-alive comments, which carry no event
     buf += dec.decode(value, { stream: true });
     let i;
     while ((i = buf.indexOf("\n\n")) >= 0) {

@@ -1,4 +1,4 @@
-import { Bot, Check, ChevronRight, FileText, History, Loader2, Maximize2, Minimize2, MoreHorizontal, Paperclip, Plus, Search, Send, ShieldAlert, Square, Trash2, User, Wrench, X } from "lucide-react";
+import { AlertTriangle, Bot, Brain, Check, ChevronRight, FileText, History, Loader2, Maximize2, Minimize2, MoreHorizontal, Paperclip, Plus, Search, Send, ShieldAlert, Square, Trash2, User, Wrench, X } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { api, newSessionId, stream, type StreamEvent } from "../api";
 import type { Attachment, ChatMessage, FlowGraph, Step } from "../types";
@@ -53,6 +53,14 @@ function MessageView({ m }: { m: ChatMessage }) {
       <div className="msg-body">
         <div className="msg-name">{m.sender_name}{m.properties?.source?.source && <span className="faint" style={{ fontWeight: 500 }}>· {m.properties.source.source}</span>}</div>
         {steps.length > 0 && <div className="steps">{steps.map((s, i) => <StepCard key={i} step={s} />)}</div>}
+        {m.properties?.warning && <div className="notice warn"><AlertTriangle size={14} /> {m.properties.warning}</div>}
+        {m.properties?.thinking && (
+          <details className="thinking" open={m.streaming && !m.text}>
+            <summary>{m.streaming && !m.text ? <Loader2 size={13} className="spin" /> : <Brain size={13} />} {m.streaming && !m.text ? "Thinking…" : "Thought process"}</summary>
+            <div className="thinking-text">{m.properties.thinking}</div>
+          </details>
+        )}
+        {m.streaming && m.properties?.status && <div className="notice"><Loader2 size={13} className="spin" /> {m.properties.status}</div>}
         {(m.properties?.files?.length ?? 0) > 0 && (
           <div className="chips">{m.properties!.files!.map((f) => <span key={f.id ?? f.name} className="chip"><FileText size={12} /> {f.name}</span>)}</div>
         )}
@@ -100,8 +108,13 @@ export function Playground({ flowId, getGraph, hasChatInput = true, onEvent, onC
   const [query, setQuery] = useState("");
   const [showHistory, setShowHistory] = useState(false);
   const [files, setFiles] = useState<(Attachment & { uploading?: boolean })[]>([]);
+  const [runId, setRunId] = useState<string | null>(null);
+  const [working, setWorking] = useState(false);  // an agent is still running in this chat (e.g. after a disconnect)
+  const poll = useRef<number | null>(null);
+  const watchRef = useRef<(sid: string) => void>(() => {});
   const fileInput = useRef<HTMLInputElement>(null);
   const abort = useRef<AbortController | null>(null);
+  const stoppedByUser = useRef(false);
   const bottom = useRef<HTMLDivElement>(null);
   const toast = useToast();
 
@@ -113,9 +126,39 @@ export function Playground({ flowId, getGraph, hasChatInput = true, onEvent, onC
 
   const openSession = useCallback(async (sid: string) => {
     setSessionId(sid);
+    setWorking(false);
     const ms = await api<ChatMessage[]>(`/api/flows/${flowId}/messages?session_id=${encodeURIComponent(sid)}`);
     setMessages(ms);
+    const st = await api<{ running: boolean }>(`/api/flows/${flowId}/status?session_id=${encodeURIComponent(sid)}`).catch(() => null);
+    if (st?.running) watchRef.current(sid);  // came back while the agent is still busy
   }, [flowId]);
+
+  /** Ask the server whether this chat's agent is still working (and waiting for approvals); refresh when done. */
+  const watch = useCallback((sid: string) => {
+    if (poll.current) window.clearTimeout(poll.current);
+    const tick = async () => {
+      try {
+        const st = await api<{ running: boolean; approvals: Approval[] }>(`/api/flows/${flowId}/status?session_id=${encodeURIComponent(sid)}`);
+        setApprovals(st.approvals);
+        if (st.running) {
+          setWorking(true);
+          poll.current = window.setTimeout(tick, 3000);
+          return;
+        }
+      } catch {
+        poll.current = window.setTimeout(tick, 5000);  // offline for a moment: try again
+        return;
+      }
+      setWorking(false);
+      poll.current = null;
+      const ms = await api<ChatMessage[]>(`/api/flows/${flowId}/messages?session_id=${encodeURIComponent(sid)}`);
+      setMessages(ms);
+      loadSessions();
+    };
+    tick();
+  }, [flowId, loadSessions]);
+  watchRef.current = watch;
+  useEffect(() => () => { if (poll.current) window.clearTimeout(poll.current); }, []);
 
   useEffect(() => {
     setMessages([]);
@@ -161,10 +204,24 @@ export function Playground({ flowId, getGraph, hasChatInput = true, onEvent, onC
         return next ? [...ms.slice(0, i), next, ...ms.slice(i + 1)] : [...ms.slice(0, i), ...ms.slice(i + 1)];
       });
     abort.current = new AbortController();
+    const ctrl = abort.current;
+    let finished = false;
+    let lastActivity = Date.now();
+    // keep-alives arrive every 15 s; 45 s of silence means the connection died without telling us
+    const watchdog = window.setInterval(() => { if (Date.now() - lastActivity > 45000) ctrl.abort(); }, 5000);
+    stoppedByUser.current = false;
     try {
       await stream(`/api/flows/${flowId}/build`, { input_value: input, session_id: sessionId, data: getGraph?.(), files: ready.map((f) => f.id) }, (e) => {
         onEvent?.(e);
-        if (e.event === "token") patchDraft((d) => ({ ...d, text: d.text + e.data.chunk }));
+        if (e.event === "start") setRunId(e.data.run_id);
+        else if (e.event === "end") finished = true;
+        else if (e.event === "token") patchDraft((d) => ({ ...d, text: d.text + e.data.chunk, properties: { ...d.properties, status: undefined } }));
+        else if (e.event === "thinking") patchDraft((d) => ({ ...d, properties: { ...d.properties, thinking: (d.properties?.thinking ?? "") + e.data.chunk } }));
+        else if (e.event === "status") patchDraft((d) => ({ ...d, properties: { ...d.properties, status: e.data.text } }));
+        else if (e.event === "context_warning") patchDraft((d) => ({ ...d, properties: { ...d.properties, warning:
+          `This chat is using about ${Math.round((100 * e.data.used) / e.data.limit)}% of the model's context window (${e.data.limit} tokens)` +
+          (e.data.trimmed ? `, so ${e.data.trimmed} older tool result(s) were shortened.` : ".") +
+          " For long tasks, start a new chat or raise Context window on the Agent." } }));
         else if (e.event === "token_reset") patchDraft((d) => ({ ...d, text: "" }));
         else if (e.event === "step") {
           const s: Step = e.data.step;
@@ -191,16 +248,34 @@ export function Playground({ flowId, getGraph, hasChatInput = true, onEvent, onC
         } else if (e.event === "approval_done") {
           setApprovals((as) => as.filter((x) => x.id !== e.data.id));
         } else if (e.event === "error") {
+          finished = true;
           patchDraft((d) => ({ ...d, streaming: false, error: true, text: e.data.error }));
         }
-      }, abort.current.signal);
+      }, ctrl.signal, () => { lastActivity = Date.now(); });
     } catch (err: any) {
-      if (err.name !== "AbortError") patchDraft((d) => ({ ...d, streaming: false, error: true, text: err.message }));
+      if (err.name !== "AbortError" && !(err instanceof TypeError)) {  // TypeError = network dropped
+        finished = true;
+        patchDraft((d) => ({ ...d, streaming: false, error: true, text: err.message }));
+      }
     } finally {
-      patchDraft((d) => (d.text || d.properties?.steps?.length ? { ...d, streaming: false } : null));
+      window.clearInterval(watchdog);
       setBusy(false);
+      setRunId(null);
+      if (!finished && !stoppedByUser.current) {
+        // The connection dropped (phone locked, network change), but the agent keeps working on the server.
+        patchDraft(() => null);
+        watch(sessionId);
+      } else {
+        patchDraft((d) => (d.text || d.properties?.steps?.length ? { ...d, streaming: false } : null));
+      }
       loadSessions();
     }
+  };
+
+  const stop = async () => {
+    stoppedByUser.current = true;
+    if (runId) await api(`/api/runs/${runId}/cancel`, { method: "POST" }).catch(() => {});
+    abort.current?.abort();
   };
 
   return (
@@ -260,6 +335,9 @@ export function Playground({ flowId, getGraph, hasChatInput = true, onEvent, onC
             </div>
           )}
           {messages.map((m, i) => <MessageView key={m.id ?? i} m={m} />)}
+          {working && (
+            <div className="notice" role="status"><Loader2 size={14} className="spin" /> The agent is still working on this chat. The reply appears here when it's done; you can leave and come back.</div>
+          )}
           {approvals.map((a) => (
             <ApprovalCard key={a.id} a={a} onAnswer={async (approve) => {
               setApprovals((as) => as.map((x) => (x.id === a.id ? { ...x, answering: true } : x)));
@@ -291,8 +369,8 @@ export function Playground({ flowId, getGraph, hasChatInput = true, onEvent, onC
             <textarea rows={1} value={text} placeholder={hasChatInput ? "Send a message…" : "This flow has no Chat Input"} aria-label="Message"
               onChange={(e) => setText(e.target.value)} disabled={!hasChatInput}
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }} />
-            {busy ? (
-              <button className="btn sm" onClick={() => abort.current?.abort()} aria-label="Stop"><Square size={13} /> Stop</button>
+            {busy || working ? (
+              <button className="btn sm" onClick={stop} aria-label="Stop" disabled={working && !busy}><Square size={13} /> Stop</button>
             ) : (
               <button className="btn primary sm" onClick={send} disabled={hasChatInput ? (!text.trim() && !files.length) || files.some((f) => f.uploading) : false} aria-label={hasChatInput ? "Send" : "Run"}>
                 <Send size={14} />{hasChatInput ? "" : " Run"}

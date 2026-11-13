@@ -6,19 +6,17 @@ Kelvo is a personal tool: one account (yours), no domain, no public internet. So
 
 ## Your setup at a glance
 
-**Machine:** Linux + NVIDIA GPU with **32 GB VRAM**. **Access:** this machine and **your phone**, privately over Tailscale, with HTTPS and no domain.
+**Machine:** Windows PC with an NVIDIA GPU with **12 GB VRAM**. **Access:** this PC and **your phone** (home Wi-Fi or Tailscale).
 
 | | choice | why |
 | --- | --- | --- |
-| everyday agent model | **`qwen3:30b`** (~19 GB) | mixture-of-experts: only a few billion parameters work per token, so tool-calling loops are fast, and it fits fully in 32 GB with room for a long context |
-| harder tasks | **`qwen3:32b`** (~20 GB) | dense and slower, but stronger; pick it on specific Agents |
-| embeddings (Document Q&A) | **`nomic-embed-text`** (<1 GB) | small; shares the GPU |
-| context window | Agent → Advanced → **Context window `16384`** | fits in the headroom; raise to 32768 if `check-gpu.sh` still says "100% GPU" |
-| phone | **Tailscale + `tailscale serve`** | private to your devices, real HTTPS at `https://<machine>.<tailnet>.ts.net`, installable on your home screen |
+| agent model | **`qwen3:8b`** (~5 GB) | tool-capable, fits fully in 12 GB together with a long context |
+| context window | Agent → Advanced → **32768** (Coding Agent: already set) | agents keep the files and pages they read, and their instructions |
+| sharper short chats | `qwen3:14b` (~9 GB) with context **8192** | smarter, but less room: forgets sooner in long tasks |
+| embeddings (Document Q&A) | `nomic-embed-text` (<1 GB) | small; shares the GPU |
+| more room | `OLLAMA_FLASH_ATTENTION=1` and `OLLAMA_KV_CACHE_TYPE=q8_0` (Windows environment variables, restart Ollama) | roughly halves context memory; may let `qwen3:14b` run with 16384 |
 
-Only one of the two big models fits in VRAM at a time; Ollama swaps them automatically (a few seconds' load). These are the strongest tool-calling models I know of for 32 GB; newer ones may be on ollama.com, and any model the picker tags **tools** works with agents.
-
-Steps, in order: **section 2** (driver, toolkit, Kelvo, models, `bash deploy/check-gpu.sh qwen3:30b`), then **section 3 → "Your phone"**. Total: about 30 minutes plus model downloads.
+Check after any change: send a message, then `ollama ps` should say **100% GPU**. A CPU/GPU split means it doesn't fit: lower the context or use a smaller model. `qwen3:30b` (~19 GB) doesn't fit in 12 GB; it runs split across GPU and CPU (needs 32 GB+ system RAM) and is noticeably slower.
 
 ## 1. Preflight (run 2026-11-08)
 
@@ -53,7 +51,7 @@ Steps, in order: **section 2** (driver, toolkit, Kelvo, models, `bash deploy/che
 Everything is in **`windows/`** (and the `kelvo-windows-*.zip` download, which adds the ready-built Kelvo package). See `windows/README.txt`. In short:
 
 1. **`install.cmd`**: checks Python 3.10+ and Ollama (offers `winget` installs), installs Kelvo into `%LOCALAPPDATA%\Kelvo`, creates your account, starts Kelvo in the background at every Windows sign-in (Startup folder, no console window, log in `%LOCALAPPDATA%\Kelvo\kelvo.log`), and opens `http://127.0.0.1:7860`.
-2. `ollama pull qwen3:30b` and pick it as the default model. Ollama for Windows uses the NVIDIA GPU directly; `ollama ps` should say "100% GPU".
+2. Let `install.cmd` pick the model for your GPU (`qwen3:8b` on 12 GB) or `ollama pull qwen3:8b`, and pick it as the default model. Ollama for Windows uses the NVIDIA GPU directly; `ollama ps` should say "100% GPU".
 3. Install as an app: Edge **⋯ → Apps → Install Kelvo**, or Chrome's install icon in the address bar.
 4. **`enable-phone.cmd`** (after installing Tailscale and turning on MagicDNS + HTTPS Certificates): runs `tailscale serve`, saves `KELVO_SECURE_COOKIE` / `KELVO_ALLOWED_ORIGINS` for your user, restarts Kelvo, and **prints your server address**.
 5. **`enable-home-wifi.cmd`** (no Tailscale, home only): Kelvo listens on your home network (`KELVO_HOST=0.0.0.0`), a firewall rule allows port 7860 on *Private* networks only, and it prints `http://<pc-ip>:7860` for the phone. Plain http, so use the Android app (browser install needs HTTPS). Run again to turn off. Works alongside Tailscale: the sign-in cookie is HTTPS-only exactly when the browser is on HTTPS.

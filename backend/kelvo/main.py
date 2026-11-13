@@ -19,7 +19,7 @@ from fastapi.staticfiles import StaticFiles
 
 from . import __version__, auth, db, memory, ollama, schedules, uploads
 from .components import REGISTRY, specs
-from .engine import Engine, FlowError, resolve_approval, validate_graph
+from .engine import PENDING_INFO, Engine, FlowError, resolve_approval, validate_graph
 from .templates import STARTER_SKILLS, TEMPLATES
 
 STATIC = Path(os.environ.get("KELVO_STATIC", Path(__file__).parent / "static"))
@@ -39,6 +39,7 @@ def seed() -> None:
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     seed()
+    _mark_interrupted_runs()
     auth.bootstrap()
     ticker = asyncio.create_task(schedules.loop())
     yield
@@ -307,8 +308,15 @@ def validate(flow_id: str, body: dict[str, Any] = Body(None)) -> dict[str, Any]:
 
 # ---------------------------------------------------------------- running
 
+KEEPALIVE_SECONDS = 15.0
+ACTIVE_RUNS: dict[str, dict[str, Any]] = {}  # run_id → {task, flow_id, session_id}
+
+
 async def _run_stream(flow: dict[str, Any], input_value: str, session_id: str | None, tweaks: dict[str, Any] | None,
                       interactive: bool = False, files: list[str] | None = None) -> AsyncIterator[str]:
+    """Stream a run as server-sent events. The run itself is independent of this connection:
+    if the browser/app disconnects (phone locked, network blip) the agent keeps working and its
+    reply is saved to the chat. Only POST /api/runs/{id}/cancel stops it."""
     q: asyncio.Queue[tuple[str, dict[str, Any]] | None] = asyncio.Queue()
 
     async def emit(event: str, data: dict[str, Any]) -> None:
@@ -326,20 +334,36 @@ async def _run_stream(flow: dict[str, Any], input_value: str, session_id: str | 
         except FlowError as e:
             _run_end(run_id, engine, str(e))
             await q.put(("error", {"error": str(e), "node_id": e.node_id}))
+        except asyncio.CancelledError:
+            _run_end(run_id, engine, "Stopped by you.")
+            await q.put(("error", {"error": "Stopped."}))
+            raise
         except Exception as e:  # pragma: no cover - unexpected
             _run_end(run_id, engine, str(e))
             await q.put(("error", {"error": f"Unexpected error: {e}"}))
         finally:
+            ACTIVE_RUNS.pop(run_id, None)
             await q.put(None)
 
     task = asyncio.create_task(work())
+    ACTIVE_RUNS[run_id] = {"task": task, "flow_id": engine.flow_id, "session_id": engine.session_id}
     yield sse("start", {"run_id": run_id, "session_id": engine.session_id})
-    try:
-        while (item := await q.get()) is not None:
-            yield sse(*item)
-    finally:
-        if not task.done():
-            task.cancel()
+    while True:
+        try:
+            item = await asyncio.wait_for(q.get(), timeout=KEEPALIVE_SECONDS)
+        except asyncio.TimeoutError:
+            yield ": keep-alive\n\n"  # SSE comment: keeps phones, proxies and Tailscale from closing a quiet stream
+            continue
+        if item is None:
+            break
+        yield sse(*item)
+
+
+def _mark_interrupted_runs() -> None:
+    """Runs still 'running' at startup were cut off when Kelvo stopped; say so instead of 'running' forever."""
+    with db.conn() as c:
+        c.execute("UPDATE runs SET status='error', error='Interrupted: Kelvo stopped during this run.', finished_at=? WHERE status='running'",
+                  (db.now(),))
 
 
 def _run_start(engine: Engine) -> str:
@@ -488,6 +512,25 @@ def upload(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
         return uploads.save_upload(str(body.get("name", "file")), str(body.get("data", "")))
     except ValueError as e:
         raise HTTPException(422, str(e))
+
+
+@app.post("/api/runs/{run_id}/cancel")
+def cancel_run(run_id: str) -> dict[str, Any]:
+    """The Stop button: stops a run on purpose (disconnecting doesn't)."""
+    run = ACTIVE_RUNS.get(run_id)
+    if not run:
+        return {"ok": False, "detail": "That run already finished."}
+    run["task"].cancel()
+    return {"ok": True}
+
+
+@app.get("/api/flows/{flow_id}/status")
+def chat_status(flow_id: str, session_id: str) -> dict[str, Any]:
+    """Is an agent still working in this chat, and is it waiting for your approval? (for reopened chats)"""
+    runs = [rid for rid, r in ACTIVE_RUNS.items() if r["session_id"] == session_id and r["flow_id"] in (flow_id, get_flow(flow_id)["id"])]
+    approvals = [{k: v for k, v in a.items() if k not in ("flow_id", "session_id")}
+                 for a in PENDING_INFO.values() if a["session_id"] == session_id]
+    return {"running": bool(runs), "run_id": runs[0] if runs else None, "approvals": approvals}
 
 
 @app.post("/api/approvals/{aid}")

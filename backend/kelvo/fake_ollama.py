@@ -11,6 +11,7 @@ Behaviour of /api/chat:
 """
 from __future__ import annotations
 
+import asyncio
 import json
 import re
 
@@ -66,8 +67,17 @@ async def chat(req: Request):
     last = msgs[-1]
     names = [t["function"]["name"] for t in tools]
 
+    first_user = next((x.get("content", "") for x in reversed(msgs) if x["role"] == "user" and not x["content"].startswith("You described")), "")
+    slow = re.search(r"slow:(\d+)", first_user)
+    delay = float(slow.group(1)) if slow else 0.0
+
     def stream_text(text: str):
-        def gen():
+        async def gen():
+            if body.get("think"):  # reasoning models stream their thinking first
+                for w in ["Let ", "me ", "work ", "this ", "out."]:
+                    yield json.dumps({"message": {"role": "assistant", "content": "", "thinking": w}, "done": False}) + "\n"
+            if delay:
+                await asyncio.sleep(delay)
             for w in re.split(r"(\s+)", text):
                 if w:
                     yield json.dumps({"message": {"role": "assistant", "content": w}, "done": False}) + "\n"
@@ -88,6 +98,20 @@ async def chat(req: Request):
     if last["role"] == "tool":
         return stream_text(f"Result: {last['content']}")
     text = last.get("content", "")
+    # quirks of real local models, for tests:
+    m = re.search(r"announce:([a-z0-9_]+):(.+)", first_user)
+    if m and tools:  # says what it will do but forgets the call, until reminded
+        if text.startswith("You described"):
+            t = next((t for t in tools if t["function"]["name"] == m.group(1)), None)
+            if t:
+                props = list(t["function"]["parameters"].get("properties", {}))
+                return call(m.group(1), {(props[0] if props else "input"): m.group(2).strip()})
+        return stream_text(f"I'll use {m.group(1)} to do that now.")
+    m = re.search(r"rawcall:([a-z0-9_]+):(.+)", text)
+    if m and tools:  # prints the tool call as text instead of making it
+        t = next((t for t in tools if t["function"]["name"] == m.group(1)), None)
+        props = list(t["function"]["parameters"].get("properties", {})) if t else ["input"]
+        return stream_text("<tool_call>" + json.dumps({"name": m.group(1), "arguments": {props[0]: m.group(2).strip()}}) + "</tool_call>")
     if tools:
         m = re.search(r"skill:([a-z0-9-]+)", text)
         if m and "load_skill" in names:

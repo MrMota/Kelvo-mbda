@@ -70,10 +70,12 @@ Click the wrench on a component to put it in **tool mode**: its *Toolset* output
 
 ## Templates
 
-Basic Prompting · Simple Agent · **Power Agent** · Skilled Agent · Multi-Agent Team · Document Q&A (local RAG) · Structured Extraction
+Basic Prompting · Simple Agent · **Power Agent** · **Coding Agent** · Skilled Agent · Multi-Agent Team · Document Q&A (local RAG) · Structured Extraction
 
 ## Chat, files, memory, schedules
 
+- **Agents finish what they start**: if a model only *announces* an action ("I'll search for…") without calling the tool, Kelvo reminds it (up to twice); tool calls a model prints as text are recognized and run. Thinking shows in a collapsible *Thinking…* block. When a chat nears the context window, the oldest tool outputs are shortened first and you get a warning.
+- **Runs survive disconnects**: locking your phone or a network blip no longer stops the agent; reopen the chat and it shows *still working*, then the reply (and any approval waiting for you). **Stop** stops it on purpose. Keep-alive signals every 15 s stop networks from closing quiet connections.
 - **Chat** (top menu, and the start page of the installed app): ChatGPT-style chat with any agent. Pick the agent at the top, keep a searchable history of chats, start new ones. Replies render Markdown (headings, lists, tables, code); HTML in replies is sanitized.
 - **Attach files** with the paperclip: PDF, Word (.docx), text and code. The agent gets their text with the file names to cite; the originals are copied to `KelvoWorkspace/uploads` so the Files tool can read long documents in full. Scanned PDFs without a text layer and images can't be read yet.
 - **Long-term memory** (Agent setting, on in Power Agent): agents `remember` lasting facts about you and `forget` outdated ones; you can see and edit everything in **Settings → Memory**.
@@ -90,7 +92,7 @@ Start from the **Power Agent** template. It wires an Agent to:
 - **Command Line**: runs commands in the workspace with a timeout. **Every command waits for your Approve in the Playground**; runs nobody is watching (API, MCP) never execute commands.
 
 What makes it smarter:
-1. **A bigger tool-capable model**: `qwen3:30b` on a 32 GB GPU.
+1. **The right tool-capable model for your GPU** (the Windows installer suggests one): `qwen3:4b` on 6–8 GB, **`qwen3:8b` on 12 GB** (with a 32768 context), `qwen3:14b` on 16 GB, `qwen3:30b` on 24 GB+. Check `ollama ps` says 100% GPU.
 2. **Think before answering** (Agent setting, on in Power Agent): reasoning models such as qwen3 work through the problem first.
 3. **Context window 16384+** (Agent → Advanced) so long pages and files fit.
 4. **Max tool rounds** (Agent → Advanced, default 20): how many rounds of tool calls before the agent must answer.

@@ -30,6 +30,7 @@ Emit = Callable[[str, dict[str, Any]], Awaitable[None]]
 VAR_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 APPROVAL_TIMEOUT = 300.0
 PENDING_APPROVALS: dict[str, "asyncio.Future[bool]"] = {}
+PENDING_INFO: dict[str, dict[str, Any]] = {}  # what each waiting approval is about, for reconnecting chats
 
 
 def resolve_approval(aid: str, approved: bool) -> bool:
@@ -254,13 +255,16 @@ class Engine:
         aid = db.new_id()
         fut: asyncio.Future[bool] = asyncio.get_running_loop().create_future()
         PENDING_APPROVALS[aid] = fut
-        await self.emit("approval", {"id": aid, "node_id": node_id, "tool": tool, "summary": summary, "details": details})
+        info = {"id": aid, "node_id": node_id, "tool": tool, "summary": summary, "details": details}
+        PENDING_INFO[aid] = {**info, "flow_id": self.flow_id, "session_id": self.session_id}
+        await self.emit("approval", info)
         try:
             ok = await asyncio.wait_for(fut, timeout=APPROVAL_TIMEOUT)
         except asyncio.TimeoutError:
             ok = False
         finally:
             PENDING_APPROVALS.pop(aid, None)
+            PENDING_INFO.pop(aid, None)
         await self.emit("approval_done", {"id": aid, "approved": ok})
         return ok
 

@@ -318,6 +318,50 @@ await step("Phone: Chat page with history drawer", async () => {
   await ctx.close();
 });
 
+await step("0.4.1: an agent that only announces is nudged into calling the tool", async () => {
+  const f = await page.request.post(`${BASE}/api/flows`, { data: { template: "simple-agent", name: "Nudge Test" } }).then((r) => r.json());
+  await page.goto(`${BASE}/chat/${f.id}`);
+  await page.getByLabel("Message", { exact: true }).fill("announce:calculator:6*7");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.locator(".md-reply", { hasText: '"result": 42' }).waitFor({ timeout: 15000 });
+  await page.getByText("Used").first().waitFor();
+});
+
+await step("0.4.1: thinking shows as a collapsible block", async () => {
+  const f = await page.request.post(`${BASE}/api/flows`, { data: { template: "power-agent", name: "Thinker" } }).then((r) => r.json());
+  await page.goto(`${BASE}/chat/${f.id}`);
+  await page.getByLabel("Message", { exact: true }).fill("hello there");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.locator(".thinking summary", { hasText: "Thought process" }).waitFor({ timeout: 15000 });
+  await page.locator(".thinking summary").click();
+  await page.locator(".thinking-text", { hasText: "Let me work this out." }).waitFor();
+  await shot(page, "20-thinking");
+});
+
+await step("0.4.1: reloading mid-reply shows 'still working', then the reply arrives", async () => {
+  const f = await page.request.post(`${BASE}/api/flows`, { data: { template: "basic-prompting", name: "Slow Bot" } }).then((r) => r.json());
+  await page.goto(`${BASE}/chat/${f.id}`);
+  await page.getByLabel("Message", { exact: true }).fill("slow:5 reconnect test");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.waitForTimeout(1200);
+  await page.reload();  // like locking the phone mid-run
+  await page.getByText("The agent is still working on this chat.").waitFor({ timeout: 10000 });
+  await shot(page, "21-still-working");
+  await page.locator(".md-reply", { hasText: "reconnect test" }).waitFor({ timeout: 20000 });
+  if (await page.getByText("The agent is still working on this chat.").count()) throw new Error("banner stayed");
+});
+
+await step("0.4.1: Stop really stops the run and Logs says so", async () => {
+  const f = await page.request.post(`${BASE}/api/flows`, { data: { template: "basic-prompting", name: "Stop Bot" } }).then((r) => r.json());
+  await page.goto(`${BASE}/chat/${f.id}`);
+  await page.getByLabel("Message", { exact: true }).fill("slow:8 stop me");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.getByRole("button", { name: "Stop" }).click({ timeout: 5000 });
+  await page.locator(".msg-text.err", { hasText: "Stopped" }).waitFor({ timeout: 10000 });
+  const runs = await page.request.get(`${BASE}/api/flows/${f.id}/runs`).then((r) => r.json());
+  if (runs[0].status !== "error" || runs[0].error !== "Stopped by you.") throw new Error(`run not stopped: ${JSON.stringify(runs[0])}`);
+});
+
 await step("Sign out returns to the sign-in screen", async () => {
   await page.goto(BASE);
   await page.getByRole("button", { name: /Sign out/ }).click();

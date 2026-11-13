@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any
 
 from .. import db, ollama
@@ -69,6 +70,82 @@ def skill_tool(skills: list[SkillDef]) -> ToolDef:
         },
         fn=load,
     )
+
+
+# ---------------------------------------------------------------- keeping the agent loop on track
+
+MAX_NUDGES = 2
+OLLAMA_DEFAULT_CTX = 4096  # Ollama's usual context when none is set; set Context window on the Agent for more
+NUDGE = ("You described what you would do, but you did not call a tool, so nothing happened. "
+         "If a tool is needed, call it now. If the task is complete, reply with your final answer.")
+_ANNOUNCE = re.compile(
+    r"\b(i'?ll|i will|i'?m going to|i am going to|let me|let'?s|i'?m about to|i'?m now|now i'?ll|next,? i|first,? i|"
+    r"i need to|i should|i can now|going to)\b", re.I)
+_CLOSING = re.compile(r"\b(let me know|feel free|hope (this|that) helps|anything else)\b", re.I)
+
+
+def looks_unfinished(text: str) -> bool:
+    """A reply that announces an action instead of giving an answer (or is empty)."""
+    t = text.strip()
+    if not t:
+        return True
+    tail = t[-400:]
+    if t.endswith("?") or _CLOSING.search(tail):
+        return False
+    return bool(_ANNOUNCE.search(tail)) or t.endswith((":", "...", "…"))
+
+
+_TAGGED = re.compile(r"<tool_call>\s*(\{.*?\})\s*</tool_call>", re.S)
+_FENCED = re.compile(r"```(?:json)?\s*(\{.*?\})\s*```", re.S)
+
+
+def parse_text_tool_calls(content: str, tools: dict[str, Any]) -> tuple[list[dict[str, Any]], str]:
+    """Some local models print the tool call instead of making it. Recover those for tools that exist."""
+    calls, spans = [], []
+    candidates = [(m.group(1), m.span()) for m in _TAGGED.finditer(content)] or \
+                 [(m.group(1), m.span()) for m in _FENCED.finditer(content)]
+    if not candidates and content.strip().startswith("{"):
+        candidates = [(content.strip(), (0, len(content)))]
+    for raw, span in candidates:
+        try:
+            obj = json.loads(raw)
+        except ValueError:
+            continue
+        if not isinstance(obj, dict) or obj.get("name") not in tools:
+            continue
+        args = obj.get("arguments", obj.get("parameters", {}))
+        calls.append({"function": {"name": obj["name"], "arguments": args if isinstance(args, dict) else _args(args)}})
+        spans.append(span)
+    if not calls:
+        return [], content
+    for a, b in reversed(spans):
+        content = content[:a] + content[b:]
+    return calls, content.strip()
+
+
+def estimate_tokens(messages: list[dict[str, Any]]) -> int:
+    chars = sum(len(str(m.get("content") or "")) + 12 for m in messages)
+    chars += sum(len(json.dumps(m.get("tool_calls"))) for m in messages if m.get("tool_calls"))
+    return int(chars / 3.5)
+
+
+def fit_context(messages: list[dict[str, Any]], limit: int) -> tuple[int, int]:
+    """Keep the conversation inside the context window by shortening the OLDEST tool outputs first
+    (the last two stay whole). Otherwise Ollama silently drops the start, often the instructions."""
+    budget = int(limit * 0.8)
+    used = estimate_tokens(messages)
+    trimmed = 0
+    tool_idx = [i for i, m in enumerate(messages) if m.get("role") == "tool"][:-2]
+    for i in tool_idx:
+        if used <= budget:
+            break
+        text = str(messages[i].get("content") or "")
+        if len(text) <= 300:
+            continue
+        messages[i]["content"] = text[:200] + f"\n[… {len(text) - 200} characters of this earlier tool output were removed to fit the context window]"
+        trimmed += 1
+        used = estimate_tokens(messages)
+    return used, trimmed
 
 
 def memory_tools() -> list[ToolDef]:
@@ -172,23 +249,49 @@ class Agent(Component):
 
         steps: list[dict[str, Any]] = []
         max_rounds = max(1, int(await ctx.get("max_iterations", 20)))
+        ctx_limit = int(cfg.options.get("num_ctx") or OLLAMA_DEFAULT_CTX)
         final = ""
         think = True if await ctx.get("think", False) else None
-        for round_no in range(max_rounds + 1):
-            content, calls = "", []
-            offer_tools = [t.schema() for t in tools] if tools and round_no < max_rounds else None
-            async for ch in ollama.chat_stream(cfg.base_url, cfg.model, messages, tools=offer_tools,
+        rounds = nudges = 0
+        warned = False
+        all_thinking = ""
+        while True:
+            offer = bool(tools) and rounds < max_rounds
+            used, trimmed = fit_context(messages, ctx_limit)
+            if (trimmed or used > 0.85 * ctx_limit) and not warned and is_top_level:
+                warned = True
+                await ctx.emit("context_warning", {"used": used, "limit": ctx_limit, "trimmed": trimmed})
+            content, thinking, calls = "", "", []
+            async for ch in ollama.chat_stream(cfg.base_url, cfg.model, messages, tools=[t.schema() for t in tools] if offer else None,
                                                options=cfg.options, keep_alive=cfg.keep_alive, think=think):
                 m = ch.get("message") or {}
+                th = m.get("thinking") or ""
+                if th:
+                    thinking += th
+                    all_thinking += th
+                    if ctx.streaming:
+                        await ctx.emit("thinking", {"chunk": th})
                 tok = m.get("content") or ""
                 if tok:
                     content += tok
                     if ctx.streaming:
                         await ctx.emit("token", {"chunk": tok})
                 calls += m.get("tool_calls") or []
+            if not calls and offer:
+                calls, content = parse_text_tool_calls(content, by_name)  # tool calls the model wrote out as text
             if not calls:
+                if offer and nudges < MAX_NUDGES and looks_unfinished(content):
+                    # It said what it would do (or said nothing) but called no tool: remind it, don't stop.
+                    nudges += 1
+                    messages.append({"role": "assistant", "content": content})
+                    messages.append({"role": "user", "content": NUDGE})
+                    await ctx.emit("status", {"text": "Reminding the model to actually use its tools…"})
+                    if ctx.streaming:
+                        await ctx.emit("token_reset", {})
+                    continue
                 final = content
                 break
+            rounds += 1
             messages.append({"role": "assistant", "content": content, "tool_calls": calls})
             for call in calls:
                 fn = call.get("function") or {}
@@ -209,12 +312,13 @@ class Agent(Component):
                 messages.append({"role": "tool", "content": result, "tool_name": name})
             if ctx.streaming:
                 await ctx.emit("token_reset", {})
-        else:
-            final = final or "I stopped after reaching the maximum number of tool rounds."
+        if not final.strip() and rounds >= max_rounds:
+            final = f"I stopped after {max_rounds} rounds of tool calls (Max tool rounds, Agent → Advanced) before finishing."
 
         return Message(
             text=final,
-            properties={"steps": steps, "source": {"id": ctx.node_id, "display_name": "Agent", "source": cfg.model}},
+            properties={"steps": steps, "source": {"id": ctx.node_id, "display_name": "Agent", "source": cfg.model},
+                        **({"thinking": all_thinking[-4000:]} if all_thinking.strip() else {})},
         )
 
 

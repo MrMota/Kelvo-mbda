@@ -16,11 +16,23 @@ def main() -> None:
     run.add_argument("--log-file", help="write logs here instead of the console (for running in the background)")
     pw = sub.add_parser("set-password", help="create your account, or reset its username/password")
     pw.add_argument("--db", help="path to the SQLite database")
+    dm = sub.add_parser("set-default-model", help="the Ollama model used when an Agent's model is blank")
+    dm.add_argument("model")
+    dm.add_argument("--db", help="path to the SQLite database")
     bk = sub.add_parser("backup", help="copy the database safely while Kelvo runs")
     bk.add_argument("dest", nargs="?", help="file or folder (default: <db folder>/backups)")
     bk.add_argument("--keep", type=int, default=int(os.environ.get("KELVO_BACKUP_KEEP", "14")), help="backups to keep in the default folder")
     bk.add_argument("--db", help="path to the SQLite database")
     args = p.parse_args()
+    if args.cmd == "set-default-model":
+        if args.db:
+            os.environ["KELVO_DB"] = args.db
+        from . import db
+
+        db.init_db()
+        db.set_setting("default_model", args.model.strip())
+        print(f"Default model: {args.model.strip()}")
+        return
     if args.cmd == "backup":
         if args.db:
             os.environ["KELVO_DB"] = args.db

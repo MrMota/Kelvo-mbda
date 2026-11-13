@@ -89,7 +89,7 @@ TEMPLATES: list[dict[str, Any]] = [
                     "max_iterations": 20,
                 }),
                 _n("chat_out", "ChatOutput", 880, 380),
-                _note("note", 460, -120, "Pick a model marked 'tools' (qwen3:30b on a big GPU). Files and commands stay in your KelvoWorkspace folder; every command waits for your Approve in the Playground."),
+                _note("note", 460, -120, "Pick a model marked 'tools' (qwen3:8b on a 12 GB GPU, qwen3:30b on 24 GB+). Files and commands stay in your KelvoWorkspace folder; every command waits for your Approve in the Playground."),
             ],
             "edges": [
                 _e("chat_in", "message", "agent", "input"),
@@ -98,6 +98,46 @@ TEMPLATES: list[dict[str, Any]] = [
                 _e("files", "tool", "agent", "tools"),
                 _e("shell", "tool", "agent", "tools"),
                 _e("calc", "tool", "agent", "tools"),
+                _e("agent", "response", "chat_out", "input"),
+            ],
+        },
+    },
+    {
+        "id": "coding-agent",
+        "name": "Coding Agent",
+        "description": "Reads, edits and runs code in your workspace, checking its work by running it. Commands need your approval.",
+        "icon": "terminal",
+        "data": {
+            "nodes": [
+                _n("chat_in", "ChatInput", 0, 760),
+                _n("files", "Files", 0, -520, tool_mode=True),
+                _n("shell", "Shell", 0, -170, {"timeout": 300}, tool_mode=True),
+                _n("search", "WebSearch", 0, 220, tool_mode=True),
+                _n("url", "URLFetch", 0, 520, tool_mode=True),
+                _n("agent", "Agent", 460, 60, {
+                    "system_prompt": (
+                        "You are a careful software engineer working in the user's workspace folder.\n"
+                        "1. Understand first: list_files, then read_file the files that matter. Never edit a file you haven't read.\n"
+                        "2. Make small, exact edits with edit_file (copy old_text exactly). Use write_file only for new files.\n"
+                        "3. Check your work: run the code or its tests with the command line, read the output, fix and re-run until it works.\n"
+                        "4. Search the web only for library docs or error messages you don't know.\n"
+                        "5. Keep tool output short (e.g. run one test file, not everything) so you don't fill your memory.\n"
+                        "6. Finish with: what you changed (files), how you verified it, and anything left to do.\n"
+                        "Always act with tools; never just describe what you would do."
+                    ),
+                    "think": True,
+                    "num_ctx": 32768,
+                    "max_iterations": 40,
+                }),
+                _n("chat_out", "ChatOutput", 880, 320),
+                _note("note", 460, -160, "Built for qwen3:8b on a 12 GB GPU (32k context). Bigger tasks: split them into steps. Every command waits for your Approve."),
+            ],
+            "edges": [
+                _e("chat_in", "message", "agent", "input"),
+                _e("files", "tool", "agent", "tools"),
+                _e("shell", "tool", "agent", "tools"),
+                _e("search", "tool", "agent", "tools"),
+                _e("url", "tool", "agent", "tools"),
                 _e("agent", "response", "chat_out", "input"),
             ],
         },
