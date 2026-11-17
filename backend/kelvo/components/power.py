@@ -32,6 +32,26 @@ def workspace_of(ctx) -> Path:
     return root.resolve()
 
 
+ACCESS_OPTIONS = ["workspace only", "whole computer"]
+
+
+def anywhere(ctx) -> bool:
+    return str(ctx.params.get("access") or "").strip() == "whole computer"
+
+
+def resolve_path(root: Path, rel: str, whole: bool) -> Path:
+    """whole=False: must stay inside root. whole=True: absolute paths, ~ and .. go anywhere; relative = from root."""
+    if not whole:
+        return inside(root, rel)
+    rel = (rel or ".").strip().strip('"')
+    p = Path(rel).expanduser()
+    return (p if p.is_absolute() else root / p).resolve()
+
+
+def in_root(root: Path, p: Path) -> bool:
+    return p == root or root in p.parents
+
+
 def inside(root: Path, rel: str) -> Path:
     """Resolve rel inside root; refuse anything that ends up outside (.., absolute paths, symlinks)."""
     rel = (rel or ".").strip()
@@ -130,6 +150,7 @@ class WebSearch(Component):
 
 # ---------------------------------------------------------------- files
 
+SKIP_DIRS = {"node_modules", "__pycache__", "venv", ".venv", "$RECYCLE.BIN", "System Volume Information", "AppData"}
 MAX_READ = 20000
 MAX_WRITE = 1_000_000
 
@@ -138,35 +159,57 @@ class Files(Component):
     key = "Files"
     display = "Files"
     category = "Tools"
-    description = ("Read, write and edit files in one workspace folder. As a tool it gives the agent "
-                   "list_files, read_file, write_file and edit_file. Nothing outside the folder can be touched.")
+    description = ("Read, write and edit files. As a tool it gives the agent list_files, read_file, write_file "
+                   "and edit_file. Access: the workspace folder only (default) or the whole computer.")
     icon = "folder"
     tool_default = True
     fields = [
         Field("workspace", "Workspace folder", "str", "", placeholder="~/KelvoWorkspace",
               info="Blank = KelvoWorkspace in your user folder (or KELVO_WORKSPACE)."),
+        Field("access", "Access", "select", "workspace only", options=ACCESS_OPTIONS,
+              info="whole computer = the agent can read and write any file your Windows user can, using full paths like C:\\Users\\you\\file.txt."),
         Field("read_only", "Read only", "bool", False, info="Only list and read; no writing or editing."),
+        Field("approve_outside", "Ask before writing outside the workspace", "bool", True,
+              info="With whole computer access: writes and edits outside the workspace wait for your Approve. Unattended runs (API, MCP, schedules) can then only write inside it."),
         Field("approve_writes", "Ask before writing", "bool", False, advanced=True,
               info="Each write or edit waits for your Approve in the Playground."),
     ]
     outputs = [Output("listing", "File list", TEXT)]
 
     @staticmethod
-    def _list(root: Path, rel: str) -> str:
-        base = inside(root, rel)
+    def _list(root: Path, rel: str, whole: bool = False, depth: int = 3) -> str:
+        base = resolve_path(root, rel, whole)
         if not base.exists():
             return f"'{rel}' does not exist. The workspace is {root}."
         if base.is_file():
             return f"{rel} (file, {base.stat().st_size} bytes)"
-        rows = []
-        for p in sorted(base.rglob("*")):
+        # Paths are shown relative to the workspace when inside it, else in full.
+        show = (lambda q: q.relative_to(root).as_posix()) if in_root(root, base) else str
+        rows: list[str] = []
+        top = len(base.parts)
+        for dirpath, dirs, files in os.walk(base, onerror=lambda e: None):
+            d = Path(dirpath)
+            dirs[:] = sorted(x for x in dirs if not x.startswith(".") and x not in SKIP_DIRS)
+            level = len(d.parts) - top
+            if level >= depth - 1:
+                dirs_here, dirs[:] = list(dirs), []
+            else:
+                dirs_here = []
+            for name in dirs_here:
+                rows.append(f"{show(d / name)}/  (not expanded)")
+            if d != base:
+                rows.append(f"{show(d)}/")
+            for f in sorted(files):
+                if f.startswith("."):
+                    continue
+                try:
+                    size = (d / f).stat().st_size
+                except OSError:
+                    continue
+                rows.append(f"{show(d / f)}  ({size} bytes)")
             if len(rows) >= 300:
-                rows.append("… (more files not shown)")
+                rows = rows[:300] + ["… (more not shown; list a subfolder)"]
                 break
-            if any(part.startswith(".") for part in p.relative_to(root).parts):
-                continue
-            r = p.relative_to(root).as_posix()
-            rows.append(f"{r}/" if p.is_dir() else f"{r}  ({p.stat().st_size} bytes)")
         return "\n".join(rows) or "(empty)"
 
     async def out_listing(self, ctx) -> str:
@@ -176,12 +219,15 @@ class Files(Component):
         root = workspace_of(ctx)
         read_only = bool(ctx.params.get("read_only"))
         approve = bool(ctx.params.get("approve_writes"))
+        whole = anywhere(ctx)
+        approve_out = whole and ctx.params.get("approve_outside", True) is not False
+        at = lambda rel: resolve_path(root, rel, whole)  # noqa: E731
 
         async def list_files(a: dict[str, Any]) -> str:
-            return self._list(root, str(a.get("path") or "."))
+            return self._list(root, str(a.get("path") or "."), whole)
 
         async def read_file(a: dict[str, Any]) -> str:
-            p = inside(root, str(a.get("path", "")))
+            p = at(str(a.get("path", "")))
             if not p.is_file():
                 return f"No file '{a.get('path')}'. Use list_files to see what exists."
             text = p.read_text(encoding="utf-8", errors="replace")
@@ -190,10 +236,14 @@ class Files(Component):
             more = f"\n\n[… {len(text) - start - len(chunk)} more characters; call read_file with start={start + len(chunk)}]" if start + len(chunk) < len(text) else ""
             return chunk + more
 
-        async def gate(what: str, details: dict[str, Any]) -> str | None:
+        async def gate(what: str, details: dict[str, Any], p: Path) -> str | None:
             if read_only:
                 return "This Files tool is read-only."
-            if approve and not await ctx.engine.ask_approval(ctx.node_id, "files", what, details):
+            outside = not in_root(root, p)
+            if (approve or (approve_out and outside)) and not await ctx.engine.ask_approval(
+                    ctx.node_id, "files", what, {**details, "full path": str(p)}):
+                if not ctx.engine.interactive and outside and not approve:
+                    return f"Writing outside the workspace needs approval, and nobody is watching this run. Not done: {what}"
                 return f"The user did not approve: {what}"
             return None
 
@@ -201,8 +251,10 @@ class Files(Component):
             rel, content = str(a.get("path", "")), str(a.get("content", ""))
             if len(content) > MAX_WRITE:
                 return f"Too large ({len(content)} characters, limit {MAX_WRITE})."
-            p = inside(root, rel)
-            if (msg := await gate(f"write {rel}", {"path": rel, "characters": len(content)})):
+            p = at(rel)
+            if p.is_dir():
+                return f"'{rel}' is a folder, not a file."
+            if (msg := await gate(f"write {rel}", {"path": rel, "characters": len(content)}, p)):
                 return msg
             p.parent.mkdir(parents=True, exist_ok=True)
             existed = p.exists()
@@ -211,7 +263,7 @@ class Files(Component):
 
         async def edit_file(a: dict[str, Any]) -> str:
             rel, old, new = str(a.get("path", "")), str(a.get("old_text", "")), str(a.get("new_text", ""))
-            p = inside(root, rel)
+            p = at(rel)
             if not p.is_file():
                 return f"No file '{rel}'. Create it with write_file."
             if not old:
@@ -222,26 +274,32 @@ class Files(Component):
                 return "old_text was not found. Read the file again and copy the text exactly, including spaces."
             if n > 1 and not a.get("replace_all"):
                 return f"old_text appears {n} times. Include more surrounding text to make it unique, or set replace_all."
-            if (msg := await gate(f"edit {rel}", {"path": rel, "replacing": old[:300], "with": new[:300]})):
+            if (msg := await gate(f"edit {rel}", {"path": rel, "replacing": old[:300], "with": new[:300]}, p)):
                 return msg
             p.write_text(text.replace(old, new) if a.get("replace_all") else text.replace(old, new, 1), encoding="utf-8")
             return f"Edited {rel} ({n if a.get('replace_all') else 1} replacement{'s' if a.get('replace_all') and n > 1 else ''})."
 
+        if whole:
+            where = f"any folder on this computer (full paths like C:\\Users\\name\\file.txt or ~/file.txt; relative paths start in the workspace {root})"
+            path_desc, dir_desc = "Full path, or a path relative to the workspace", "Folder: full path, or relative to the workspace; '.' = the workspace"
+        else:
+            where = f"the workspace ({root})"
+            path_desc, dir_desc = "File path inside the workspace", "Folder inside the workspace; '.' for all"
         s = lambda **props: {"type": "object", "properties": props, "required": [k for k, v in props.items() if v.pop("_req", False)]}  # noqa: E731
         tools = [
-            ToolDef("list_files", f"List files and folders in the workspace ({root}).",
-                    s(path={"type": "string", "description": "Folder inside the workspace; '.' for all"}), list_files),
-            ToolDef("read_file", "Read a text file from the workspace.",
-                    s(path={"type": "string", "description": "File path inside the workspace", "_req": True},
+            ToolDef("list_files", f"List files and folders (3 levels deep) in {where}.",
+                    s(path={"type": "string", "description": dir_desc}), list_files),
+            ToolDef("read_file", f"Read a text file from {where}.",
+                    s(path={"type": "string", "description": path_desc, "_req": True},
                       start={"type": "integer", "description": "Character offset to continue from"}), read_file),
         ]
         if not read_only:
             tools += [
-                ToolDef("write_file", "Create or overwrite a text file in the workspace.",
-                        s(path={"type": "string", "description": "File path inside the workspace", "_req": True},
+                ToolDef("write_file", f"Create or overwrite a text file in {where}.",
+                        s(path={"type": "string", "description": path_desc, "_req": True},
                           content={"type": "string", "description": "The full file content", "_req": True}), write_file),
-                ToolDef("edit_file", "Replace exact text in a workspace file. Read the file first and copy old_text exactly.",
-                        s(path={"type": "string", "description": "File path inside the workspace", "_req": True},
+                ToolDef("edit_file", "Replace exact text in a file. Read the file first and copy old_text exactly.",
+                        s(path={"type": "string", "description": path_desc, "_req": True},
                           old_text={"type": "string", "description": "Exact text to replace (must be unique)", "_req": True},
                           new_text={"type": "string", "description": "Replacement text", "_req": True},
                           replace_all={"type": "boolean", "description": "Replace every occurrence"}), edit_file),
@@ -258,14 +316,19 @@ class Shell(Component):
     key = "Shell"
     display = "Command Line"
     category = "Tools"
-    description = "Run a command in the workspace folder and get its output. Asks you to approve each command first."
+    description = ("Run a command and get its output. Runs in the workspace folder, or (with whole computer access) "
+                   "in any folder. Asks you to approve each command first.")
     icon = "terminal"
     tool_default = True
     tool_output = "output"
     fields = [
         Field("command", "Command", "str", "", tool_param=True, required=True,
               info="The command to run, e.g. 'dir' on Windows or 'ls -la' on Linux/macOS"),
+        Field("folder", "Run in folder", "str", "", tool_param=True,
+              info="Optional folder to run the command in. Blank = the working folder. A full path needs whole computer access."),
         Field("workspace", "Working folder", "str", "", placeholder="~/KelvoWorkspace", info="Blank = the Files workspace."),
+        Field("access", "Access", "select", "workspace only", options=ACCESS_OPTIONS,
+              info="whole computer = the agent may pick any folder to run in. Commands can always reach the whole computer; approval is what protects you."),
         Field("shell", "Shell", "select", "default", options=["default", "powershell"],
               info="default = cmd on Windows, sh on Linux/macOS."),
         Field("timeout", "Timeout (seconds)", "int", 60, advanced=True),
@@ -279,6 +342,15 @@ class Shell(Component):
         if not cmd:
             return "No command given."
         root = workspace_of(ctx)
+        want = (await ctx.text("folder")).strip()
+        if want:
+            try:
+                root = resolve_path(root, want, anywhere(ctx))
+            except PermissionError:
+                return (f"'{want}' is outside the workspace {root}. This Command Line tool is set to 'workspace only' "
+                        "(the user can switch Access to 'whole computer').")
+            if not root.is_dir():
+                return f"The folder '{want}' does not exist."
         shell = await ctx.text("shell", "default") or "default"
         if await ctx.get("require_approval", True):
             ok = await ctx.engine.ask_approval(ctx.node_id, "command line", cmd, {"command": cmd, "folder": str(root), "shell": shell})

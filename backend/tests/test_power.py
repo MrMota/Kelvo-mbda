@@ -184,3 +184,47 @@ def test_power_agent_template_and_think(client, tmp_path, monkeypatch, mock_net)
     steps = [e["data"]["step"] for e in evs if e["event"] == "step" and e["data"]["step"]["status"] == "done"]
     assert steps[0]["name"] == "web_search" and "https://ollama.com/blog" in steps[0]["output"]
     assert final_messages(evs)[0].startswith("Result:")
+
+
+def test_files_whole_computer(tmp_path):
+    ws, other = tmp_path / "ws", tmp_path / "elsewhere"
+    ws.mkdir(); other.mkdir()
+    (other / "notes.txt").write_text("outside hello")
+    run = asyncio.run
+    # default: workspace only, full paths refused
+    t = tools_of(_Ctx(ws))
+    with pytest.raises(PermissionError):
+        run(t["read_file"].fn({"path": str(other / "notes.txt")}))
+    # whole computer: read anywhere, list with full paths
+    ctx = _Ctx(ws, interactive=True, access="whole computer")
+    t = tools_of(ctx)
+    assert "outside hello" in run(t["read_file"].fn({"path": str(other / "notes.txt")}))
+    assert str(other / "notes.txt") in run(t["list_files"].fn({"path": str(other)}))
+    assert "any folder on this computer" in t["write_file"].description
+    # writes outside ask first (approved here); inside the workspace they don't
+    assert "Created" in run(t["write_file"].fn({"path": str(other / "new.txt"), "content": "x"}))
+    assert (other / "new.txt").read_text() == "x" and len(ctx.answers) == 1
+    assert "Created" in run(t["write_file"].fn({"path": "in.txt", "content": "y"}))
+    assert (ws / "in.txt").exists() and len(ctx.answers) == 1
+    # unattended runs can't write outside
+    t = tools_of(_Ctx(ws, interactive=False, access="whole computer"))
+    assert "nobody is watching" in run(t["write_file"].fn({"path": str(other / "no.txt"), "content": "x"}))
+    assert not (other / "no.txt").exists()
+    # approval for outside writes can be switched off
+    t = tools_of(_Ctx(ws, interactive=False, access="whole computer", approve_outside=False))
+    assert "Edited" in run(t["edit_file"].fn({"path": str(other / "notes.txt"), "old_text": "hello", "new_text": "bye"}))
+    assert (other / "notes.txt").read_text() == "outside bye"
+
+
+def test_shell_folder(client, tmp_path, monkeypatch):
+    monkeypatch.setenv("KELVO_WORKSPACE", str(tmp_path / "ws"))
+    other = tmp_path / "elsewhere"
+    other.mkdir()
+    pwd = "pwd" if sys.platform != "win32" else "cd"
+    flow = _shell_flow(pwd, approval=False)
+    flow["data"]["nodes"][0]["data"]["params"]["folder"] = str(other)
+    _, out = _run_engine(flow, interactive=False)
+    assert "workspace only" in out[0]
+    flow["data"]["nodes"][0]["data"]["params"]["access"] = "whole computer"
+    _, out = _run_engine(flow, interactive=False)
+    assert str(other) in out[0] and "exit code 0" in out[0]

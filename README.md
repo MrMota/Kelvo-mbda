@@ -88,8 +88,8 @@ Start from the **Power Agent** template. It wires an Agent to:
 
 - **Web Search**: DuckDuckGo with no key, or Brave / Tavily (free API key, more reliable) / your own SearXNG. Put keys in a global variable, e.g. `${TAVILY_API_KEY}`.
 - **URL**: reads the pages it found.
-- **Files**: `list_files`, `read_file`, `write_file`, `edit_file`, confined to one workspace folder (`~/KelvoWorkspace` by default, or `KELVO_WORKSPACE`). Paths that leave it (`..`, absolute paths, symlinks) are refused. Optional read-only and ask-before-writing.
-- **Command Line**: runs commands in the workspace with a timeout. **Every command waits for your Approve in the Playground**; runs nobody is watching (API, MCP) never execute commands.
+- **Files**: `list_files`, `read_file`, `write_file`, `edit_file`. **Access** picks how far it reaches: *workspace only* (default: one folder, `~/KelvoWorkspace` or `KELVO_WORKSPACE`; `..`, absolute paths and symlinks out are refused) or *whole computer* (full paths like `C:\Users\you\notes.txt`; relative paths start in the workspace). With whole computer, writes outside the workspace wait for your Approve unless you turn *Ask before writing outside the workspace* off. Optional read-only and ask-before-every-write.
+- **Command Line**: runs commands with a timeout, in the workspace or, with **Access → whole computer**, in any folder the agent names. **Every command waits for your Approve in the Playground**; runs nobody is watching (API, MCP) never execute commands.
 
 What makes it smarter:
 1. **The right tool-capable model for your GPU** (the Windows installer suggests one): `qwen3:4b` on 6–8 GB, **`qwen3:8b` on 12 GB** (with a 32768 context), `qwen3:14b` on 16 GB, `qwen3:30b` on 24 GB+. Check `ollama ps` says 100% GPU.
