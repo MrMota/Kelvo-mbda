@@ -20,10 +20,11 @@ from fastapi.responses import JSONResponse, StreamingResponse
 
 app = FastAPI()
 MODELS = ["llama3.1:8b", "qwen2.5:7b", "gemma2:2b", "nomic-embed-text:latest"]
-CAPS = {"llama3.1:8b": ["completion", "tools"], "qwen2.5:7b": ["completion", "tools"],
+CAPS = {"llama3.1:8b": ["completion", "tools"], "qwen2.5:7b": ["completion", "tools", "vision"],
         "gemma2:2b": ["completion"], "nomic-embed-text:latest": ["embedding"]}
 SEEN_AUTH: list[str] = []
 SEEN_THINK: list[object] = []
+SEEN_IMAGES: list[int] = []
 
 
 @app.post("/api/show")
@@ -64,6 +65,8 @@ async def chat(req: Request):
         return JSONResponse({"error": f"model '{body['model']}' not found"}, status_code=404)
     msgs = body["messages"]
     tools = body.get("tools") or []
+    SEEN_IMAGES.append(sum(len(m.get("images") or []) for m in msgs))
+    prompt_tokens = sum(len(str(m.get("content") or "")) for m in msgs) // 4
     last = msgs[-1]
     names = [t["function"]["name"] for t in tools]
 
@@ -81,15 +84,19 @@ async def chat(req: Request):
             for w in re.split(r"(\s+)", text):
                 if w:
                     yield json.dumps({"message": {"role": "assistant", "content": w}, "done": False}) + "\n"
-            yield json.dumps({"message": {"role": "assistant", "content": ""}, "done": True}) + "\n"
+            yield json.dumps({"message": {"role": "assistant", "content": ""}, "done": True, "prompt_eval_count": prompt_tokens,
+                              "eval_count": 20, "eval_duration": 500_000_000}) + "\n"
         return StreamingResponse(gen(), media_type="application/x-ndjson")
 
     def call(name: str, args: dict):
         def gen():
             yield json.dumps({"message": {"role": "assistant", "content": "", "tool_calls": [{"function": {"name": name, "arguments": args}}]}, "done": False}) + "\n"
-            yield json.dumps({"message": {"role": "assistant", "content": ""}, "done": True}) + "\n"
+            yield json.dumps({"message": {"role": "assistant", "content": ""}, "done": True, "prompt_eval_count": prompt_tokens,
+                              "eval_count": 10, "eval_duration": 250_000_000}) + "\n"
         return StreamingResponse(gen(), media_type="application/x-ndjson")
 
+    if msgs and msgs[0]["role"] == "system" and msgs[0]["content"].startswith("You compress conversations"):
+        return stream_text(f"Summary: {msgs[-1]['content'].count(chr(10) + chr(10)) + 1} parts covered.")
     if body.get("format") and isinstance(body["format"], dict):
         props = body["format"].get("properties", {})
         out = {k: (re.search(r"[\w.+-]+@[\w.-]+", last["content"]) or [""])[0] if "mail" in k else last["content"].split()[0] if props[k].get("type") == "string" else 0 for k in props}

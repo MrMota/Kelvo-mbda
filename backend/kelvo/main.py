@@ -17,7 +17,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse, PlainTextResponse, Response, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import __version__, auth, db, memory, ollama, schedules, uploads
+from . import __version__, auth, checkpoints, compact, db, memory, ollama, rules, schedules, uploads
 from .components import REGISTRY, specs
 from .engine import PENDING_INFO, Engine, FlowError, resolve_approval, validate_graph
 from .templates import STARTER_SKILLS, TEMPLATES
@@ -40,6 +40,7 @@ def seed() -> None:
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     seed()
     _mark_interrupted_runs()
+    checkpoints.prune()
     auth.bootstrap()
     ticker = asyncio.create_task(schedules.loop())
     yield
@@ -368,6 +369,7 @@ def _mark_interrupted_runs() -> None:
 
 def _run_start(engine: Engine) -> str:
     rid = db.new_id()
+    engine.run_id = rid
     with db.conn() as c:
         c.execute("INSERT INTO runs(id,flow_id,session_id,status,started_at) VALUES (?,?,?,?,?)",
                   (rid, engine.flow_id, engine.session_id, "running", db.now()))
@@ -514,6 +516,20 @@ def upload(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
         raise HTTPException(422, str(e))
 
 
+@app.get("/api/uploads/{uid}/file")
+def upload_file(uid: str) -> Response:
+    """An attached image, for the chat's thumbnails. Images only: other files never render in the browser."""
+    got = uploads.load(uid)
+    if not got or got[0].get("kind") != "image":
+        raise HTTPException(404, "No such image.")
+    meta, _, path = got
+    media = uploads.IMAGE_TYPES.get(Path(meta["name"]).suffix.lower())
+    if not media or not path.is_file():
+        raise HTTPException(404, "No such image.")
+    return FileResponse(path, media_type=media, headers={"X-Content-Type-Options": "nosniff", "Cache-Control": "private, max-age=86400",
+                                                         "Content-Security-Policy": "default-src 'none'"})
+
+
 @app.post("/api/runs/{run_id}/cancel")
 def cancel_run(run_id: str) -> dict[str, Any]:
     """The Stop button: stops a run on purpose (disconnecting doesn't)."""
@@ -536,9 +552,56 @@ def chat_status(flow_id: str, session_id: str) -> dict[str, Any]:
 @app.post("/api/approvals/{aid}")
 def answer_approval(aid: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
     """Approve or reject an action an agent is waiting on (e.g. a command line)."""
-    if not resolve_approval(aid, bool(body.get("approve"))):
+    approve, scope = bool(body.get("approve")), str(body.get("scope") or "once")
+    pattern = str(body.get("pattern") or "").strip()
+    if approve and scope == "always" and pattern:
+        rules.add_allow(pattern)  # Settings → Approvals
+    if not resolve_approval(aid, approve, "chat" if scope in ("chat", "always") else "once", pattern):
         raise HTTPException(404, "That request isn't waiting any more (it was answered, timed out, or the run ended).")
     return {"ok": True}
+
+
+@app.get("/api/approval-rules")
+def get_rules() -> dict[str, Any]:
+    return {"allow": rules.allow_list(), "block": rules.block_list(),
+            "default_allow": rules.DEFAULT_ALLOW, "default_block": rules.DEFAULT_BLOCK}
+
+
+@app.put("/api/approval-rules")
+def put_rules(body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    def lst(k: str) -> list[str] | None:
+        v = body.get(k)
+        return None if v is None else [str(x) for x in (v if isinstance(v, list) else str(v).splitlines())]
+    rules.save(lst("allow"), lst("block"))
+    return get_rules()
+
+
+@app.get("/api/runs/{run_id}/changes")
+def run_changes(run_id: str) -> list[dict[str, Any]]:
+    return checkpoints.changes(run_id)
+
+
+@app.post("/api/runs/{run_id}/undo")
+def undo_run(run_id: str) -> dict[str, Any]:
+    """Put back every file an agent wrote or edited in this run (files it created are removed)."""
+    if not checkpoints.changes(run_id):
+        raise HTTPException(404, "Nothing to undo for that reply.")
+    if run_id in ACTIVE_RUNS:
+        raise HTTPException(409, "The agent is still working on this reply. Stop it first, then undo.")
+    return checkpoints.undo(run_id)
+
+
+@app.post("/api/flows/{flow_id}/compact")
+async def compact_chat(flow_id: str, body: dict[str, Any] = Body(...)) -> dict[str, Any]:
+    """Summarize a chat's earlier messages so the agent keeps the gist without using up its memory."""
+    flow = get_flow(flow_id)
+    try:
+        msg = await compact.compact_session(flow, str(body.get("session_id") or ""))
+    except ValueError as e:
+        raise HTTPException(400, str(e)) from e
+    except ollama.OllamaError as e:
+        raise HTTPException(502, str(e)) from e
+    return msg
 
 
 # ---------------------------------------------------------------- playground memory & logs

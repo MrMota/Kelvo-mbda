@@ -138,3 +138,20 @@ CREATE TABLE IF NOT EXISTS schedules (
   updated_at TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS schedules_due ON schedules(enabled, next_run);
+
+-- Checkpoints: a file's content before an agent wrote or edited it, so a reply's changes can be undone.
+CREATE TABLE IF NOT EXISTS checkpoints (
+  id TEXT PRIMARY KEY,
+  run_id TEXT NOT NULL,
+  flow_id TEXT NOT NULL,
+  session_id TEXT NOT NULL,
+  path TEXT NOT NULL,
+  existed INTEGER NOT NULL CHECK (existed IN (0,1)),
+  content BLOB,                 -- NULL when the file didn't exist or was too large to keep
+  too_big INTEGER NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  restored_at TEXT,
+  UNIQUE (run_id, path)
+);
+CREATE INDEX IF NOT EXISTS checkpoints_run ON checkpoints(run_id);
+CREATE INDEX IF NOT EXISTS checkpoints_age ON checkpoints(created_at);

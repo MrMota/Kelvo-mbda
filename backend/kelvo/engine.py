@@ -31,14 +31,28 @@ VAR_RE = re.compile(r"\$\{([A-Za-z_][A-Za-z0-9_]*)\}")
 APPROVAL_TIMEOUT = 300.0
 PENDING_APPROVALS: dict[str, "asyncio.Future[bool]"] = {}
 PENDING_INFO: dict[str, dict[str, Any]] = {}  # what each waiting approval is about, for reconnecting chats
+APPROVAL_SCOPE: dict[str, tuple[str, str]] = {}  # aid → ("chat", pattern) when answered "allow in this chat"
+# "Allow in this chat" answers: (flow_id, session_id) → [(tool, pattern)]. Kept until Kelvo restarts.
+CHAT_GRANTS: dict[tuple[str, str], list[tuple[str, str]]] = {}
 
 
-def resolve_approval(aid: str, approved: bool) -> bool:
+def resolve_approval(aid: str, approved: bool, scope: str = "once", pattern: str = "") -> bool:
     fut = PENDING_APPROVALS.get(aid)
     if fut is None or fut.done():
         return False
+    if approved and scope == "chat":
+        APPROVAL_SCOPE[aid] = ("chat", pattern or "*")
     fut.set_result(bool(approved))
     return True
+
+
+def _granted(key: tuple[str, str], tool: str, summary: str) -> bool:
+    from . import rules
+
+    for t, pat in CHAT_GRANTS.get(key, []):
+        if t == tool and (pat == "*" or rules.matches(summary, pat)):
+            return True
+    return False
 MAX_DEPTH = 4
 
 
@@ -117,6 +131,10 @@ class Engine:
         self.closers: list[Callable[[], Awaitable[None]]] = []  # e.g. MCP connections, closed when the run ends
         self.outputs: list[dict[str, Any]] = []  # chat/text outputs for API response
         self.trace: list[dict[str, Any]] = []
+        self.run_id: str | None = None  # set when the run is logged; ties checkpoints to it
+        self.changed_files: list[str] = []  # files the Files tool wrote this run (undo)
+        self.loaded_instructions: set[str] = set()  # AGENTS.md files already given to the agent
+        self.extra: dict[str, Any] = {}  # per-run state for components (e.g. an open browser)
         self._apply_tweaks(tweaks or {})
         # nodes whose output goes straight into a Chat Output stream tokens to the UI
         self.streaming_nodes = {
@@ -246,12 +264,28 @@ class Engine:
                     pass
         return {"session_id": self.session_id, "outputs": self.outputs}
 
+    # ------------------------------------------------------------ checkpoints
+    def checkpoint(self, path: Any) -> None:
+        """Keep the file's current content before the Files tool changes it, so this reply can be undone."""
+        from . import checkpoints
+
+        if not self.persist:
+            return
+        if self.run_id is None:
+            self.run_id = db.new_id()
+        checkpoints.save(self.run_id, self.flow_id, self.session_id, path)
+        if str(path) not in self.changed_files:
+            self.changed_files.append(str(path))
+
     # ------------------------------------------------------------ approvals
     async def ask_approval(self, node_id: str, tool: str, summary: str, details: dict[str, Any]) -> bool:
         """Pause until the person in the Playground approves or rejects (5 min → rejected).
         Runs nobody is watching (API, MCP) are never approved."""
         if not self.interactive:
             return False
+        key = (self.flow_id, self.session_id)
+        if _granted(key, tool, summary):
+            return True
         aid = db.new_id()
         fut: asyncio.Future[bool] = asyncio.get_running_loop().create_future()
         PENDING_APPROVALS[aid] = fut
@@ -265,6 +299,9 @@ class Engine:
         finally:
             PENDING_APPROVALS.pop(aid, None)
             PENDING_INFO.pop(aid, None)
+        scope = APPROVAL_SCOPE.pop(aid, None)
+        if ok and scope:
+            CHAT_GRANTS.setdefault(key, []).append((tool, scope[1]))
         await self.emit("approval_done", {"id": aid, "approved": ok})
         return ok
 
@@ -277,18 +314,29 @@ class Engine:
         with db.conn() as c:
             c.execute(
                 "INSERT INTO messages(id,flow_id,session_id,sender,sender_name,text,properties,created_at) VALUES (?,?,?,?,?,?,?,?)",
-                (msg.id, self.flow_id, msg.session_id, msg.sender, msg.sender_name, msg.text, json.dumps(msg.properties), db.now()),
+                (msg.id, self.flow_id, msg.session_id, msg.sender, msg.sender_name, msg.text, json.dumps(msg.properties), db.now_precise()),
             )
         self.stored_message_ids.add(msg.id)
         return msg
 
     def history(self, session_id: str, limit: int) -> list[dict[str, Any]]:
+        """The chat's last `limit` messages, starting at the newest summary if there is one."""
         with db.conn() as c:
             rs = c.execute(
                 "SELECT * FROM messages WHERE flow_id=? AND session_id=? ORDER BY created_at DESC, rowid DESC LIMIT ?",
                 (self.flow_id, session_id, limit + len(self.stored_message_ids)),
             ).fetchall()
-        out = [dict(r) for r in rs if r["id"] not in self.stored_message_ids][:limit]
+        out = []
+        for r in rs:
+            if r["id"] in self.stored_message_ids:
+                continue
+            m = dict(r)
+            out.append(m)
+            if '"summary": true' in (m.get("properties") or ""):
+                m["summary"] = True
+                break  # older messages are covered by this summary
+            if len(out) >= limit:
+                break
         return list(reversed(out))
 
 

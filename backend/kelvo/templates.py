@@ -68,32 +68,38 @@ TEMPLATES: list[dict[str, Any]] = [
         "icon": "terminal",
         "data": {
             "nodes": [
-                _n("chat_in", "ChatInput", 0, 880),
-                _n("search", "WebSearch", 0, -600, tool_mode=True),
-                _n("url", "URLFetch", 0, -280, tool_mode=True),
-                _n("files", "Files", 0, 20, {"access": "whole computer"}, tool_mode=True),
-                _n("shell", "Shell", 0, 380, {"access": "whole computer"}, tool_mode=True),
-                _n("calc", "Calculator", 0, 1180, tool_mode=True),
-                _n("agent", "Agent", 460, 120, {
+                _n("chat_in", "ChatInput", 0, 560),
+                _n("browser", "Browser", 0, -1300, tool_mode=True),
+                _n("search", "WebSearch", 0, -917, tool_mode=True),
+                _n("url", "URLFetch", 0, -635, tool_mode=True),
+                _n("files", "Files", 0, -431, {"access": "whole computer"}, tool_mode=True),
+                _n("shell", "Shell", 0, 40, {"access": "whole computer"}, tool_mode=True),
+                _n("calc", "Calculator", 0, 845, tool_mode=True),
+                _n("agent", "Agent", 460, -330, {
                     "system_prompt": (
                         "You are a capable assistant working on the user's own computer.\n"
                         "- For anything current or factual you're unsure of: web_search, then read the best 1-3 results with the url tool. Cite the URLs you used.\n"
+                        "- Use the browser_* tools only for pages that need clicking, typing, JavaScript or a login; refer to elements by their [number].\n"
                         "- Work with files through list_files, read_file, write_file and edit_file. You can reach any folder on this computer with full paths (e.g. C:\\Users\\...); relative paths start in the workspace. Read a file before editing it; keep edits small and exact.\n"
                         "- Use the command line for things only a command can do (running code, git, converting files). Say in one line why before each command; the user approves it.\n"
                         "- Plan briefly, do the work, then answer clearly and say what you changed."
                     ),
                     "think": True,
                     "long_term_memory": True,
+                    "plan": True,
+                    "sub_agents": True,
+                    "learn_skills": True,
                     "library_skills": ["*"],
                     "num_ctx": 16384,
                     "max_iterations": 20,
                 }),
-                _n("chat_out", "ChatOutput", 880, 380),
-                _note("note", 460, -120, "Pick a model marked 'tools' (qwen3:8b on a 12 GB GPU, qwen3:30b on 24 GB+). Files and Command Line have whole-computer access: writing outside KelvoWorkspace and every command wait for your Approve. Set Access to 'workspace only' on both to fence it in."),
+                _n("chat_out", "ChatOutput", 880, -60),
+                _note("note", 460, -490, "Pick a model marked 'tools' (qwen3:8b on a 12 GB GPU, qwen3:30b on 24 GB+). Files and Command Line have whole-computer access: writing outside KelvoWorkspace and every command wait for your Approve. Set Access to 'workspace only' on both to fence it in."),
             ],
             "edges": [
                 _e("chat_in", "message", "agent", "input"),
                 _e("search", "tool", "agent", "tools"),
+                _e("browser", "tool", "agent", "tools"),
                 _e("url", "tool", "agent", "tools"),
                 _e("files", "tool", "agent", "tools"),
                 _e("shell", "tool", "agent", "tools"),
@@ -109,15 +115,15 @@ TEMPLATES: list[dict[str, Any]] = [
         "icon": "terminal",
         "data": {
             "nodes": [
-                _n("chat_in", "ChatInput", 0, 760),
-                _n("files", "Files", 0, -520, {"access": "whole computer"}, tool_mode=True),
-                _n("shell", "Shell", 0, -170, {"timeout": 300, "access": "whole computer"}, tool_mode=True),
-                _n("search", "WebSearch", 0, 220, tool_mode=True),
-                _n("url", "URLFetch", 0, 520, tool_mode=True),
+                _n("chat_in", "ChatInput", 0, 775),
+                _n("files", "Files", 0, -700, {"access": "whole computer"}, tool_mode=True),
+                _n("shell", "Shell", 0, -229, {"timeout": 300, "access": "whole computer"}, tool_mode=True),
+                _n("search", "WebSearch", 0, 289, tool_mode=True),
+                _n("url", "URLFetch", 0, 571, tool_mode=True),
                 _n("agent", "Agent", 460, 60, {
                     "system_prompt": (
                         "You are a careful software engineer working on the user's computer. Projects can be anywhere: use full paths (e.g. C:\\Users\\me\\code\\app), and give the command line a folder to run in.\n"
-                        "1. Understand first: list_files, then read_file the files that matter. Never edit a file you haven't read.\n"
+                        "1. Understand first: find_files and search_files to locate the code, then read_file what matters. Never edit a file you haven't read.\n"
                         "2. Make small, exact edits with edit_file (copy old_text exactly). Use write_file only for new files.\n"
                         "3. Check your work: run the code or its tests with the command line, read the output, fix and re-run until it works.\n"
                         "4. Search the web only for library docs or error messages you don't know.\n"
@@ -126,6 +132,8 @@ TEMPLATES: list[dict[str, Any]] = [
                         "Always act with tools; never just describe what you would do."
                     ),
                     "think": True,
+                    "plan": True,
+                    "sub_agents": True,
                     "num_ctx": 32768,
                     "max_iterations": 40,
                 }),

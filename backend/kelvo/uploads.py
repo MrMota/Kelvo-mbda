@@ -18,6 +18,8 @@ from . import db
 
 MAX_BYTES = 25 * 1024 * 1024
 INLINE_TOTAL = 40_000  # characters of attached text given to the model per message
+IMAGE_TYPES = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".gif": "image/gif", ".webp": "image/webp",
+               ".bmp": "image/bmp"}
 TEXT_EXT = {".txt", ".md", ".markdown", ".csv", ".tsv", ".json", ".jsonl", ".yaml", ".yml", ".xml", ".html", ".htm",
             ".log", ".ini", ".cfg", ".toml", ".py", ".js", ".ts", ".tsx", ".jsx", ".java", ".c", ".h", ".cpp", ".cs",
             ".go", ".rs", ".rb", ".php", ".sh", ".ps1", ".bat", ".sql", ".css", ".kt", ".swift", ".r", ".m", ".tex"}
@@ -61,8 +63,8 @@ def extract_text(name: str, data: bytes) -> tuple[str, str, str | None]:
         import html as _html
 
         return "docx", _html.unescape(text).strip(), None
-    if ext in {".png", ".jpg", ".jpeg", ".gif", ".webp", ".bmp"}:
-        return "image", "", f"{name} is an image. Kelvo agents read text files for now, so it was saved to the workspace only."
+    if ext in IMAGE_TYPES:
+        return "image", "", None  # given to vision models as an image (Agent)
     try:
         text = data.decode("utf-8")
     except UnicodeDecodeError:
@@ -121,6 +123,9 @@ def attach(file_ids: list[str], workspace: Path | None) -> tuple[list[dict[str, 
             rel = dest.relative_to(workspace).as_posix()
         metas.append({k: meta[k] for k in ("id", "name", "size", "kind")})
         where = f" (saved in the workspace as {rel})" if rel else ""
+        if meta.get("kind") == "image":
+            blocks.append(f"### {meta['name']}{where}\n[image: attached to this message for vision models]")
+            continue
         if not text.strip():
             blocks.append(f"### {meta['name']}{where}\n[no readable text]")
             continue

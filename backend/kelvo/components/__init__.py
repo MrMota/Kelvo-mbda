@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from .agent import Agent, Skill
 from .base import Component
+from .browser import Browser
 from .io import ChatInput, ChatOutput, Prompt, TextInput, TextOutput
 from .logic import IfElse, KnowledgeBase, MessageHistory, Parser, SplitText
 from .models import OllamaEmbeddings, OllamaModel, StructuredOutput
@@ -14,7 +15,7 @@ ALL: list[type[Component]] = [
     Prompt,
     OllamaModel, OllamaEmbeddings, StructuredOutput,
     Agent, Skill,
-    WebSearch, URLFetch, Files, Shell, MCPTools, Calculator, CurrentDate, RunFlow,
+    WebSearch, URLFetch, Browser, Files, Shell, MCPTools, Calculator, CurrentDate, RunFlow,
     MessageHistory,
     KnowledgeBase,
     Parser, SplitText,

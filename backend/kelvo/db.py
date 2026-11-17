@@ -21,6 +21,11 @@ def now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
 
+def now_precise() -> str:
+    """Microsecond timestamps for chat messages, so their order is exact."""
+    return datetime.now(timezone.utc).isoformat(timespec="microseconds")
+
+
 def new_id() -> str:
     return str(uuid.uuid4())
 

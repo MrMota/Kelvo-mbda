@@ -98,7 +98,7 @@ def tools_of(ctx):
 def test_files_tools(tmp_path):
     t = tools_of(_Ctx(tmp_path))
     run = asyncio.run
-    assert set(t) == {"list_files", "read_file", "write_file", "edit_file"}
+    assert set(t) == {"list_files", "find_files", "search_files", "read_file", "write_file", "edit_file"}
     assert "Created notes/todo.md" in run(t["write_file"].fn({"path": "notes/todo.md", "content": "a\nb\na\n"}))
     assert "notes/todo.md" in run(t["list_files"].fn({}))
     assert run(t["read_file"].fn({"path": "notes/todo.md"})) == "a\nb\na\n"
@@ -112,7 +112,7 @@ def test_files_tools(tmp_path):
 
 
 def test_files_read_only_and_write_approval(tmp_path):
-    assert set(tools_of(_Ctx(tmp_path, read_only=True))) == {"list_files", "read_file"}
+    assert set(tools_of(_Ctx(tmp_path, read_only=True))) == {"list_files", "find_files", "search_files", "read_file"}
     ctx = _Ctx(tmp_path, interactive=False, approve_writes=True)
     msg = asyncio.run(tools_of(ctx)["write_file"].fn({"path": "x.txt", "content": "hi"}))
     assert "did not approve" in msg and not (tmp_path / "x.txt").exists()

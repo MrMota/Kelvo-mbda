@@ -68,8 +68,13 @@ export type ChatMessage = {
   sender: "user" | "machine";
   sender_name: string;
   text: string;
-  properties?: { steps?: Step[]; source?: { source?: string }; files?: Attachment[]; thinking?: string; status?: string; warning?: string };
+  properties?: {
+    steps?: Step[]; source?: { source?: string }; files?: Attachment[]; thinking?: string; status?: string; warning?: string;
+    plan?: PlanStep[]; usage?: Usage; changes?: { run_id: string; files: string[]; undone?: boolean }; summary?: boolean; covered?: number;
+  };
   error?: boolean;
   streaming?: boolean;
 };
+export type PlanStep = { text: string; status: "pending" | "in_progress" | "done" };
+export type Usage = { used?: number; limit?: number; tokens_per_sec?: number; output_tokens?: number };
 export type NodeRun = { status: "running" | "done" | "error" | "skipped"; preview?: string; ms?: number; error?: string };

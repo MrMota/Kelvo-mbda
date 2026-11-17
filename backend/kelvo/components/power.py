@@ -150,8 +150,51 @@ class WebSearch(Component):
 
 # ---------------------------------------------------------------- files
 
-SKIP_DIRS = {"node_modules", "__pycache__", "venv", ".venv", "$RECYCLE.BIN", "System Volume Information", "AppData"}
+SKIP_DIRS = {"node_modules", "__pycache__", "venv", ".venv", "$RECYCLE.BIN", "System Volume Information", "AppData",
+             "dist", "build", ".git", "target", ".next"}
 MAX_READ = 20000
+MAX_DIFF = 8000
+MAX_SEARCH_FILE = 2 * 1024 * 1024
+PROJECT_FILES = ("AGENTS.md", "KELVO.md")
+
+
+def make_diff(old: str, new: str, name: str) -> str:
+    """A unified diff for the approval card (red/green lines)."""
+    import difflib
+
+    lines = list(difflib.unified_diff(old.splitlines(), new.splitlines(), f"a/{name}", f"b/{name}", n=2, lineterm=""))
+    out = "\n".join(lines)
+    return out if len(out) <= MAX_DIFF else out[:MAX_DIFF] + "\n… (diff cut)"
+
+
+def project_instructions(engine: Any, path: Path) -> str:
+    """AGENTS.md files the agent hasn't seen yet, in the folder of `path` or up to 3 folders above it."""
+    loaded = getattr(engine, "loaded_instructions", None)
+    if loaded is None:
+        return ""
+    d = path if path.is_dir() else path.parent
+    found = []
+    for folder in [d, *list(d.parents)[:3]]:
+        for name in PROJECT_FILES:
+            f = folder / name
+            key = str(f).lower()
+            if key in loaded or not f.is_file():
+                continue
+            loaded.add(key)
+            try:
+                text = f.read_text(encoding="utf-8", errors="replace")[:8000]
+            except OSError:
+                continue
+            found.append(f"[Project instructions from {f} — follow them while working in {folder}]\n{text.strip()}")
+    return ("\n\n" + "\n\n".join(found)) if found else ""
+
+
+def _walk_files(base: Path):
+    for dirpath, dirs, files in os.walk(base, onerror=lambda e: None):
+        dirs[:] = sorted(x for x in dirs if not x.startswith(".") and x not in SKIP_DIRS)
+        for f in sorted(files):
+            if not f.startswith("."):
+                yield Path(dirpath) / f
 MAX_WRITE = 1_000_000
 
 
@@ -159,8 +202,9 @@ class Files(Component):
     key = "Files"
     display = "Files"
     category = "Tools"
-    description = ("Read, write and edit files. As a tool it gives the agent list_files, read_file, write_file "
-                   "and edit_file. Access: the workspace folder only (default) or the whole computer.")
+    description = ("Read, search, write and edit files. As a tool it gives the agent list_files, find_files, search_files, "
+                   "read_file, write_file and edit_file. Changes can be undone from the chat. Access: the workspace only "
+                   "(default) or the whole computer.")
     icon = "folder"
     tool_default = True
     fields = [
@@ -223,18 +267,78 @@ class Files(Component):
         approve_out = whole and ctx.params.get("approve_outside", True) is not False
         at = lambda rel: resolve_path(root, rel, whole)  # noqa: E731
 
+        show = lambda q: q.relative_to(root).as_posix() if in_root(root, q) else str(q)  # noqa: E731
+        hint = lambda p: project_instructions(ctx.engine, p)  # noqa: E731
+
         async def list_files(a: dict[str, Any]) -> str:
-            return self._list(root, str(a.get("path") or "."), whole)
+            rel = str(a.get("path") or ".")
+            return self._list(root, rel, whole) + hint(at(rel))
 
         async def read_file(a: dict[str, Any]) -> str:
             p = at(str(a.get("path", "")))
             if not p.is_file():
-                return f"No file '{a.get('path')}'. Use list_files to see what exists."
+                return f"No file '{a.get('path')}'. Use list_files or find_files to see what exists."
             text = p.read_text(encoding="utf-8", errors="replace")
             start = max(0, int(a.get("start", 0) or 0))
             chunk = text[start:start + MAX_READ]
             more = f"\n\n[… {len(text) - start - len(chunk)} more characters; call read_file with start={start + len(chunk)}]" if start + len(chunk) < len(text) else ""
-            return chunk + more
+            return chunk + more + hint(p)
+
+        async def find_files(a: dict[str, Any]) -> str:
+            import fnmatch
+
+            pattern = str(a.get("pattern") or a.get("input") or "*").strip()
+            base = at(str(a.get("path") or "."))
+            if not base.is_dir():
+                return f"'{a.get('path')}' is not a folder."
+            pat = pattern.lower().replace("\\", "/")
+            out = []
+            for f in _walk_files(base):
+                r = f.relative_to(base).as_posix().lower()
+                if fnmatch.fnmatchcase(f.name.lower(), pat) or fnmatch.fnmatchcase(r, pat) or fnmatch.fnmatchcase(r, pat.lstrip("*/")):
+                    out.append(show(f))
+                    if len(out) >= 200:
+                        out.append("… (more; narrow the pattern or folder)")
+                        break
+            return ("\n".join(out) or f"No files match '{pattern}' in {show(base)}.") + hint(base)
+
+        async def search_files(a: dict[str, Any]) -> str:
+            import fnmatch
+
+            query = str(a.get("query") or a.get("input") or "")
+            if not query:
+                return "Give the text (or regular expression) to search for."
+            base = at(str(a.get("path") or "."))
+            only = str(a.get("file_pattern") or "").strip().lower()
+            try:
+                rx = re.compile(query if a.get("regex") else re.escape(query), 0 if a.get("case_sensitive") else re.I)
+            except re.error as e:
+                return f"Bad regular expression: {e}"
+            files = [base] if base.is_file() else _walk_files(base) if base.is_dir() else []
+            if not files:
+                return f"'{a.get('path')}' does not exist."
+            hits, scanned = [], 0
+            for f in files:
+                if only and not fnmatch.fnmatchcase(f.name.lower(), only):
+                    continue
+                try:
+                    if f.stat().st_size > MAX_SEARCH_FILE:
+                        continue
+                    data = f.read_bytes()
+                except OSError:
+                    continue
+                if b"\0" in data[:4096]:
+                    continue  # binary
+                scanned += 1
+                for i, line in enumerate(data.decode("utf-8", "replace").splitlines(), 1):
+                    if rx.search(line):
+                        hits.append(f"{show(f)}:{i}: {line.strip()[:200]}")
+                        if len(hits) >= 100:
+                            break
+                if len(hits) >= 100 or scanned >= 5000:
+                    hits.append("… (stopped early; narrow the folder or file_pattern)")
+                    break
+            return ("\n".join(hits) or f"No matches for '{query}' in {scanned} files.") + hint(base)
 
         async def gate(what: str, details: dict[str, Any], p: Path) -> str | None:
             if read_only:
@@ -245,6 +349,8 @@ class Files(Component):
                 if not ctx.engine.interactive and outside and not approve:
                     return f"Writing outside the workspace needs approval, and nobody is watching this run. Not done: {what}"
                 return f"The user did not approve: {what}"
+            if (cp := getattr(ctx.engine, "checkpoint", None)):
+                cp(p)  # keep the old version so the user can undo this reply
             return None
 
         async def write_file(a: dict[str, Any]) -> str:
@@ -254,7 +360,9 @@ class Files(Component):
             p = at(rel)
             if p.is_dir():
                 return f"'{rel}' is a folder, not a file."
-            if (msg := await gate(f"write {rel}", {"path": rel, "characters": len(content)}, p)):
+            old = p.read_text(encoding="utf-8", errors="replace") if p.is_file() else ""
+            if (msg := await gate(f"write {rel}", {"path": rel, "characters": len(content),
+                                                   "diff": make_diff(old, content, p.name)}, p)):
                 return msg
             p.parent.mkdir(parents=True, exist_ok=True)
             existed = p.exists()
@@ -274,9 +382,10 @@ class Files(Component):
                 return "old_text was not found. Read the file again and copy the text exactly, including spaces."
             if n > 1 and not a.get("replace_all"):
                 return f"old_text appears {n} times. Include more surrounding text to make it unique, or set replace_all."
-            if (msg := await gate(f"edit {rel}", {"path": rel, "replacing": old[:300], "with": new[:300]}, p)):
+            updated = text.replace(old, new) if a.get("replace_all") else text.replace(old, new, 1)
+            if (msg := await gate(f"edit {rel}", {"path": rel, "diff": make_diff(text, updated, p.name)}, p)):
                 return msg
-            p.write_text(text.replace(old, new) if a.get("replace_all") else text.replace(old, new, 1), encoding="utf-8")
+            p.write_text(updated, encoding="utf-8")
             return f"Edited {rel} ({n if a.get('replace_all') else 1} replacement{'s' if a.get('replace_all') and n > 1 else ''})."
 
         if whole:
@@ -289,6 +398,16 @@ class Files(Component):
         tools = [
             ToolDef("list_files", f"List files and folders (3 levels deep) in {where}.",
                     s(path={"type": "string", "description": dir_desc}), list_files),
+            ToolDef("find_files", f"Find files by name in {where}, e.g. '*.py', 'test_*', 'src/**/*.tsx'.",
+                    s(pattern={"type": "string", "description": "File name pattern with * wildcards", "_req": True},
+                      path={"type": "string", "description": dir_desc}), find_files),
+            ToolDef("search_files", f"Search inside files in {where} for text; returns path:line: matching line. "
+                    "Use it to find where something is defined or used before reading files.",
+                    s(query={"type": "string", "description": "Text to find (or a regular expression with regex=true)", "_req": True},
+                      path={"type": "string", "description": "Folder (or one file) to search; '.' = the workspace"},
+                      file_pattern={"type": "string", "description": "Only these files, e.g. '*.py'"},
+                      regex={"type": "boolean", "description": "Treat query as a regular expression"},
+                      case_sensitive={"type": "boolean"}), search_files),
             ToolDef("read_file", f"Read a text file from {where}.",
                     s(path={"type": "string", "description": path_desc, "_req": True},
                       start={"type": "integer", "description": "Character offset to continue from"}), read_file),
@@ -352,8 +471,13 @@ class Shell(Component):
             if not root.is_dir():
                 return f"The folder '{want}' does not exist."
         shell = await ctx.text("shell", "default") or "default"
-        if await ctx.get("require_approval", True):
-            ok = await ctx.engine.ask_approval(ctx.node_id, "command line", cmd, {"command": cmd, "folder": str(root), "shell": shell})
+        from .. import rules
+
+        if (bad := rules.blocked(cmd)):
+            return f"Blocked by your rules (Settings → Approvals: '{bad}'). Not run: {cmd}"
+        if await ctx.get("require_approval", True) and not rules.allowed(cmd):
+            ok = await ctx.engine.ask_approval(ctx.node_id, "command line", cmd, {"command": cmd, "folder": str(root), "shell": shell,
+                                                                                  "suggest": rules.suggest(cmd)})
             if not ok:
                 return (f"The user did not approve running: {cmd}" if ctx.engine.interactive
                         else "Commands need approval, and nobody is watching this run (API/MCP). Not run.")
@@ -377,7 +501,7 @@ class Shell(Component):
         out = (r.stdout or "") + (("\n" + r.stderr) if r.stderr else "")
         if len(out) > MAX_OUTPUT:
             out = out[:MAX_OUTPUT] + f"\n[… output cut at {MAX_OUTPUT} characters]"
-        return f"$ {cmd}\n(exit code {r.returncode})\n{out.strip()}"
+        return f"$ {cmd}\n(exit code {r.returncode})\n{out.strip()}" + project_instructions(ctx.engine, root)
 
 
 # ---------------------------------------------------------------- MCP servers

@@ -290,7 +290,7 @@ await step("Schedules: create, run now, result lands in Chat", async () => {
   await page.getByRole("combobox", { name: "Flow" }).selectOption({ label: "Echo Bot" });
   await page.getByPlaceholder(/Search this week/).fill("Daily briefing please");
   await page.getByRole("button", { name: "Add schedule" }).click();
-  await page.getByText("“Daily briefing please”").waitFor();
+  await page.getByText("“Daily briefing please”").first().waitFor();
   await page.getByRole("button", { name: "Run now" }).first().click();
   await page.getByText("Ran: the result is in Chat").waitFor({ timeout: 20000 });
   await shot(page, "18-schedules");
@@ -360,6 +360,85 @@ await step("0.4.1: Stop really stops the run and Logs says so", async () => {
   await page.locator(".msg-text.err", { hasText: "Stopped" }).waitFor({ timeout: 10000 });
   const runs = await page.request.get(`${BASE}/api/flows/${f.id}/runs`).then((r) => r.json());
   if (runs[0].status !== "error" || runs[0].error !== "Stopped by you.") throw new Error(`run not stopped: ${JSON.stringify(runs[0])}`);
+});
+
+// ---------------------------------------------------------------- 0.5.0
+const PNG = Buffer.from("89504e470d0a1a0a0000000d4948445200000008000000080806000000c40fbe8b0000001249444154789c63d0cf7ff21f1f6618190a004a36a041196caea90000000049454e44ae426082", "hex");
+let power;
+
+await step("0.5.0: plan checklist and speed/memory meter", async () => {
+  power = await page.request.post(`${BASE}/api/flows`, { data: { template: "power-agent", name: "Power 05" } }).then((r) => r.json());
+  await page.goto(`${BASE}/chat/${power.id}`);
+  const plan = JSON.stringify([{ text: "Look around", status: "done" }, { text: "Write the answer", status: "in_progress" }]);
+  await page.getByLabel("Message", { exact: true }).fill(`tool:update_plan:${plan}`);
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.locator(".plan", { hasText: "Write the answer" }).waitFor({ timeout: 15000 });
+  await page.locator(".plan-head", { hasText: "1/2" }).waitFor();
+  await page.locator(".usage", { hasText: "tok/s" }).first().waitFor({ timeout: 15000 });
+  await page.locator('.usage [role="meter"]').first().waitFor();
+  await shot(page, "50-plan-meter");
+});
+
+await step("0.5.0: a file change can be undone from the chat", async () => {
+  await page.getByLabel("Message", { exact: true }).fill("tool:write_file:undo-me.txt");
+  await page.getByRole("button", { name: "Send" }).click();
+  const bar = page.locator(".changes", { hasText: "undo-me.txt" });
+  await bar.waitFor({ timeout: 15000 });
+  await shot(page, "51-changes");
+  page.once("dialog", (d) => d.accept());
+  await bar.getByRole("button", { name: "Undo" }).click();
+  await page.locator(".changes", { hasText: "Undone" }).waitFor({ timeout: 10000 });
+});
+
+await step("0.5.0: 'Allow in this chat' stops repeat questions for matching commands", async () => {
+  await page.getByLabel("Message", { exact: true }).fill("tool:command_line:echo hi there");
+  await page.getByRole("button", { name: "Send" }).click();
+  const card = page.getByRole("alertdialog");
+  await card.waitFor({ timeout: 15000 });
+  await card.getByRole("button", { name: "More" }).click();
+  await card.getByLabel("Command pattern").fill("echo hi*");
+  await shot(page, "52-approval-more");
+  await card.getByRole("button", { name: "Allow in this chat" }).click();
+  await page.locator(".msg-text", { hasText: "hi there" }).first().waitFor({ timeout: 15000 });
+  await page.getByLabel("Message", { exact: true }).fill("tool:command_line:echo hi again");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.locator(".msg-text", { hasText: "hi again" }).first().waitFor({ timeout: 15000 });
+  if (await page.getByRole("alertdialog").count()) throw new Error("asked again despite the chat grant");
+});
+
+await step("0.5.0: Compact summarizes the chat", async () => {
+  await page.getByRole("button", { name: "Compact chat" }).click();
+  await page.locator(".summary-msg", { hasText: "Earlier messages summarized" }).waitFor({ timeout: 15000 });
+  await shot(page, "53-compacted");
+});
+
+await step("0.5.0: attached photo shows as a thumbnail", async () => {
+  await page.getByRole("button", { name: "New chat" }).click();
+  await page.locator('input[type="file"]').setInputFiles({ name: "photo.png", mimeType: "image/png", buffer: PNG });
+  await page.locator(".chip", { hasText: "photo.png" }).waitFor();
+  await page.getByLabel("Message", { exact: true }).fill("what is in this photo?");
+  await page.getByRole("button", { name: "Send" }).click();
+  await page.locator('img.thumb[alt="photo.png"]').waitFor({ timeout: 15000 });
+  const src = await page.locator("img.thumb").first().getAttribute("src");
+  const r = await page.request.get(`${BASE}${src}`);
+  if (r.status() !== 200 || r.headers()["content-type"] !== "image/png") throw new Error(`thumbnail ${src}: ${r.status()} ${r.headers()["content-type"]}`);
+  await page.waitForFunction(() => { const i = document.querySelector("img.thumb"); return i && i.complete && i.naturalWidth > 0; }, null, { timeout: 5000 });
+});
+
+await step("0.5.0: Settings → Approvals lists the rules, incl. the always-allow default", async () => {
+  await page.goto(`${BASE}/settings/approvals`);
+  const allow = page.getByLabel("Allowed commands");
+  await allow.waitFor();
+  if (!(await allow.inputValue()).includes("git status")) throw new Error("default allow list missing");
+  await allow.fill("git status\nnpm test*");
+  await page.getByRole("button", { name: "Save rules" }).click();
+  await page.getByText("Approval rules saved").waitFor();
+  await shot(page, "54-approvals");
+});
+
+await step("0.5.0: Browser tool is in the palette and the Power Agent", async () => {
+  await page.goto(`${BASE}/flow/${power.id}`);
+  await page.locator('.react-flow__node[data-id="browser"]').waitFor({ timeout: 10000 });
 });
 
 await step("Sign out returns to the sign-in screen", async () => {

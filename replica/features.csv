@@ -82,3 +82,14 @@ Agent nudge when it announces without acting; text tool-call recovery,agents,mus
 Runs survive disconnects (keep-alive; reconnect; explicit Stop; logs never stuck),chat,must,no,yes,0.4.1
 Thinking indicator + context-window protection,chat,should,no,yes,0.4.1
 GPU-aware model pick in installer + Coding Agent template,setup,should,no,yes,0.4.1 (12 GB: qwen3:8b with 32k context)
+Checkpoints + Undo for file changes,agents,must,no,yes,0.5.0
+Approval rules (allow/block lists; allow in this chat; always allow) + diffs in approvals,agents,must,no,yes,0.5.0
+find_files and search_files tools,tools,must,no,yes,0.5.0
+Plan checklist tool shown live,agents,must,no,yes,0.5.0
+Auto-summarize near context limit + Compact button,chat,must,no,yes,0.5.0
+Helpers (sub-agents via delegate),agents,should,no,yes,0.5.0
+AGENTS.md project instructions,agents,should,no,yes,0.5.0
+Images to vision models + thumbnails,chat,should,no,yes,0.5.0
+Browser tool (Playwright; Edge on Windows),tools,should,no,yes,0.5.0
+Learn skills (save_skill with approval),agents,should,no,yes,0.5.0
+Speed and memory meter,chat,could,no,yes,0.5.0

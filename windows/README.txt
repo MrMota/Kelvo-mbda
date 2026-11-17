@@ -32,6 +32,9 @@ WHAT'S IN THIS FOLDER
   - In Kelvo: Settings > Models > Default model = that model.
     Agents need a model tagged "tools".
   - Check it runs on the GPU: send a message, then run  ollama ps  -> "100% GPU".
+  - For photos in chat, also pull a vision model:  ollama pull qwen2.5vl:7b
+    (or gemma3:12b) and pick it on the Agent you send photos to.
+  - The Browser tool uses Microsoft Edge, which Windows already has.
 
 3. INSTALL IT AS AN APP ON THIS PC
   - Edge:   ... menu > Apps > Install Kelvo

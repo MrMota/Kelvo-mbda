@@ -1,4 +1,4 @@
-import { Brain, CalendarClock, Cpu, Download, KeyRound, Plus, RefreshCw, Trash2, UserRound, Variable } from "lucide-react";
+import { Brain, CalendarClock, Cpu, Download, KeyRound, Plus, RefreshCw, ShieldCheck, Trash2, UserRound, Variable } from "lucide-react";
 import { useEffect, useState } from "react";
 import { NavLink, useParams } from "react-router-dom";
 import { androidApp, api, stream } from "../api";
@@ -209,6 +209,44 @@ function Memory() {
   );
 }
 
+function Approvals() {
+  const [r, setR] = useState<{ allow: string[]; block: string[]; default_allow: string[]; default_block: string[] } | null>(null);
+  const [allow, setAllow] = useState("");
+  const [block, setBlock] = useState("");
+  const toast = useToast();
+  const load = () => api("/api/approval-rules").then((x) => { setR(x); setAllow(x.allow.join("\n")); setBlock(x.block.join("\n")); });
+  useEffect(() => { load(); }, []);
+  const save = async () => {
+    const x = await api("/api/approval-rules", { method: "PUT", body: { allow: allow.split("\n"), block: block.split("\n") } });
+    setR(x); setAllow(x.allow.join("\n")); setBlock(x.block.join("\n"));
+    toast("Approval rules saved");
+  };
+  if (!r) return <div className="panel"><h2>Approvals</h2></div>;
+  return (
+    <div className="panel">
+      <h2>Approvals</h2>
+      <p className="muted" style={{ margin: 0 }}>
+        Rules for the <b>Command Line</b> tool. One command per line; <code>*</code> matches anything, and capitals don't matter.
+        A pattern with <code>*</code> never covers commands that chain or redirect (<code>&amp; | ; &gt;</code>), so <code>npm test*</code> can't sneak in <code>npm test &amp;&amp; del *</code>.
+        In a chat, <b>More → Always allow</b> on an approval adds a line here.
+      </p>
+      <label className="field">
+        <span className="label">Always allowed (run without asking, also in schedules)</span>
+        <textarea className="textarea code" rows={7} value={allow} onChange={(e) => setAllow(e.target.value)} placeholder={"git status\nnpm test*"} aria-label="Allowed commands" />
+      </label>
+      <label className="field">
+        <span className="label">Always blocked (never run, even with approval switched off)</span>
+        <textarea className="textarea code" rows={7} value={block} onChange={(e) => setBlock(e.target.value)} placeholder="*shutdown*" aria-label="Blocked commands" />
+      </label>
+      <div className="row" style={{ flexWrap: "wrap" }}>
+        <button className="btn primary" onClick={save}>Save rules</button>
+        <button className="btn ghost" onClick={() => { setAllow(r.default_allow.join("\n")); setBlock(r.default_block.join("\n")); }}>Reset to defaults</button>
+      </div>
+      <p className="help" style={{ margin: 0 }}>File changes are covered separately: each reply that changed files has an <b>Undo</b> button in the chat.</p>
+    </div>
+  );
+}
+
 function Schedules() {
   return (
     <div className="panel">
@@ -278,10 +316,11 @@ export default function Settings() {
             <NavLink to="/settings/keys" className={() => `side-item ${tab === "keys" ? "active" : ""}`}><KeyRound size={15} /> API keys</NavLink>
             <NavLink to="/settings/memory" className={() => `side-item ${tab === "memory" ? "active" : ""}`}><Brain size={15} /> Memory</NavLink>
             <NavLink to="/settings/schedules" className={() => `side-item ${tab === "schedules" ? "active" : ""}`}><CalendarClock size={15} /> Schedules</NavLink>
+            <NavLink to="/settings/approvals" className={() => `side-item ${tab === "approvals" ? "active" : ""}`}><ShieldCheck size={15} /> Approvals</NavLink>
             <NavLink to="/settings/account" className={() => `side-item ${tab === "account" ? "active" : ""}`}><UserRound size={15} /> Account</NavLink>
           </div>
         </aside>
-        <section>{tab === "variables" ? <Variables /> : tab === "keys" ? <ApiKeys /> : tab === "account" ? <Account /> : tab === "memory" ? <Memory /> : tab === "schedules" ? <Schedules /> : <Models />}</section>
+        <section>{tab === "variables" ? <Variables /> : tab === "keys" ? <ApiKeys /> : tab === "account" ? <Account /> : tab === "memory" ? <Memory /> : tab === "schedules" ? <Schedules /> : tab === "approvals" ? <Approvals /> : <Models />}</section>
       </div>
     </div>
   );
